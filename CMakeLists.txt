@@ -19,3 +19,7 @@ add_subdirectory("ThirdParty/spdlog")
 add_subdirectory("OpenGLProject")
 
 set(VS_STARTUP_PROJECT OpenGLProject)
+
+set_target_properties(OpenGLProject PROPERTIES
+        VS_DEBUGGER_WORKING_DIRECTORY "$<TARGET_FILE_DIR:OpenGLProject>"
+)
