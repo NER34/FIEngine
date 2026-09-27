@@ -11,11 +11,11 @@ endif()
 
 project ("OpenGLProject")
 
-set(VS_STARTUP_PROJECT OpenGLProject)
-
 # Include sub-projects.
 add_subdirectory("ThirdParty/glfw")
 add_subdirectory("ThirdParty/glad")
 add_subdirectory("ThirdParty/glm")
 add_subdirectory("ThirdParty/spdlog")
 add_subdirectory("OpenGLProject")
+
+set(VS_STARTUP_PROJECT OpenGLProject)

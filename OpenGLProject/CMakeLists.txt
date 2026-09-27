@@ -5,7 +5,7 @@
 # Yes, I know that it's not recommended. For now, I don't care. It's a problem of a future me
 file(GLOB_RECURSE files CONFIGURE_DEPENDS 
 		"*.cpp" 
-		"*.h", 
+		"*.h" 
 		"*.vert"
 		"*.frag"
 )
