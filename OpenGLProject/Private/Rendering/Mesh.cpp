@@ -52,7 +52,7 @@ void Mesh::draw() const
             );
         //CHECK_OGL_ERR("Mesh glDrawElements")
         
-        glBindVertexArray(0);
+        //glBindVertexArray(0);
         //CHECK_OGL_ERR("Mesh glBindVertexArray")
     }
 }
@@ -78,7 +78,7 @@ void Mesh::setupBuffers(const MeshDesc& desc)
     CHECK_OGL_ERR("Mesh glBindBuffer GL_ARRAY_BUFFER")
     glBufferData(
         GL_ARRAY_BUFFER, 
-        static_cast<GLsizei>(desc.m_vertices.size()), 
+        static_cast<GLsizei>(desc.m_vertices.size() * sizeof(GLfloat)), 
         desc.m_vertices.data(), 
         GL_STATIC_DRAW
         );
@@ -93,7 +93,7 @@ void Mesh::setupBuffers(const MeshDesc& desc)
     CHECK_OGL_ERR("Mesh glBindBuffer GL_ELEMENT_ARRAY_BUFFER")
     glBufferData(
         GL_ELEMENT_ARRAY_BUFFER,         
-        static_cast<GLsizei>(desc.m_indices.size()), 
+        static_cast<GLsizei>(desc.m_indices.size() * sizeof(GLuint)), 
         desc.m_indices.data(), 
         GL_STATIC_DRAW
         );
