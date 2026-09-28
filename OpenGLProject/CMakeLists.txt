@@ -27,6 +27,7 @@ target_link_libraries(OpenGLProject
 		glad
 		glm
 		spdlog
+		stb
 )
 
 add_custom_command(
