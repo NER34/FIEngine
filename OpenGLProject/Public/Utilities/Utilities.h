@@ -4,6 +4,7 @@
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include "glm/gtx/euler_angles.hpp"
+#include "glm/gtx/rotate_vector.hpp"
 
 inline std::filesystem::path getWorkingDirectoryPath()
 {
@@ -13,6 +14,14 @@ inline std::filesystem::path getWorkingDirectoryPath()
 inline std::filesystem::path getResourcesPath()
 {
     return getWorkingDirectoryPath() / "Resources";
+}
+
+inline glm::vec3 rotateVector(glm::vec3 vector, glm::vec3 eulerRot)
+{
+    vector = glm::rotateX(vector, glm::radians(eulerRot.x));
+    vector = glm::rotateY(vector, glm::radians(eulerRot.y));
+    vector = glm::rotateZ(vector, glm::radians(eulerRot.z));
+    return vector;
 }
 
 struct Transform
@@ -32,6 +41,21 @@ struct Transform
             );
         modelMatrix = glm::scale(modelMatrix, m_scale);
         return modelMatrix;
+    }
+    
+    glm::vec3 getForwardVector() const
+    {
+        return rotateVector(glm::vec3(1.0f, 0.0f, 0.0f), m_rotation);
+    }
+    
+    glm::vec3 getRightVector() const
+    {
+        return rotateVector(glm::vec3(0.0f, 1.0f, 0.0f), m_rotation);
+    }
+    
+    glm::vec3 getUpVector() const
+    {
+        return rotateVector(glm::vec3(0.0f, 0.0f, 1.0f), m_rotation);
     }
 };
 

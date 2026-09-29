@@ -8,6 +8,7 @@
 
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
+#include "Rendering/Camera.h"
 
 #include "Rendering/Material.h"
 #include "Rendering/Mesh.h"
@@ -75,6 +76,11 @@ int main()
 		meshDesc.m_vertices.assign(vertices, vertices + sizeof(vertices) / sizeof(GLfloat));
 		meshDesc.m_indices.assign(indices, indices + sizeof(indices) / sizeof(GLuint));
 		Mesh mesh(meshDesc);
+		
+		CameraDesc cameraDesc;
+		Camera camera(cameraDesc);
+		camera.setPosition({ 1.0f, 0.0f, 0.0f });
+		camera.setRotation({ 0.0f, 0.0f, 180.0f });
 	
 		glViewport(0, 0, 640, 480);
 	
@@ -96,7 +102,7 @@ int main()
 			globalVal += deltaTime;
 			
 			auto rotation = mesh.getRotation();
-			rotation.x = 10*globalVal;
+			rotation.x = 10 * globalVal;
 			mesh.setRotation(rotation);
 			
 			//auto scale = mesh.getScale();
@@ -109,6 +115,7 @@ int main()
 			
 			material.activate();
 			
+			/*
 			glm::mat4 projectionMat = glm::perspective(glm::radians(90.0f), 640.0f/ 480.0f, 0.1f, 100.0f );
 			float xPos = 1;
 			glm::mat4 viewMat = glm::lookAt(
@@ -116,9 +123,13 @@ int main()
 				toOGLCoordSys(glm::vec3(xPos-1.0f, 0.0f, 0.0f)), 
 				toOGLCoordSys(glm::vec3(0.0f, 0.0f, 1.0f))
 				);
-			const glm::mat4& modelMat = mesh.getTransform().getModelMatrix();
+				*/
 			
-			material.setUniform("mvp", projectionMat * viewMat * toLeftHandTransformMat  * modelMat);
+			glm::mat4 projMat = camera.getProjectionMatrix();
+			glm::mat4 viewMat = camera.getViewMatrix();
+			glm::mat4 modelMat = mesh.getTransform().getModelMatrix();
+			
+			material.setUniform("mvp", projMat * viewMat * toLeftHandTransformMat  * modelMat);
 
 			mesh.draw();	
 			material.deactivate();
