@@ -95,17 +95,17 @@ int main()
 		
 			globalVal += deltaTime;
 			
-			//auto rotation = mesh.getRotation();
-			//rotation.z = 10*globalVal;
-			//mesh.setRotation(rotation);
+			auto rotation = mesh.getRotation();
+			rotation.x = 10*globalVal;
+			mesh.setRotation(rotation);
 			
 			//auto scale = mesh.getScale();
 			//scale = glm::vec3(1.0f) * (sin(globalVal) / 2.0f + 1.0f);
 			//mesh.setScale(scale);
 			
-			//auto position = mesh.getPosition();
-			//position.z = sin(globalVal) / 2.0f;
-			//mesh.setPosition(position);
+			auto position = mesh.getPosition();
+			position.z = sin(globalVal) / 2.0f;
+			mesh.setPosition(position);
 			
 			material.activate();
 			
@@ -116,14 +116,10 @@ int main()
 				toOGLCoordSys(glm::vec3(xPos-1.0f, 0.0f, 0.0f)), 
 				toOGLCoordSys(glm::vec3(0.0f, 0.0f, 1.0f))
 				);
-			const glm::mat4& modelMat = mesh.getModelMatrix();
+			const glm::mat4& modelMat = mesh.getTransform().getModelMatrix();
 			
-			material.setUniform("mvp", projectionMat * viewMat * modelMat);
-			/*
-			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, texture);
-			*/
-			
+			material.setUniform("mvp", projectionMat * viewMat * toLeftHandTransformMat  * modelMat);
+
 			mesh.draw();	
 			material.deactivate();
 

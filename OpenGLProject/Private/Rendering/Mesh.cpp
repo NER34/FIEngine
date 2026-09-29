@@ -1,8 +1,5 @@
 ﻿#include "Rendering/Mesh.h"
 
-#define GLM_ENABLE_EXPERIMENTAL
-#include "glm/gtx/euler_angles.hpp"
-
 #include "Rendering/Validation.h"
 #include "Utilities/Utilities.h"
 
@@ -68,61 +65,42 @@ void Mesh::draw() const
 
 const glm::vec3& Mesh::getPosition() const
 {
-    return m_position;
+    return m_transform.m_position;
 }
 
 const glm::vec3& Mesh::getRotation() const
 {
-    return m_rotation;
+    return m_transform.m_rotation;
 }
 
 const glm::vec3& Mesh::getScale() const
 {
-    return m_scale;
+    return m_transform.m_scale;
 }
 
-const glm::mat4& Mesh::getModelMatrix()
+const Transform& Mesh::getTransform() const
 {
-    m_modelMatrix = glm::mat4(1.0f);
-    m_modelMatrix = glm::translate(
-        m_modelMatrix, 
-        toOGLCoordSys(m_position)
-        );
-    glm::vec3 rotationOGL = toOGLCoordSys(m_rotation);
-    m_modelMatrix *= glm::eulerAngleZYX(
-        glm::radians(rotationOGL.z), 
-        glm::radians(rotationOGL.y), 
-        glm::radians(rotationOGL.x)
-        );
-    m_modelMatrix = glm::scale(
-        m_modelMatrix, 
-        toOGLCoordSys(m_scale)
-        );
-    
-    constexpr glm::mat4 toLeftHandTransformMat = {
-        {  0.0f, 0.0f, -1.0f, 0.0f },
-        {  1.0f, 0.0f,  0.0f, 0.0f },
-        {  0.0f, 1.0f,  0.0f, 0.0f },
-        {  0.0f, 0.0f,  0.0f, 1.0f },
-    };
-    m_modelMatrix *= toLeftHandTransformMat;
-    
-    return m_modelMatrix;
+    return m_transform;
 }
 
 void Mesh::setPosition(const glm::vec3& position)
 {
-    m_position = position;
+    m_transform.m_position = position;
 }
 
 void Mesh::setRotation(const glm::vec3& rotation)
 {
-    m_rotation = rotation;
+    m_transform.m_rotation = rotation;
 }
 
 void Mesh::setScale(const glm::vec3& scale)
 {
-    m_scale = scale;
+    m_transform.m_scale = scale;
+}
+
+void Mesh::setTransform(const Transform& transform)
+{
+    m_transform = transform;
 }
 
 bool Mesh::isValid() const

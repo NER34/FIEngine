@@ -2,6 +2,9 @@
 
 #include <filesystem>
 
+#define GLM_ENABLE_EXPERIMENTAL
+#include "glm/gtx/euler_angles.hpp"
+
 inline std::filesystem::path getWorkingDirectoryPath()
 {
     return std::filesystem::current_path();
@@ -12,14 +15,40 @@ inline std::filesystem::path getResourcesPath()
     return getWorkingDirectoryPath() / "Resources";
 }
 
-template <bool inverseZ = true>
-glm::vec3 toOGLCoordSys(glm::vec3 coords)
+struct Transform
 {
-    constexpr int mask = 0 - (int)inverseZ;
-    constexpr int multiplier = (-1 & mask) | (1 & ~mask);
-    return glm::vec3(
-        coords.y, 
-        coords.z, 
-        multiplier * coords.x
-        );
+    glm::vec3 m_position = glm::vec3(0.0f);
+    glm::vec3 m_rotation = glm::vec3(0.0f);
+    glm::vec3 m_scale = glm::vec3(1.0f);
+    
+    glm::mat4 getModelMatrix() const
+    {
+        glm::mat4 modelMatrix = glm::mat4(1.0f);
+        modelMatrix = glm::translate(modelMatrix, m_position);
+        modelMatrix *= glm::eulerAngleZYX(
+            glm::radians(m_rotation.z), 
+            glm::radians(m_rotation.y), 
+            glm::radians(m_rotation.x)
+            );
+        modelMatrix = glm::scale(modelMatrix, m_scale);
+        return modelMatrix;
+    }
+};
+
+inline glm::vec3 toOGLCoordSys(glm::vec3 coords)
+{
+    return glm::vec3(coords.y, coords.z, -coords.x);
 }
+
+constexpr glm::mat4 toLeftHandTransformMat = {
+    {  0.0f, 0.0f, -1.0f, 0.0f },
+    {  1.0f, 0.0f,  0.0f, 0.0f },
+    {  0.0f, 1.0f,  0.0f, 0.0f },
+    {  0.0f, 0.0f,  0.0f, 1.0f },
+};
+
+inline glm::mat4 toOGLCoordSys(const glm::mat4& mat)
+{
+    return toLeftHandTransformMat * mat;
+}
+
