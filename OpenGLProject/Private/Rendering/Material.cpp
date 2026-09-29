@@ -1,11 +1,17 @@
 ﻿#include "Rendering/Material.h"
 
+#include <ranges>
+
+#include "glm/mat4x4.hpp"
+
 #include "Rendering/Validation.h"
 
 Material::Material(const MaterialDesc& desc)
 {
     createShaders(desc);
     createShaderProgram(desc);
+    createTextures(desc);
+    setupTextureSamplers(desc);
 }
 
 Material::Material(Material&& other) noexcept
@@ -40,6 +46,8 @@ void Material::setup(const MaterialDesc& desc)
     destroyMaterial();
     createShaders(desc);
     createShaderProgram(desc);
+    createTextures(desc);
+    setupTextureSamplers(desc);
 }
 
 void Material::activate() const
@@ -47,12 +55,29 @@ void Material::activate() const
     if (isValid())
     {
         glUseProgram(m_shaderProgramID);
+        GLuint textureSlot = GL_TEXTURE0;
+        uint32_t textureIndex = 0;
+        for (; textureIndex < m_textures.size(); textureIndex++, textureSlot++)
+        {
+            glActiveTexture(textureSlot);
+            glBindTexture(GL_TEXTURE_2D, m_textures[textureIndex].getTextureID());
+        }
         //CHECK_OGL_ERR("Material glUseProgram")
     }
     else
     {
         LOG_ERROR("Failed activate material: m_shaderProgramID is invalid");
     }
+}
+
+void Material::deactivate() const
+{
+    glUseProgram(0);
+}
+
+GLuint Material::getShaderProgramID() const
+{
+    return m_shaderProgramID;
 }
 
 bool Material::isValid() const
@@ -99,4 +124,29 @@ void Material::createShaders(const MaterialDesc& desc)
         desc.m_shadersDesc.begin(), 
         desc.m_shadersDesc.end()
         );
+}
+
+void Material::createTextures(const MaterialDesc& desc)
+{
+    auto getTextureDesc = [](const TextureSamplerDesc& desc) { return desc.m_textureDesc; };
+    auto texturesDesc = desc.m_texturesDesc | std::views::transform(getTextureDesc);
+    m_textures.insert(
+        m_textures.begin(),
+        texturesDesc.begin(),
+        texturesDesc.end()
+        );
+}
+
+void Material::setupTextureSamplers(const MaterialDesc& desc)
+{
+    glUseProgram(m_shaderProgramID);
+    
+    for (uint32_t i = 0; i < desc.m_texturesDesc.size(); i++)
+    {
+        const auto& samplerName = desc.m_texturesDesc[i].m_name;
+        GLint uniformLoc = glGetUniformLocation(m_shaderProgramID, samplerName.c_str());
+        glUniform1i(uniformLoc, i);
+    }
+    
+    glUseProgram(0);
 }

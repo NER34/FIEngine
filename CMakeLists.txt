@@ -17,6 +17,7 @@ add_subdirectory("ThirdParty/glad")
 add_subdirectory("ThirdParty/glm")
 add_subdirectory("ThirdParty/spdlog")
 add_subdirectory("ThirdParty/stb")
+add_subdirectory("ThirdParty/assimp")
 add_subdirectory("OpenGLProject")
 
 set(VS_STARTUP_PROJECT OpenGLProject)

@@ -10,3 +10,7 @@
 	path = ThirdParty/spdlog
 	url = https://github.com/gabime/spdlog.git
 	branch = v1.x
+[submodule "ThirdParty/assimp"]
+	path = ThirdParty/assimp
+	url = https://github.com/assimp/assimp.git
+	branch = master

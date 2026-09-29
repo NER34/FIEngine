@@ -1,6 +1,10 @@
 ﻿#include "Rendering/Mesh.h"
 
+#define GLM_ENABLE_EXPERIMENTAL
+#include "glm/gtx/euler_angles.hpp"
+
 #include "Rendering/Validation.h"
+#include "Utilities/Utilities.h"
 
 Mesh::Mesh(const MeshDesc& desc)
     : m_numIndices(static_cast<uint32_t>(desc.m_indices.size()))
@@ -10,6 +14,11 @@ Mesh::Mesh(const MeshDesc& desc)
 
 Mesh::Mesh(Mesh&& other) noexcept
 {
+    m_VAO = other.m_VAO;
+    m_VBO = other.m_VBO;
+    m_EBO = other.m_EBO;
+        
+    other.m_VAO = other.m_VBO = other.m_EBO = 0;
 }
 
 Mesh& Mesh::operator=(Mesh&& other) noexcept
@@ -52,9 +61,68 @@ void Mesh::draw() const
             );
         //CHECK_OGL_ERR("Mesh glDrawElements")
         
-        //glBindVertexArray(0);
+        glBindVertexArray(0);
         //CHECK_OGL_ERR("Mesh glBindVertexArray")
     }
+}
+
+const glm::vec3& Mesh::getPosition() const
+{
+    return m_position;
+}
+
+const glm::vec3& Mesh::getRotation() const
+{
+    return m_rotation;
+}
+
+const glm::vec3& Mesh::getScale() const
+{
+    return m_scale;
+}
+
+const glm::mat4& Mesh::getModelMatrix()
+{
+    m_modelMatrix = glm::mat4(1.0f);
+    m_modelMatrix = glm::translate(
+        m_modelMatrix, 
+        toOGLCoordSys(m_position)
+        );
+    glm::vec3 rotationOGL = toOGLCoordSys(m_rotation);
+    m_modelMatrix *= glm::eulerAngleZYX(
+        glm::radians(rotationOGL.z), 
+        glm::radians(rotationOGL.y), 
+        glm::radians(rotationOGL.x)
+        );
+    m_modelMatrix = glm::scale(
+        m_modelMatrix, 
+        toOGLCoordSys(m_scale)
+        );
+    
+    constexpr glm::mat4 toLeftHandTransformMat = {
+        {  0.0f, 0.0f, -1.0f, 0.0f },
+        {  1.0f, 0.0f,  0.0f, 0.0f },
+        {  0.0f, 1.0f,  0.0f, 0.0f },
+        {  0.0f, 0.0f,  0.0f, 1.0f },
+    };
+    m_modelMatrix *= toLeftHandTransformMat;
+    
+    return m_modelMatrix;
+}
+
+void Mesh::setPosition(const glm::vec3& position)
+{
+    m_position = position;
+}
+
+void Mesh::setRotation(const glm::vec3& rotation)
+{
+    m_rotation = rotation;
+}
+
+void Mesh::setScale(const glm::vec3& scale)
+{
+    m_scale = scale;
 }
 
 bool Mesh::isValid() const
@@ -84,10 +152,15 @@ void Mesh::setupBuffers(const MeshDesc& desc)
         );
     CHECK_OGL_ERR("Mesh glBufferData GL_ARRAY_BUFFER")
 	
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-    CHECK_OGL_ERR("Mesh glVertexAttribPointer")
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+    CHECK_OGL_ERR("Mesh glVertexAttribPointer: Position")	
     glEnableVertexAttribArray(0);
-    CHECK_OGL_ERR("Mesh glEnableVertexAttribArray")
+    CHECK_OGL_ERR("Mesh glEnableVertexAttribArray: Position")
+    
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+    CHECK_OGL_ERR("Mesh glVertexAttribPointer: UV")
+    glEnableVertexAttribArray(1);
+    CHECK_OGL_ERR("Mesh glEnableVertexAttribArray: UV")
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
     CHECK_OGL_ERR("Mesh glBindBuffer GL_ELEMENT_ARRAY_BUFFER")

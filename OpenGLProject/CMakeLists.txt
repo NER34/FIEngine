@@ -28,13 +28,14 @@ target_link_libraries(OpenGLProject
 		glm
 		spdlog
 		stb
+		assimp
 )
 
 add_custom_command(
 	TARGET OpenGLProject POST_BUILD
 	COMMAND ${CMAKE_COMMAND} -E copy_directory
-		"${CMAKE_CURRENT_SOURCE_DIR}/Shaders"
-		"$<TARGET_FILE_DIR:OpenGLProject>/Shaders"
+		"${CMAKE_CURRENT_SOURCE_DIR}/Resources"
+		"$<TARGET_FILE_DIR:OpenGLProject>/Resources"
 )
 
 # Debug enable/disable variable
