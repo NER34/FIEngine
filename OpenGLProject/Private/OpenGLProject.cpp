@@ -114,17 +114,7 @@ int main()
 			mesh.setPosition(position);
 			
 			material.activate();
-			
-			/*
-			glm::mat4 projectionMat = glm::perspective(glm::radians(90.0f), 640.0f/ 480.0f, 0.1f, 100.0f );
-			float xPos = 1;
-			glm::mat4 viewMat = glm::lookAt(
-				toOGLCoordSys(glm::vec3(xPos, 0.0f, 0.0f)), 
-				toOGLCoordSys(glm::vec3(xPos-1.0f, 0.0f, 0.0f)), 
-				toOGLCoordSys(glm::vec3(0.0f, 0.0f, 1.0f))
-				);
-				*/
-			
+
 			glm::mat4 projMat = camera.getProjectionMatrix();
 			glm::mat4 viewMat = camera.getViewMatrix();
 			glm::mat4 modelMat = mesh.getTransform().getModelMatrix();
