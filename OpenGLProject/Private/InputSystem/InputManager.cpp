@@ -4,10 +4,10 @@
 
 namespace FIE
 {
-	IInputManager* IInputManager::Get()
+	IInputManager& IInputManager::Get()
 	{
 		static InputManager instance;
-		return &instance;
+		return instance;
 	}
 
 	void InputManager::update()

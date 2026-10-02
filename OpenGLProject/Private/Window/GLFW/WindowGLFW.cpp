@@ -24,7 +24,13 @@ namespace FIE
 				LOG_ERROR("Failed to initialize GLFW.");
 				return false;
 			}
-			LOG_ERROR("GLFW Initialized");
+			// Define OpenGL version
+			glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+			glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+			// Tell GLFW that we are using CORE profile
+			// So that means we only have the modern function
+			glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+			LOG_INFO("GLFW Initialized");
 		}
 		return true;
 	}
@@ -94,6 +100,11 @@ namespace FIE
 		}
 	}
 
+	bool WindowGLFW::isWindowShouldClose() const
+	{
+		return glfwWindowShouldClose(m_window);
+	}
+
 	void WindowGLFW::setWindowSize(uint32_t width, uint32_t height)
 	{
 		//TODO: Set window width manually
@@ -104,6 +115,12 @@ namespace FIE
 	{
 		// TODO: Set window full screen mode
 		IWindow::setWindowFullScreen(fullScreen);
+	}
+
+	void WindowGLFW::requestWindowClose()
+	{
+		glfwSetWindowShouldClose(m_window, 1);
+		IWindow::requestWindowClose();
 	}
 
 	GLFWwindow* WindowGLFW::getGLFWWindow() const

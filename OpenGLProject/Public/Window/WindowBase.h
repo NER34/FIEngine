@@ -35,6 +35,7 @@ namespace FIE
 
 		virtual void setWindowSize(uint32_t width, uint32_t height);
 		virtual void setWindowFullScreen(bool fullScreen);
+		virtual bool isWindowShouldClose() const = 0;
 
 		const WindowDesc& getWindowDesc() const;
 

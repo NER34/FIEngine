@@ -14,7 +14,7 @@ namespace FIE
 		auto it = m_props.m_inputHandles.find(inputEvent.m_inputID);
 		if (it != m_props.m_inputHandles.end())
 		{
-			(*it).second.Broadcast(inputEvent.m_inputValue);
+			(*it).second.Broadcast(inputEvent.m_inputID, inputEvent.m_inputValue);
 		}
 	}
 

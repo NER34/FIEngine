@@ -162,50 +162,56 @@ namespace FIE
 
 	void InputAdapterGLFW::OnKeyboardInput(GLFWwindow* window, int key, int scancode, int action, int mods)
 	{
-		IInputManager* inputManager = IInputManager::Get();
+		IInputManager& inputManager = IInputManager::Get();
 		auto it = keyboardMapping.find(key);
 		if (it != keyboardMapping.end())
 		{
 			if (action == GLFW_PRESS)
 			{
-				inputManager->updateInput({it->second, 1.0});
+				inputManager.updateInput({it->second, 1.0});
 			}
 			else if (action == GLFW_RELEASE)
 			{
-				inputManager->updateInput({it->second, 0.0f});
+				inputManager.updateInput({it->second, 0.0f});
 			}
 		}
 	}
 
 	void InputAdapterGLFW::OnMouseMove(GLFWwindow* window, double xpos, double ypos)
 	{
-		IInputManager* inputManager = IInputManager::Get();
-		inputManager->updateInput({MOUSE_MOVE_X, (float)xpos});
-		inputManager->updateInput({MOUSE_MOVE_Y, (float)ypos});
+		static double prevPosX = xpos;
+		static double prevPosY = ypos;
+		IInputManager& inputManager = IInputManager::Get();
+		inputManager.updateInput({MOUSE_POS_X, (float)xpos});
+		inputManager.updateInput({MOUSE_POS_Y, (float)ypos});
+		inputManager.updateInput({MOUSE_MOVE_X, (float)(xpos - prevPosX)});
+		inputManager.updateInput({MOUSE_MOVE_Y, (float)(ypos - prevPosY)});
+		prevPosX = xpos;
+		prevPosY = ypos;
 	}
 
 	void InputAdapterGLFW::OnMouseInput(GLFWwindow* window, int button, int action, int mods)
 	{
-		IInputManager* inputManager = IInputManager::Get();
+		IInputManager& inputManager = IInputManager::Get();
 		auto it = mouseButtonMapping.find(button);
 		if (it != mouseButtonMapping.end())
 		{
 			if (action == GLFW_PRESS)
 			{
-				inputManager->updateInput({it->second, 1.0f});
+				inputManager.updateInput({it->second, 1.0f});
 			}
 			else if (action == GLFW_RELEASE)
 			{
-				inputManager->updateInput({it->second, 0.0f});
+				inputManager.updateInput({it->second, 0.0f});
 			}
 		}
 	}
 
 	void InputAdapterGLFW::OnScrollInput(GLFWwindow* window, double xoffset, double yoffset)
 	{
-		IInputManager* inputManager = IInputManager::Get();
-		inputManager->updateInput({SCROLL_X, (float)xoffset});
-		inputManager->updateInput({SCROLL_Y, (float)yoffset});
+		IInputManager& inputManager = IInputManager::Get();
+		inputManager.updateInput({SCROLL_X, (float)xoffset});
+		inputManager.updateInput({SCROLL_Y, (float)yoffset});
 	}
 
 }

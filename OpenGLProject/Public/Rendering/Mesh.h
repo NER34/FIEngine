@@ -3,7 +3,6 @@
 #include "glad/glad.h"
 #include "glm/glm.hpp"
 
-#include "Material.h"
 #include "Utilities/Utilities.h"
 
 struct MeshDesc
@@ -30,16 +29,6 @@ public:
     void setup(const MeshDesc& desc);
     void draw() const;
     
-    const glm::vec3& getPosition() const;
-    const glm::vec3& getRotation() const;
-    const glm::vec3& getScale() const;
-    const Transform& getTransform() const;
-    
-    void setPosition(const glm::vec3& position);
-    void setRotation(const glm::vec3& rotation);
-    void setScale(const glm::vec3& scale);
-    void setTransform(const Transform& transform);
-    
     bool isValid() const;
 
 protected:
@@ -57,4 +46,19 @@ private:
     
     Transform m_transform;
     
+};
+
+struct MeshSpawnData
+{
+    MeshSpawnData() = delete;
+    MeshSpawnData(const MeshSpawnData& other)
+        : m_mesh(other.m_mesh)
+        , m_transform(other.m_transform)
+    {}
+    MeshSpawnData(Mesh& mesh)
+        : m_mesh(mesh)
+    {}
+    
+    Mesh& m_mesh;
+    Transform m_transform;
 };

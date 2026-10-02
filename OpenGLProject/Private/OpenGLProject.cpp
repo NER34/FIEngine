@@ -3,20 +3,27 @@
 
 #include "OpenGLProject.h"
 
-#include <iostream>
 #include <filesystem>
+#include <algorithm>
 
 #include "glad/glad.h"
-#include "GLFW/glfw3.h"
-#include "Rendering/Camera.h"
 
+#include "InputSystem/InputContext.h"
+#include "InputSystem/InputManager.h"
+#include "Rendering/Camera.h"
 #include "Rendering/Material.h"
 #include "Rendering/Mesh.h"
 #include "Utilities/Logger.h"
 #include "Utilities/Utilities.h"
+#include "Window/GLFW/WindowGLFW.h"
 
 const char* vertShaderPath = "Shaders/VertexShader.vert";
 const char* fragShaderPath = "Shaders/FragmentShader.frag";
+
+void temp(float a, float b)
+{
+	std::cout << a << " " << b << std::endl;
+}
 
 int main()
 {
@@ -33,27 +40,69 @@ int main()
 		2, 3, 1
 	};
 	
+	FIE::WindowDesc windowDesc;
+	windowDesc.m_title = "OpenGL Project";
+	FIE::WindowGLFW window(windowDesc);
 	
+	CameraDesc cameraDesc;
+	cameraDesc.m_aspectRatio = (float)window.getWindowDesc().m_width / (float)window.getWindowDesc().m_height;
+		
+	Camera camera(cameraDesc);
+	camera.setPosition({ 1.0f, 0.0f, 0.0f });
+	camera.setRotation({ 0.0f, 0.0f, 180.0f });
 	
-	glfwInit();
+	FIE::IInputManager& inputManager = FIE::IInputManager::Get();
+	FIE::InputContext inputContext;
+	inputManager.setInputContext(&inputContext);
 	
-	// Define OpenGL version
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	// Tell GLFW that we are using CORE profile
-	// So that means we only have the modern function
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	
-	// Create window
-	GLFWwindow* window = glfwCreateWindow(640, 480, "OpenGL Project", NULL, NULL);
-	if (window == NULL)
+	float cameraMovSpeed = 1.0f;
+	struct CameraMovDir
 	{
-		std::cout << "Failed to create GLFW window." << std::endl;
-		glfwTerminate();
-		return -1;
+		int m_forwardMult = 0;
+		int m_rightMult = 0;
+		int m_upMult = 0;
+	} cameraMovDir;
+	
+#define CHANGE_CAMERA_POS(dir, multi) \
+	[&cameraMovDir](FIE::InputIDs inputID, float inputValue) \
+	{ \
+		if (inputValue > 0.5f) \
+		{ \
+			cameraMovDir.dir += multi; \
+		} \
+		else \
+		{ \
+			cameraMovDir.dir -= multi; \
+		} \
 	}
-	// Set created window into current context
-	glfwMakeContextCurrent(window);
+	
+	inputContext.assignHandle(FIE::KEY_W, CHANGE_CAMERA_POS(m_forwardMult, 1));
+	inputContext.assignHandle(FIE::KEY_S, CHANGE_CAMERA_POS(m_forwardMult, -1));
+	inputContext.assignHandle(FIE::KEY_D, CHANGE_CAMERA_POS(m_rightMult, 1));
+	inputContext.assignHandle(FIE::KEY_A, CHANGE_CAMERA_POS(m_rightMult, -1));
+	inputContext.assignHandle(FIE::KEY_E, CHANGE_CAMERA_POS(m_upMult, 1));
+	inputContext.assignHandle(FIE::KEY_Q, CHANGE_CAMERA_POS(m_upMult, -1));
+
+	float cameraRotSpeed = 1.0f;
+	struct CameraRot
+	{
+		float m_pitch = 0;
+		float m_yaw = 0;
+	} cameraRot;
+
+#define CHANGE_CAMERA_ROT(axis) \
+	[&cameraRot, cameraRotSpeed](FIE::InputIDs inputID, float inputValue) \
+	{ \
+		cameraRot.axis += inputValue * cameraRotSpeed; \
+	}
+	
+	inputContext.assignHandle(FIE::MOUSE_MOVE_X, CHANGE_CAMERA_ROT(m_yaw));
+	inputContext.assignHandle(FIE::MOUSE_MOVE_Y, CHANGE_CAMERA_ROT(m_pitch));
+	
+	inputContext.assignHandle(FIE::KEY_ESCAPE, [&window](FIE::InputIDs, float)
+	{
+		window.requestWindowClose();
+	});
 	
 	// Load GLAD and init OpenGL
 	gladLoadGL();
@@ -77,58 +126,70 @@ int main()
 		meshDesc.m_indices.assign(indices, indices + sizeof(indices) / sizeof(GLuint));
 		Mesh mesh(meshDesc);
 		
-		CameraDesc cameraDesc;
-		Camera camera(cameraDesc);
-		camera.setPosition({ 1.0f, 0.0f, 0.0f });
-		camera.setRotation({ 0.0f, 0.0f, 180.0f });
+		MeshSpawnData meshSpawnData(mesh);
+		meshSpawnData.m_transform.m_position = glm::vec3(2.0f, 0.0f, 0.0f);
+		meshSpawnData.m_transform.m_rotation = glm::vec3(0.0f, 0.0f, 180.0f);
 	
-		glViewport(0, 0, 640, 480);
+		glViewport(
+			0, 0,
+			(GLsizei)window.getWindowDesc().m_width,
+			(GLsizei)window.getWindowDesc().m_height
+			);
 	
 		auto prevTime = std::chrono::high_resolution_clock::now();
 		auto currTime = std::chrono::high_resolution_clock::now();
 		
 		float globalVal = 0.0f;
 		
-		//mesh.setRotation({45, 45, 45});
-		while (!glfwWindowShouldClose(window))
+		while (!window.isWindowShouldClose())
 		{
 			prevTime = currTime;
 			currTime = std::chrono::high_resolution_clock::now();
 			float deltaTime = std::chrono::duration<float>(currTime - prevTime).count();
 			
 			glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
-			glClear(GL_COLOR_BUFFER_BIT);
-		
-			globalVal += deltaTime;
+			glClear(GL_COLOR_BUFFER_BIT);\
 			
-			auto rotation = mesh.getRotation();
-			rotation.x = 10 * globalVal;
-			mesh.setRotation(rotation);
+			inputManager.update();
 			
-			//auto scale = mesh.getScale();
-			//scale = glm::vec3(1.0f) * (sin(globalVal) / 2.0f + 1.0f);
-			//mesh.setScale(scale);
+			auto cameraPos = camera.getPosition();
+			auto cameraForward =  camera.getTransform().getForwardVector();
+			auto cameraRight = camera.getTransform().getRightVector();
+			cameraPos += cameraForward * cameraMovSpeed * deltaTime * (float)cameraMovDir.m_forwardMult;
+			cameraPos += cameraRight * cameraMovSpeed * deltaTime * (float)cameraMovDir.m_rightMult;
+			cameraPos += glm::vec3(0.0f, 0.0f, 1.0f) * cameraMovSpeed * deltaTime * (float)cameraMovDir.m_upMult;
+			camera.setPosition(cameraPos);
 			
-			auto position = mesh.getPosition();
-			position.z = sin(globalVal) / 2.0f;
-			mesh.setPosition(position);
+			cameraRot.m_pitch = std::clamp(cameraRot.m_pitch, -89.0f, 89.0f);
+			camera.setRotation({ 0.0f, cameraRot.m_pitch, cameraRot.m_yaw });
+			
+			{
+				globalVal += deltaTime;
+			
+				auto& rotation = meshSpawnData.m_transform.m_rotation;
+				rotation.x = 10 * globalVal;
+			
+				//auto& scale = meshSpawnData.m_transform.m_scale;
+				//scale = glm::vec3(1.0f) * (sin(globalVal) / 2.0f + 1.0f);
+			
+				//auto& position = meshSpawnData.m_transform.m_position;
+				//position.z = sin(globalVal) / 2.0f;
+			}
 			
 			material.activate();
 
 			glm::mat4 projMat = camera.getProjectionMatrix();
 			glm::mat4 viewMat = camera.getViewMatrix();
-			glm::mat4 modelMat = mesh.getTransform().getModelMatrix();
+			glm::mat4 modelMat = meshSpawnData.m_transform.getModelMatrix();
 			
 			material.setUniform("mvp", projMat * viewMat * toLeftHandTransformMat  * modelMat);
 
-			mesh.draw();	
+			meshSpawnData.m_mesh.draw();	
 			material.deactivate();
 
-			glfwSwapBuffers(window);
-			glfwPollEvents();
+			window.update();
 		}
 	}
-	glfwDestroyWindow(window);
-	glfwTerminate();
+	
 	return 0;
 }

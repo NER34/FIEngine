@@ -18,7 +18,7 @@ namespace FIE
 		
 		virtual ~IInputManager() = default;
 
-		static IInputManager* Get();
+		static IInputManager& Get();
 
 		virtual void update() = 0;
 		virtual void setInputContext(InputContext* newInputContext) = 0;

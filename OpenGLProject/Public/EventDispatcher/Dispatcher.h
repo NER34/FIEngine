@@ -243,7 +243,7 @@ namespace FIE
 
 		bool IsBound(DispatcherHandle handle) const
 		{
-			return m_events.find() != m_events.end();
+			return m_events.find((uint64_t)handle) != m_events.end();
 		}
 
 		bool IsAnyBound() const

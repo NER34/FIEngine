@@ -1,4 +1,5 @@
 #pragma once
+#include <functional>
 
 namespace FIE
 {
@@ -42,7 +43,7 @@ namespace FIE
 
 		virtual void Execute(Ts... args) override
 		{
-			(*funcPtr)(args...);
+			funcPtr(args...);
 		}
 
 	private:

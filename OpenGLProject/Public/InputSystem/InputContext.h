@@ -9,7 +9,7 @@
 
 namespace FIE
 {
-	DECLARE_MULTI_DISPATCHER(InputHandle, InputValue)
+	DECLARE_MULTI_DISPATCHER(InputHandle, InputIDs, InputValue)
 	struct InputContextDesc
 	{
 		std::unordered_map<InputIDs, InputHandle> m_inputHandles;
@@ -20,10 +20,9 @@ namespace FIE
 
 	class InputContext
 	{
-		
-		using InputWeekHandle = SingleDispatcher<InputValue>;
 	
 	public:
+		using InputWeekHandle = SingleDispatcher<InputIDs, InputValue>;
 
 		InputContext() = default;
 

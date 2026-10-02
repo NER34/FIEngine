@@ -26,9 +26,13 @@ namespace FIE
 
 		void initialize();
 		void update() override;
+		
+		bool isWindowShouldClose() const override;
 
 		void setWindowSize(uint32_t width, uint32_t height) override;
 		void setWindowFullScreen(bool fullScreen) override;
+		void requestWindowClose() override;
+		
 		
 		GLFWwindow* getGLFWWindow() const;
 

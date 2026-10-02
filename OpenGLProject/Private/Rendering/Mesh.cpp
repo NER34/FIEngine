@@ -69,46 +69,6 @@ void Mesh::draw() const
     }
 }
 
-const glm::vec3& Mesh::getPosition() const
-{
-    return m_transform.m_position;
-}
-
-const glm::vec3& Mesh::getRotation() const
-{
-    return m_transform.m_rotation;
-}
-
-const glm::vec3& Mesh::getScale() const
-{
-    return m_transform.m_scale;
-}
-
-const Transform& Mesh::getTransform() const
-{
-    return m_transform;
-}
-
-void Mesh::setPosition(const glm::vec3& position)
-{
-    m_transform.m_position = position;
-}
-
-void Mesh::setRotation(const glm::vec3& rotation)
-{
-    m_transform.m_rotation = rotation;
-}
-
-void Mesh::setScale(const glm::vec3& scale)
-{
-    m_transform.m_scale = scale;
-}
-
-void Mesh::setTransform(const Transform& transform)
-{
-    m_transform = transform;
-}
-
 bool Mesh::isValid() const
 {
     return m_VAO != 0;
