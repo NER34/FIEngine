@@ -44,8 +44,6 @@ private:
     
     uint32_t m_numIndices = 0;
     
-    Transform m_transform;
-    
 };
 
 struct MeshSpawnData

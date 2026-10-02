@@ -15,7 +15,6 @@ Mesh::Mesh(Mesh&& other) noexcept
     m_VBO = other.m_VBO;
     m_EBO = other.m_EBO;
     m_numIndices = other.m_numIndices;
-    m_transform = other.m_transform;
     
     other.m_VAO = other.m_VBO = other.m_EBO = 0;
     other.m_numIndices = 0;
@@ -29,7 +28,6 @@ Mesh& Mesh::operator=(Mesh&& other) noexcept
         m_VBO = other.m_VBO;
         m_EBO = other.m_EBO;
         m_numIndices = other.m_numIndices;
-        m_transform = other.m_transform;
         
         other.m_VAO = other.m_VBO = other.m_EBO = 0;
         other.m_numIndices = 0;

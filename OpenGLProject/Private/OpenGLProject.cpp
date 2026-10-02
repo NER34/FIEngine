@@ -20,11 +20,6 @@
 const char* vertShaderPath = "Shaders/VertexShader.vert";
 const char* fragShaderPath = "Shaders/FragmentShader.frag";
 
-void temp(float a, float b)
-{
-	std::cout << a << " " << b << std::endl;
-}
-
 int main()
 {
 	// Define vertices
