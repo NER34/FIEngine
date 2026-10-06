@@ -14,6 +14,7 @@ namespace FIE
 
 		void update() override;
 		void setInputContext(InputContext* newInputContext) override;
+		InputContext* getInputContext() override;
 		void updateInput(InputEvent inputEvent) override;
 		void resetInputs() override;
 

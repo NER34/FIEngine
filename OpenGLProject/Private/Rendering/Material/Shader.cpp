@@ -1,4 +1,4 @@
-﻿#include "Rendering/Shader.h"
+﻿#include "Rendering/Material/Shader.h"
 
 #include <fstream>
 
@@ -74,30 +74,24 @@ void Shader::createShader(const std::string& shaderFilePath)
     
     const GLchar* shaderDataPtr = shaderData.c_str();
     GLint shaderDataSize = static_cast<GLint>(shaderData.size());
-    
-    m_shaderID = glCreateShader(m_shaderType);
-    CHECK_OGL_ERR("Shader glCreateShader")
-    glShaderSource(m_shaderID, 1, &shaderDataPtr, &shaderDataSize);
-    CHECK_OGL_ERR("Shader glShaderSource")
-    glCompileShader(m_shaderID);
-    CHECK_OGL_ERR("Shader glCompileShader")
+
+    CHECK_OGL_ERR(m_shaderID = glCreateShader(m_shaderType))
+    CHECK_OGL_ERR(glShaderSource(m_shaderID, 1, &shaderDataPtr, &shaderDataSize))
+    CHECK_OGL_ERR(glCompileShader(m_shaderID))
 
     GLint compileStatus = 0;
-    glGetShaderiv(m_shaderID, GL_COMPILE_STATUS, &compileStatus);
-    CHECK_OGL_ERR("Shader glGetShaderiv GL_COMPILE_STATUS")
+    CHECK_OGL_ERR(glGetShaderiv(m_shaderID, GL_COMPILE_STATUS, &compileStatus))
 
     if (compileStatus == GL_FALSE)
     {
         GLchar infoLog[1024] = {};
-        glGetShaderInfoLog(m_shaderID, sizeof(infoLog), nullptr, infoLog);
-        CHECK_OGL_ERR("Shader glGetShaderInfoLog")
+        CHECK_OGL_ERR(glGetShaderInfoLog(m_shaderID, sizeof(infoLog), nullptr, infoLog))
         LOG_ERROR("Failed to compile shader {}: {}", shaderFilePath, infoLog);
     }
 }
 
 void Shader::destroyShader()
 {
-    glDeleteShader(m_shaderID);
-    CHECK_OGL_ERR("Shader glDeleteShader")
+    CHECK_OGL_ERR(glDeleteShader(m_shaderID))
     m_shaderID = 0;
 }

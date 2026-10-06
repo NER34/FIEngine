@@ -17,7 +17,7 @@ class Camera
 public:
     
     Camera() = default;
-    Camera(const CameraDesc& desc) 
+    explicit Camera(const CameraDesc& desc)
         : m_cameraDesc(desc)
     {}
     

@@ -1,8 +1,6 @@
-﻿#include "Rendering/Material.h"
+﻿#include "Rendering/Material/Material.h"
 
 #include <ranges>
-
-#include "glm/mat4x4.hpp"
 
 #include "Rendering/Validation.h"
 
@@ -90,31 +88,30 @@ void Material::createShaderProgram(const MaterialDesc& desc)
     m_shaderProgramID = glCreateProgram();
     for (const Shader& shader : m_shaders)
     {
-        glAttachShader(m_shaderProgramID, shader.getShaderID());
-        CHECK_OGL_ERR("Material glAttachShader")
+        CHECK_OGL_ERR(glAttachShader(m_shaderProgramID, shader.getShaderID()))
     }
-    glLinkProgram(m_shaderProgramID);
-    CHECK_OGL_ERR("Material glLinkProgram")
+    CHECK_OGL_ERR(glLinkProgram(m_shaderProgramID))
 
     GLint linkStatus = 0;
-    glGetProgramiv(m_shaderProgramID, GL_LINK_STATUS, &linkStatus);
-    CHECK_OGL_ERR("Material glGetProgramiv GL_LINK_STATUS")
+    CHECK_OGL_ERR(glGetProgramiv(m_shaderProgramID, GL_LINK_STATUS, &linkStatus))
 
     if (linkStatus == GL_FALSE)
     {
         GLchar infoLog[1024] = {};
-        glGetProgramInfoLog(m_shaderProgramID, sizeof(infoLog), nullptr, infoLog);
-        CHECK_OGL_ERR("Material glGetProgramInfoLog")
+        CHECK_OGL_ERR(glGetProgramInfoLog(m_shaderProgramID, sizeof(infoLog), nullptr, infoLog))
         LOG_ERROR("Failed to link shader program: {}", infoLog);
     }
 }
 
 void Material::destroyMaterial()
 {
-    glDeleteProgram(m_shaderProgramID);
-    CHECK_OGL_ERR("Material glDeleteProgram")
-    m_shaderProgramID = 0;
-    m_shaders.clear();
+    if (isValid())
+    {
+        CHECK_OGL_ERR(glDeleteProgram(m_shaderProgramID))
+        m_shaderProgramID = 0;
+        m_shaders.clear();
+        m_textures.clear();
+    }
 }
 
 void Material::createShaders(const MaterialDesc& desc)

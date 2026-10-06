@@ -5,10 +5,9 @@
 #include "glad/glad.h"
 
 #include "Shader.h"
-#include "Texture.h"
-#include "Validation.h"
-#include "glm/vec2.hpp"
 #include "glm/gtc/type_ptr.hpp"
+#include "Rendering/Texture.h"
+#include "Rendering/Validation.h"
 #include "Utilities/Logger.h"
 
 struct TextureSamplerDesc
@@ -75,22 +74,19 @@ private:
     template <>
     void setUniform_Internal(GLint uniformLoc, const glm::vec3& val) const
     {
-        glUniform3fv(uniformLoc, 1, glm::value_ptr(val));
-        //CHECK_OGL_ERR("Material glUniform3fv")
+        CHECK_OGL_ERR(glUniform3fv(uniformLoc, 1, glm::value_ptr(val)))
     }
     
     template <>
     void setUniform_Internal(GLint uniformLoc, const float& val) const
     {
-        glUniform1fv(uniformLoc, 1, &val);
-        //CHECK_OGL_ERR("Material glUniform1fv")
+        CHECK_OGL_ERR(glUniform1fv(uniformLoc, 1, &val))
     }
     
     template <>
     void setUniform_Internal(GLint uniformLoc, const glm::mat4& val) const
     {
-        glUniformMatrix4fv(uniformLoc, 1, false, glm::value_ptr(val));
-        //CHECK_OGL_ERR("Material glUniformMatrix4fv")
+        CHECK_OGL_ERR(glUniformMatrix4fv(uniformLoc, 1, false, glm::value_ptr(val)))
     }
     
 private:

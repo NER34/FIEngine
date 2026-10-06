@@ -28,6 +28,11 @@ namespace FIE
 		m_inputContext = newInputContext;
 	}
 
+	InputContext* InputManager::getInputContext()
+	{
+		return m_inputContext;
+	}
+
 	void InputManager::updateInput(InputEvent inputEvent)
 	{
 		m_inputQueue.push(inputEvent);

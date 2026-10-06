@@ -42,10 +42,8 @@ void Texture::activate(GLenum textureUnit) const
 {
     if (isValid())
     {
-        glActiveTexture(textureUnit);
-        CHECK_OGL_ERR("Texture glActiveTexture")
-        glBindTexture(GL_TEXTURE_2D, m_textureID);
-        CHECK_OGL_ERR("Texture glBindTexture")
+        CHECK_OGL_ERR(glActiveTexture(textureUnit))
+        CHECK_OGL_ERR(glBindTexture(GL_TEXTURE_2D, m_textureID))
     }
     else
     {
@@ -65,19 +63,13 @@ GLuint Texture::getTextureID() const
 
 void Texture::createTexture(const TextureDesc& desc)
 {
-    glGenTextures(1, &m_textureID);
-    CHECK_OGL_ERR("Texture glGenTextures")
-    glBindTexture(GL_TEXTURE_2D, m_textureID);
-    CHECK_OGL_ERR("Texture glBindTexture")
+    CHECK_OGL_ERR(glGenTextures(1, &m_textureID))
+    CHECK_OGL_ERR(glBindTexture(GL_TEXTURE_2D, m_textureID))
     
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    CHECK_OGL_ERR("Texture glTexParameteri GL_TEXTURE_WRAP_S")
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    CHECK_OGL_ERR("Texture glTexParameteri GL_TEXTURE_WRAP_T")
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    CHECK_OGL_ERR("Texture glTexParameteri GL_TEXTURE_MAG_FILTER")
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    CHECK_OGL_ERR("Texture glTexParameteri GL_TEXTURE_MIN_FILTER")
+    CHECK_OGL_ERR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT))
+    CHECK_OGL_ERR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT))
+    CHECK_OGL_ERR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR))
+    CHECK_OGL_ERR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR))
     
     int width = 0;
     int height = 0;
@@ -100,10 +92,8 @@ void Texture::createTexture(const TextureDesc& desc)
             format = GL_RGBA;
         }
         
-        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
-        CHECK_OGL_ERR("Texture glTexImage2D")
-        glGenerateMipmap(GL_TEXTURE_2D);
-        CHECK_OGL_ERR("Texture glGenerateMipmap")
+        CHECK_OGL_ERR(glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data))
+        CHECK_OGL_ERR(glGenerateMipmap(GL_TEXTURE_2D))
     }
     else
     {
@@ -112,13 +102,11 @@ void Texture::createTexture(const TextureDesc& desc)
     }
     
     stbi_image_free(data);
-    glBindTexture(GL_TEXTURE_2D, 0);
-    CHECK_OGL_ERR("Texture glBindTexture")
+    CHECK_OGL_ERR(glBindTexture(GL_TEXTURE_2D, 0))
 }
 
 void Texture::destroyTexture()
 {
-    glDeleteTextures(1, &m_textureID);
-    CHECK_OGL_ERR("Texture glDeleteTextures")
+    CHECK_OGL_ERR(glDeleteTextures(1, &m_textureID))
     m_textureID = 0;
 }

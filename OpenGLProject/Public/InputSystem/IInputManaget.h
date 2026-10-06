@@ -22,6 +22,7 @@ namespace FIE
 
 		virtual void update() = 0;
 		virtual void setInputContext(InputContext* newInputContext) = 0;
+		virtual InputContext* getInputContext() = 0;
 		virtual void updateInput(InputEvent inputEvent) = 0;
 		virtual void resetInputs() = 0;
 	};
