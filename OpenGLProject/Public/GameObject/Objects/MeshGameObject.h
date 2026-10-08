@@ -13,7 +13,7 @@ public:
     
 private:
     
-    Mesh* m_mesh = nullptr;
+    Mesh m_mesh;
     Material m_material; 
     Transform m_transform;
     float m_globalVal = 0.0f;

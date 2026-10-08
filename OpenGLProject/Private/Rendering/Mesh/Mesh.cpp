@@ -115,7 +115,7 @@ void Mesh::destroyMesh()
         CHECK_OGL_ERR(glDeleteBuffers(1, &m_VBO_Norm))
         CHECK_OGL_ERR(glDeleteBuffers(1, &m_EBO))
         
-        m_VAO = m_VBO_Pos = m_VBO_UV = m_VBO_Norm = m_EBO = 0;
+        clearData();
     }
 }
 

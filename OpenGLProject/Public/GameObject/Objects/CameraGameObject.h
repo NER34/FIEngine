@@ -14,6 +14,7 @@ private:
     float m_cameraMovSpeed = 10.0f;
     float m_cameraRotSpeed = 100.0f;
     bool m_followMouse = false;
+    bool m_attachToLight = false;
     
     struct CameraMovDir
     {

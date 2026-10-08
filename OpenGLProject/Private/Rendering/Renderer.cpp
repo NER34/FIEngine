@@ -12,7 +12,7 @@ void Renderer::render()
     m_backDrawList.clear();
     
     glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
     glm::mat4 projMat = m_camera.getProjectionMatrix();
     glm::mat4 viewMat = m_camera.getViewMatrix();
@@ -23,7 +23,11 @@ void Renderer::render()
         glm::mat4 modelMat = drawDesc.m_transform.getModelMatrix();
         
         drawDesc.m_material.activate();
-        drawDesc.m_material.setUniform("mvp", viewProjMat * modelMat);
+        drawDesc.m_material.setUniform("projViewMat", viewProjMat);
+        drawDesc.m_material.setUniform("modelMat", modelMat);
+        drawDesc.m_material.setUniform("lightPos", m_lightPoint.getPosition());
+        drawDesc.m_material.setUniform("lightColor", m_lightPoint.getColor());
+        drawDesc.m_material.setUniform("viewPos", m_camera.getPosition());
         
         drawDesc.m_mesh.draw();
         
@@ -36,12 +40,18 @@ Camera& Renderer::getCamera()
     return m_camera;
 }
 
+LightPoint& Renderer::getLightPoint()
+{
+    return m_lightPoint; 
+}
+
 void Renderer::initialize(const RendererDesc& desc)
 {
 	gladLoadGL();
     
 	//glEnable(GL_CULL_FACE);
 	glDisable(GL_CULL_FACE);
+    glEnable(GL_DEPTH_TEST);
     
     glViewport(
         desc.m_viewportDesc.x,

@@ -8,6 +8,7 @@
 #include "GameObject/GameObjectManager.h"
 #include "GameObject/Objects/CameraGameObject.h"
 #include "GameObject/Objects/MeshGameObject.h"
+#include "GameObject/Objects/PlainGameObject.h"
 #include "glad/glad.h"
 
 #include "InputSystem/InputContext.h"
@@ -51,6 +52,7 @@ int main()
 	
 	GameObjectManager& gameObjectManager = GameObjectManager::get();
 	gameObjectManager.createGameObject<CameraGameObject>();
+	gameObjectManager.createGameObject<PlainGameObject>();
 	gameObjectManager.createGameObject<MeshGameObject>();
 	
 	auto prevTime = std::chrono::high_resolution_clock::now(); 

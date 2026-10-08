@@ -32,10 +32,18 @@ void CameraGameObject::beginPlay()
     inputContext->assignHandle(FIE::MOUSE_MOVE_X, CHANGE_CAMERA_ROT(m_yaw));
     inputContext->assignHandle(FIE::MOUSE_MOVE_Y, CHANGE_CAMERA_ROT(m_pitch));
 	
-	inputContext->assignHandle(FIE::MOUSE_BUTTON_LEFT, 
+	inputContext->assignHandle(FIE::MOUSE_BUTTON_LEFT, 	
 		[this](FIE::InputIDs inputID, float inputValue)
 		{
 			m_followMouse = inputValue > 0.5f;
+		}
+	);
+	
+	inputContext->assignHandle(FIE::KEY_1, 
+		[this](FIE::InputIDs inputID, float inputValue)
+		{
+			if (inputValue > 0.5f)
+				m_attachToLight = !m_attachToLight;
 		}
 	);
 }
@@ -66,4 +74,11 @@ void CameraGameObject::update(float deltaTime)
 	cameraRot += glm::vec3{ 0.0f, deltaPitch, deltaYaw };
 	cameraRot.y = std::clamp(cameraRot.y, -89.0f, 89.0f);
 	camera.setRotation(cameraRot);
+	
+	if (m_attachToLight)
+	{
+		Renderer& renderer = Renderer::get();
+		LightPoint& lightPoint = renderer.getLightPoint();
+		lightPoint.setPosition(cameraPos);
+	}
 }

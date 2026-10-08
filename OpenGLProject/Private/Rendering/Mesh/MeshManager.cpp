@@ -19,7 +19,7 @@ void MeshManager::loadMesh(const MeshLoadDesc& desc)
     }
     
     Assimp::Importer importer;
-    std::string fullPath = getResourcesPath().string() + desc.m_meshPath;
+    std::string fullPath = (getResourcesPath() / desc.m_meshPath).string();
     auto* scene = importer.ReadFile(
         fullPath.c_str(), 
         aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_JoinIdenticalVertices
@@ -34,6 +34,7 @@ void MeshManager::loadMesh(const MeshLoadDesc& desc)
     {
         aiMesh* aimesh = scene->mMeshes[i];
         MeshDesc meshDesc;
+        meshDesc.m_numVerts = aimesh->mNumVertices;
         meshDesc.m_vertices.reserve(aimesh->mNumVertices);
         meshDesc.m_normals.reserve(aimesh->mNumVertices);
         meshDesc.m_uvCoords.reserve(aimesh->mNumVertices);
@@ -56,6 +57,15 @@ void MeshManager::loadMesh(const MeshLoadDesc& desc)
             auto& uvCoord = hasUV ? aimesh->mTextureCoords[0][j] : zeroUV;
             meshDesc.m_uvCoords.push_back(uvCoord.x);
             meshDesc.m_uvCoords.push_back(uvCoord.y);
+        }
+        
+        for (uint32_t j = 0; j < aimesh->mNumFaces; j++)
+        {
+            auto& face = aimesh->mFaces[j];
+            assert(face.mNumIndices == 3);
+            meshDesc.m_indices.push_back(face.mIndices[0]);
+            meshDesc.m_indices.push_back(face.mIndices[1]);
+            meshDesc.m_indices.push_back(face.mIndices[2]);
         }
         m_meshes.emplace_back(meshDesc);
     }

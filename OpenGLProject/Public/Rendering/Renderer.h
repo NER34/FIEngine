@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "Camera.h"
+#include "LightPoint.h"
 #include "Rendering/Mesh/Mesh.h"
 #include "Rendering/Material/Material.h"
 
@@ -57,6 +58,7 @@ public:
     void render();
     
     Camera& getCamera();
+    LightPoint& getLightPoint();
     
 private:
     
@@ -67,5 +69,6 @@ private:
     std::vector<GeometryDrawDesc> m_drawList_2;
     
     Camera m_camera;
+    LightPoint m_lightPoint;
     
 };
