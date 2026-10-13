@@ -29,6 +29,8 @@ target_link_libraries(OpenGLProject
 		spdlog
 		stb
 		assimp
+		json
+		stduuid
 )
 
 add_custom_command(

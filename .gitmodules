@@ -14,3 +14,6 @@
 	path = ThirdParty/assimp
 	url = https://github.com/assimp/assimp.git
 	branch = master
+[submodule "ThirdParty/stduuid"]
+	path = ThirdParty/stduuid
+	url = https://github.com/mariusbancila/stduuid.git

@@ -18,6 +18,7 @@
 #include "Rendering/Mesh/MeshManager.h"
 #include "Utilities/Logger.h"
 #include "Window/GLFW/WindowGLFW.h"
+#include "json.h"
 
 int main()
 {
@@ -49,6 +50,8 @@ int main()
 	
 	Renderer& renderer = Renderer::get();
 	renderer.initialize(rendererDesc);
+	
+	ResourceManager::Get().Initialize();
 	
 	GameObjectManager& gameObjectManager = GameObjectManager::get();
 	gameObjectManager.createGameObject<CameraGameObject>();

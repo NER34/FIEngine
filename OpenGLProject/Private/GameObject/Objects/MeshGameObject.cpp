@@ -2,6 +2,8 @@
 
 #include "Rendering/Renderer.h"
 #include "Rendering/Mesh/MeshManager.h"
+#include "ResourceManager/ResourceManager.h"
+#include "ResourceManager/Resources/MeshResource.h"
 
 namespace
 {
@@ -31,14 +33,8 @@ void MeshGameObject::beginPlay()
 	meshLoadDesc.m_meshName = meshName;
 	meshLoadDesc.m_meshPath = meshPath;
 	
-	MeshManager& meshManager = MeshManager::get();
-	meshManager.loadMesh(meshLoadDesc);
-	/*
-	meshManager.registerMesh(meshName, meshDesc);
-	MeshManager::ConstMeshIterator begIt, endIt;
-	meshManager.getMeshes(meshName, begIt, endIt);
-	m_mesh = begIt._Ptr;
-	*/
+	ResourceManager& resourceManager = ResourceManager::Get();
+	m_meshResourceHandle = resourceManager.LoadResource<MeshResource>(meshName, meshPath);
 	
     m_transform.m_position = glm::vec3(2.0f, 2.0f, 0.0f);
     m_transform.m_rotation = glm::vec3(0.0f, 0.0f, 180.0f);
@@ -48,13 +44,17 @@ void MeshGameObject::update(float deltaTime)
 {
 	m_globalVal += deltaTime;
 
+	/*
 	MeshManager& meshManager = MeshManager::get();
 	MeshManager::ConstMeshIterator begIt, endIt;
 	meshManager.getMeshes(meshName, begIt, endIt);
+	*/
+	
+	auto* meshResource = m_meshResourceHandle.Get();
 			
 	Renderer& renderer = Renderer::get();
-	for (auto it = begIt; it != endIt; ++it)
+	for (const auto& mesh : meshResource->GetMeshes())
 	{
-		renderer.addDraw(GeometryDrawDesc(*it._Ptr, m_material, m_transform));
+		renderer.addDraw(GeometryDrawDesc(mesh, m_material, m_transform));
 	}
 }

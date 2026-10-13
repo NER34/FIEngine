@@ -13,18 +13,18 @@ struct GeometryDrawDesc
         , m_material(other.m_material)
         , m_transform(other.m_transform)
     {}
-    GeometryDrawDesc(Mesh& mesh, Material& material)
+    GeometryDrawDesc(const Mesh& mesh, const Material& material)
         : m_mesh(mesh)
         , m_material(material)
     {}
-    GeometryDrawDesc(Mesh& mesh, Material& material, const Transform& transform)
+    GeometryDrawDesc(const Mesh& mesh, const Material& material, const Transform& transform)
         : m_mesh(mesh)
         , m_material(material)
         , m_transform(transform)
     {}
     
-    Mesh& m_mesh;
-    Material& m_material;
+    const Mesh& m_mesh;
+    const Material& m_material;
     Transform m_transform;
 };
 

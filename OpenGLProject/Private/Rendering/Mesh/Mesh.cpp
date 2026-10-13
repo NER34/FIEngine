@@ -1,8 +1,5 @@
 ﻿#include "Rendering/Mesh/Mesh.h"
 
-#include <__msvc_ranges_to.hpp>
-
-#include "assimp/mesh.h"
 #include "Rendering/Validation.h"
 #include "Utilities/Utilities.h"
 
