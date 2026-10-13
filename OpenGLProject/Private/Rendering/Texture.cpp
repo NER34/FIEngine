@@ -71,37 +71,31 @@ void Texture::createTexture(const TextureDesc& desc)
     CHECK_OGL_ERR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR))
     CHECK_OGL_ERR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR))
     
-    int width = 0;
-    int height = 0;
-    int numChannels = 0;
-    unsigned char* data = stbi_load(
-        desc.m_texturePath.c_str(), 
-        &width, &height, 
-        &numChannels, 0
-        );
-    
-    if (data)
+    if (desc.data)
     {
         GLint format = GL_RGB;
-        if (numChannels == 1)
+        if (desc.numChannels == 1)
         {
             format = GL_RED;
         }
-        else if (numChannels == 4)
+        else if (desc.numChannels == 4)
         {
             format = GL_RGBA;
         }
         
-        CHECK_OGL_ERR(glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data))
+        CHECK_OGL_ERR(glTexImage2D(
+            GL_TEXTURE_2D, 0, format, 
+            desc.dimensions[0], desc.dimensions[1], 
+            0, format, GL_UNSIGNED_BYTE, desc.data
+            ))
         CHECK_OGL_ERR(glGenerateMipmap(GL_TEXTURE_2D))
     }
     else
     {
-        LOG_ERROR("Failed to load texture: {}", desc.m_texturePath);
+        LOG_ERROR("Failed to create texture: Invalid data");
         assert(false);
     }
-    
-    stbi_image_free(data);
+
     CHECK_OGL_ERR(glBindTexture(GL_TEXTURE_2D, 0))
 }
 

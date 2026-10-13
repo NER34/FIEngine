@@ -21,11 +21,11 @@ void MeshGameObject::beginPlay()
 		
     MaterialDesc materialDesc;
     materialDesc.m_shadersDesc = {
-			    { GL_VERTEX_SHADER, (resourcesPath / vertShaderPath).string() },
-                { GL_FRAGMENT_SHADER, (resourcesPath / fragShaderPath).string() }
+		{ GL_VERTEX_SHADER, (getResourcesPath() / vertShaderPath).string() },
+		{ GL_FRAGMENT_SHADER, (getResourcesPath() / fragShaderPath).string() }
     };
     materialDesc.m_texturesDesc = {
-			    { "SolidColor", { (resourcesPath / meshTexturePath).string() } }
+		{ "SolidColor", meshTexturePath }
     };
     m_material.setup(materialDesc);
 		
@@ -34,7 +34,7 @@ void MeshGameObject::beginPlay()
 	meshLoadDesc.m_meshPath = meshPath;
 	
 	ResourceManager& resourceManager = ResourceManager::Get();
-	m_meshResourceHandle = resourceManager.LoadResource<MeshResource>(meshName, meshPath);
+	m_meshResourceHandle = resourceManager.LoadResource<MeshResource>(/*meshName, */meshPath);
 	
     m_transform.m_position = glm::vec3(2.0f, 2.0f, 0.0f);
     m_transform.m_rotation = glm::vec3(0.0f, 0.0f, 180.0f);

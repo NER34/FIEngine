@@ -18,7 +18,6 @@
 #include "Rendering/Mesh/MeshManager.h"
 #include "Utilities/Logger.h"
 #include "Window/GLFW/WindowGLFW.h"
-#include "json.h"
 
 int main()
 {

@@ -4,6 +4,7 @@
 
 #include "ResourceManager/ResourceContainer.h"
 #include "ResourceManager/Resources/MeshResource.h"
+#include "ResourceManager/Resources/TextureResource.h"
 
 ResourceManager::~ResourceManager()
 {
@@ -23,6 +24,7 @@ ResourceManager& ResourceManager::Get()
 void ResourceManager::Initialize()
 {
     RegisterResourceType<ResourceContainer<MeshResource>, MeshResource>();
+    RegisterResourceType<ResourceContainer<TextureResource>, TextureResource>();
 }
 
 void ResourceManager::FreeAllResources()

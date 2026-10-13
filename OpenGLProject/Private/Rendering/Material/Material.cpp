@@ -3,6 +3,8 @@
 #include <ranges>
 
 #include "Rendering/Validation.h"
+#include "ResourceManager/ResourceManager.h"
+#include "ResourceManager/Resources/TextureResource.h"
 
 Material::Material(const MaterialDesc& desc)
 {
@@ -58,7 +60,8 @@ void Material::activate() const
         for (; textureIndex < m_textures.size(); textureIndex++, textureSlot++)
         {
             glActiveTexture(textureSlot);
-            glBindTexture(GL_TEXTURE_2D, m_textures[textureIndex].getTextureID());
+            const Texture* texture = m_textures[textureIndex].Get()->GetTexture();
+            glBindTexture(GL_TEXTURE_2D, texture->getTextureID());
         }
         //CHECK_OGL_ERR("Material glUseProgram")
     }
@@ -125,13 +128,12 @@ void Material::createShaders(const MaterialDesc& desc)
 
 void Material::createTextures(const MaterialDesc& desc)
 {
-    auto getTextureDesc = [](const TextureSamplerDesc& desc) { return desc.m_textureDesc; };
-    auto texturesDesc = desc.m_texturesDesc | std::views::transform(getTextureDesc);
-    m_textures.insert(
-        m_textures.begin(),
-        texturesDesc.begin(),
-        texturesDesc.end()
-        );
+    for (auto& textureLoadDesc : desc.m_texturesDesc)
+    {
+        m_textures.push_back(ResourceManager::Get().LoadResource<TextureResource>(
+            /*textureLoadDesc.m_name, */textureLoadDesc.m_path
+            ));
+    }
 }
 
 void Material::setupTextureSamplers(const MaterialDesc& desc)

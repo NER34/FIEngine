@@ -6,7 +6,10 @@
 
 struct TextureDesc
 {
-    std::string m_texturePath;
+    //std::string m_texturePath;
+    int dimensions[3] = { 0, 0, 0 };
+    int numChannels = 0;
+    unsigned char* data;
 };
 
 class Texture

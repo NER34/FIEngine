@@ -40,7 +40,7 @@ void PlainGameObject::beginPlay()
                 { GL_FRAGMENT_SHADER, (resourcesPath / fragShaderPath).string() }
     };
     materialDesc.m_texturesDesc = {
-			    { "SolidColor", { (resourcesPath / "Textures/test_image.png").string() } }
+			    { "SolidColor", "Textures/test_image.png" }
     };
     m_material.setup(materialDesc);
 		

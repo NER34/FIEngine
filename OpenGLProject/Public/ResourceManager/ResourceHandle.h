@@ -1,8 +1,9 @@
 ﻿#pragma once
 
 #include <memory>
+#include <type_traits>
 
-class ResourceBase;
+#include "ResourceManager/ResourceBase.h"
 
 template <typename TResource>
 class ResourceHandle

@@ -21,12 +21,12 @@ public:
     void FreeAllResources();
     
     template<typename TResource>
-    ResourceHandle<TResource> LoadResource(const std::string& name, const std::string& fileName)
+    ResourceHandle<TResource> LoadResource(const std::string& filePath)
     {
         if (auto it = m_registeredContainers.find(typeid(TResource)); it != m_registeredContainers.end())
         {
             auto* container = static_cast<ResourceContainer<TResource>*>(it->second);
-            return container->LoadResource(name, fileName);
+            return container->LoadResource(filePath);
         }
         return ResourceHandle<TResource>();
     }
@@ -44,12 +44,12 @@ public:
     */
     
     template<typename TResource>
-    void FreeResource(const std::string& name)
+    void FreeResource(const std::string& filePath)
     {
         if (auto it = m_registeredContainers.find(typeid(TResource)); it != m_registeredContainers.end())
         {
             auto* container = static_cast<ResourceContainer<TResource>*>(it->second);
-            container->FreeResource(name);
+            container->FreeResource(filePath);
         }
     }
     

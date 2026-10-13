@@ -46,13 +46,13 @@ class ResourceContainer : public IResourceContainer
 public:
     
     //void AllocateResource_Internal(const std::string& name, const std::string& filePath, ResourceHandleBase& outHandle) //override
-    ResourceHandle<TResource> LoadResource(const std::string& name, const std::string& filePath/*, ResourceHandleBase& outHandle*/) //override
+    ResourceHandle<TResource> LoadResource(const std::string& filePath/*, ResourceHandleBase& outHandle*/) //override
     {
-        auto [it, inserted] = m_resources.try_emplace(name, std::make_shared<TResource>());
+        auto [it, inserted] = m_resources.try_emplace(filePath, std::make_shared<TResource>());
         if (inserted)
         {
-            it->second->SetFilePath(filePath);
-            it->second->SetName(name);
+            it->second->m_filePath = filePath;
+            //it->second->SetName(name);
             it->second->Reload();
         }
         ResourceHandle<TResource> handle;
@@ -72,9 +72,9 @@ public:
     }
     */
     
-    void FreeResource(const std::string& name) //override
+    void FreeResource(const std::string& filePath) //override
     {
-        if (auto it = m_resources.find(name); it != m_resources.end())
+        if (auto it = m_resources.find(filePath); it != m_resources.end())
         {
             it->second->Free();
             m_resources.erase(it);

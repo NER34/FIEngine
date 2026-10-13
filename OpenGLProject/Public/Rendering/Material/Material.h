@@ -6,14 +6,15 @@
 
 #include "Shader.h"
 #include "glm/gtc/type_ptr.hpp"
-#include "Rendering/Texture.h"
 #include "Rendering/Validation.h"
+#include "ResourceManager/ResourceHandle.h"
+#include "ResourceManager/Resources/TextureResource.h"
 #include "Utilities/Logger.h"
 
 struct TextureSamplerDesc
 {
     std::string m_name;
-    TextureDesc m_textureDesc;
+    std::string m_path;
 };
 
 struct MaterialDesc
@@ -94,6 +95,6 @@ private:
     GLuint m_shaderProgramID = 0;
     
     std::vector<Shader> m_shaders;
-    std::vector<Texture> m_textures;
+    std::vector<ResourceHandle<TextureResource>> m_textures;
     
 };
