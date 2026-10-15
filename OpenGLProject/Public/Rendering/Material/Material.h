@@ -1,25 +1,27 @@
-﻿#pragma once
+#pragma once
 
+#include <cassert>
+#include <string>
 #include <vector>
 
+#include "MaterialParametersPool.h"
 #include "glad/glad.h"
 
-#include "Shader.h"
 #include "glm/gtc/type_ptr.hpp"
+#include "Rendering/Material/ShaderProgram.h"
+#include "Rendering/Texture.h"
 #include "Rendering/Validation.h"
-#include "ResourceManager/ResourceHandle.h"
-#include "ResourceManager/Resources/TextureResource.h"
 #include "Utilities/Logger.h"
 
 struct TextureSamplerDesc
 {
     std::string m_name;
-    std::string m_path;
+    const Texture* m_texture = nullptr;
 };
 
 struct MaterialDesc
 {
-    std::vector<ShaderDesc> m_shadersDesc;
+    const ShaderProgram* m_shaderProgram = nullptr;
     std::vector<TextureSamplerDesc> m_texturesDesc;
 };
 
@@ -28,41 +30,53 @@ class Material
 public:
 
     Material() = default;
-    Material(const MaterialDesc& desc);
+    //Material(const MaterialDesc& desc);
     
-    Material(const Material& other) = default;
-    Material& operator=(const Material& other) = default;
+    Material(const Material& other) = delete;/*= default*/;
+    Material& operator=(const Material& other) = delete;/*= default*/;
 
-    Material(Material&& other) noexcept;
-    Material& operator=(Material&& other) noexcept;
+    Material(Material&& other) noexcept = delete;
+    Material& operator=(Material&& other) noexcept = delete;
 
     ~Material();
     
-    void setup(const MaterialDesc& desc);
+    void SetShaderProgram(const ShaderProgram* shaderProgram);
+    
+    //void setup(const MaterialDesc& desc);
     void activate() const;
     void deactivate() const;
     
+    /*
     template <typename T>
     void setUniform(const std::string& name, const T& val) const
     {
-        //glUseProgram(m_shaderProgramID);
-        GLint uniformLoc = glGetUniformLocation(m_shaderProgramID, name.c_str());
+        GLint uniformLoc = glGetUniformLocation(getShaderProgramID(), name.c_str());
         setUniform_Internal(uniformLoc, val);
-        //glUseProgram(0);
     }
+    */
     
     GLuint getShaderProgramID() const;
+    
+    template <typename TParam, typename ... TArgs>
+    MaterialParamHandle<TParam> PushParameter(TArgs&& ... args)
+    {
+        return m_parametersPool.PushParameter<TParam>(std::forward<TArgs>(args)...);
+    }
+    
+    template <typename TParam>
+    TParam* GetParameter(MaterialParamHandle<TParam> handle) const
+    {
+        return m_parametersPool.GetParameter(handle);
+    }
     
     bool isValid() const;
     
 protected:
 
-    void createShaders(const MaterialDesc& desc);
-    void createShaderProgram(const MaterialDesc& desc);
-    void createTextures(const MaterialDesc& desc);
-    void setupTextureSamplers(const MaterialDesc& desc);
-    void destroyMaterial();
+    //void setupTextureSamplers(const MaterialDesc& desc);
+    void clearMaterial();
     
+/*
 private:
     
     template <typename T>
@@ -89,12 +103,12 @@ private:
     {
         CHECK_OGL_ERR(glUniformMatrix4fv(uniformLoc, 1, false, glm::value_ptr(val)))
     }
+    */
     
 private:
-
-    GLuint m_shaderProgramID = 0;
     
-    std::vector<Shader> m_shaders;
-    std::vector<ResourceHandle<TextureResource>> m_textures;
+    const ShaderProgram* m_shaderProgram = nullptr;
+    MaterialParametersPool m_parametersPool;
+    //std::vector<TextureSamplerDesc> m_textures;
     
 };

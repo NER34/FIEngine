@@ -4,6 +4,8 @@
 
 #include "ResourceManager/ResourceContainer.h"
 #include "ResourceManager/Resources/MeshResource.h"
+#include "ResourceManager/Resources/ShaderProgramResource.h"
+#include "ResourceManager/Resources/ShaderResource.h"
 #include "ResourceManager/Resources/TextureResource.h"
 
 ResourceManager::~ResourceManager()
@@ -24,6 +26,8 @@ ResourceManager& ResourceManager::Get()
 void ResourceManager::Initialize()
 {
     RegisterResourceType<ResourceContainer<MeshResource>, MeshResource>();
+    RegisterResourceType<ResourceContainer<ShaderProgramResource>, ShaderProgramResource>();
+    RegisterResourceType<ResourceContainer<ShaderResource>, ShaderResource>();
     RegisterResourceType<ResourceContainer<TextureResource>, TextureResource>();
 }
 

@@ -17,6 +17,7 @@ public:
     virtual void Free() {}
     
     const std::string& GetFilePath() const;
+    std::string GetFullFilePath() const;
     //const std::string& GetName() const;
     
 private:

@@ -12,6 +12,16 @@ class ResourceHandle
 
 public:
     
+    ResourceHandle() = default;
+    
+    ResourceHandle(const ResourceHandle& other) = default;
+    ResourceHandle& operator=(const ResourceHandle& other) = default;
+    
+    ResourceHandle(ResourceHandle&& other) noexcept = default;
+    ResourceHandle& operator=(ResourceHandle&& other) noexcept = default;
+    
+    ~ResourceHandle() = default;
+    
     bool IsValid() const
     {
         return m_resourcePtr != nullptr;

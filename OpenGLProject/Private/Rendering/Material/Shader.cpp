@@ -1,13 +1,22 @@
 ﻿#include "Rendering/Material/Shader.h"
 
 #include <fstream>
+#include <unordered_map>
 
 #include "Rendering/Validation.h"
+
+const std::unordered_map<ShaderType, GLenum> g_enumToGLenum = 
+{
+    { ShaderType::Vertex, GL_VERTEX_SHADER },
+    { ShaderType::Fragment, GL_FRAGMENT_SHADER },
+    { ShaderType::Geometry, GL_GEOMETRY_SHADER },
+    { ShaderType::Compute, GL_COMPUTE_SHADER }
+};
 
 Shader::Shader(const ShaderDesc& desc)
     : m_shaderType(desc.m_shaderType)
 {
-    createShader(desc.m_shaderFilePath);
+    createShader(desc);
 }
 
 Shader::Shader(Shader&& other) noexcept
@@ -38,7 +47,7 @@ void Shader::setup(const ShaderDesc& desc)
     m_shaderType = desc.m_shaderType;
     
     destroyShader();
-    createShader(desc.m_shaderFilePath);
+    createShader(desc);
 }
 
 bool Shader::isValid() const
@@ -46,9 +55,14 @@ bool Shader::isValid() const
     return m_shaderID != 0;
 }
 
-GLenum Shader::getShaderType() const
+ShaderType Shader::getShaderType() const
 {
     return m_shaderType;
+}
+
+GLenum Shader::getGLShaderType() const
+{
+    return g_enumToGLenum.at(m_shaderType);
 }
 
 GLuint Shader::getShaderID() const
@@ -56,8 +70,10 @@ GLuint Shader::getShaderID() const
     return m_shaderID;
 }
 
-void Shader::createShader(const std::string& shaderFilePath)
+void Shader::createShader(const ShaderDesc& desc)
 {
+    
+    /*
     // Read shader file
     std::ifstream shaderFile(shaderFilePath);
     
@@ -72,11 +88,12 @@ void Shader::createShader(const std::string& shaderFilePath)
         std::istreambuf_iterator<char>()
         );
     
-    const GLchar* shaderDataPtr = shaderData.c_str();
-    GLint shaderDataSize = static_cast<GLint>(shaderData.size());
+    const char* shaderDataPtr = shaderData.c_str();
+    int shaderDataSize = static_cast<GLint>(shaderData.size());
+    */
 
-    CHECK_OGL_ERR(m_shaderID = glCreateShader(m_shaderType))
-    CHECK_OGL_ERR(glShaderSource(m_shaderID, 1, &shaderDataPtr, &shaderDataSize))
+    CHECK_OGL_ERR(m_shaderID = glCreateShader(getGLShaderType()))
+    CHECK_OGL_ERR(glShaderSource(m_shaderID, 1, &desc.m_shaderDataPtr, &desc.m_shaderDataSize))
     CHECK_OGL_ERR(glCompileShader(m_shaderID))
 
     GLint compileStatus = 0;
@@ -86,7 +103,9 @@ void Shader::createShader(const std::string& shaderFilePath)
     {
         GLchar infoLog[1024] = {};
         CHECK_OGL_ERR(glGetShaderInfoLog(m_shaderID, sizeof(infoLog), nullptr, infoLog))
-        LOG_ERROR("Failed to compile shader {}: {}", shaderFilePath, infoLog);
+#if DEBUG_ENABLED
+        LOG_ERROR("Failed to compile shader {}: {}", desc.m_shaderFilePath, infoLog);
+#endif
     }
 }
 

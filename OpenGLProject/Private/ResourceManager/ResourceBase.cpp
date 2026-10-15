@@ -1,5 +1,7 @@
 ﻿#include "ResourceManager/ResourceBase.h"
 
+#include "Utilities/Utilities.h"
+
 
 /*
 void ResourceBase::SetFilePath(const std::string& filePath)
@@ -18,6 +20,11 @@ void ResourceBase::SetName(const std::string& name)
 const std::string& ResourceBase::GetFilePath() const
 {
     return m_filePath;
+}
+
+std::string ResourceBase::GetFullFilePath() const
+{
+    return (getResourcesPath() / m_filePath).string();
 }
 
 /*

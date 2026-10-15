@@ -25,7 +25,7 @@ namespace FIE
 				return false;
 			}
 			// Define OpenGL version
-			glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+			glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 			glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 			// Tell GLFW that we are using CORE profile
 			// So that means we only have the modern function

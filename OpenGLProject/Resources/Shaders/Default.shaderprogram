@@ -1,0 +1,6 @@
+{
+  "shaders": [
+    "Shaders/VertexShader.shader.json",
+    "Shaders/FragmentShader.shader.json"
+  ]
+}

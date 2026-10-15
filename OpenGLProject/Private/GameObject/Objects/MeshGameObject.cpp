@@ -19,15 +19,18 @@ void MeshGameObject::beginPlay()
 {
     auto resourcesPath = getResourcesPath();
 		
+	m_material
+    /*
     MaterialDesc materialDesc;
     materialDesc.m_shadersDesc = {
-		{ GL_VERTEX_SHADER, (getResourcesPath() / vertShaderPath).string() },
-		{ GL_FRAGMENT_SHADER, (getResourcesPath() / fragShaderPath).string() }
+		{ ShaderType::Vertex, (getResourcesPath() / vertShaderPath).string() },
+		{ ShaderType::Fragment, (getResourcesPath() / fragShaderPath).string() }
     };
     materialDesc.m_texturesDesc = {
 		{ "SolidColor", meshTexturePath }
     };
     m_material.setup(materialDesc);
+    */
 		
     MeshLoadDesc meshLoadDesc;
 	meshLoadDesc.m_meshName = meshName;

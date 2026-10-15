@@ -4,10 +4,25 @@
 
 #include "glad/glad.h"
 
+enum class ShaderType : char
+{
+    Invalid = -1,
+    
+    Vertex = 0,
+    Fragment,
+    Geometry,
+    Compute
+};
+
 struct ShaderDesc
 {
-    GLenum m_shaderType;
+#if DEBUG_ENABLED
     std::string m_shaderFilePath;
+#endif
+    
+    int m_shaderDataSize = 0;
+    ShaderType m_shaderType = ShaderType::Vertex;
+    const GLchar* m_shaderDataPtr = nullptr;
 };
 
 class Shader
@@ -29,17 +44,18 @@ public:
     
     bool isValid() const;
     
-    GLenum getShaderType() const;
+    ShaderType getShaderType() const;
+    GLenum getGLShaderType() const;
     GLuint getShaderID() const;
     
 protected:
     
-    void createShader(const std::string& shaderFilePath);
+    void createShader(const ShaderDesc& desc);
     void destroyShader();
     
 private:
     
-    GLenum m_shaderType = GL_VERTEX_SHADER; 
+    ShaderType m_shaderType = ShaderType::Invalid; 
     GLuint m_shaderID = 0;
     
 };

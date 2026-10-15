@@ -34,15 +34,17 @@ void PlainGameObject::beginPlay()
 {
     auto resourcesPath = getResourcesPath();
 		
+    /*
     MaterialDesc materialDesc;
     materialDesc.m_shadersDesc = {
-			    { GL_VERTEX_SHADER, (resourcesPath / vertShaderPath).string() },
-                { GL_FRAGMENT_SHADER, (resourcesPath / fragShaderPath).string() }
+			    { ShaderType::Vertex, (resourcesPath / vertShaderPath).string() },
+                { ShaderType::Fragment, (resourcesPath / fragShaderPath).string() }
     };
     materialDesc.m_texturesDesc = {
 			    { "SolidColor", "Textures/test_image.png" }
     };
     m_material.setup(materialDesc);
+    */
 		
     MeshDesc meshDesc;
 	meshDesc.m_numVerts = sizeof(vertices) / (sizeof(GLfloat) * 3);
@@ -51,13 +53,6 @@ void PlainGameObject::beginPlay()
 	meshDesc.m_normals.resize(meshDesc.m_numVerts * 3, 0.0f);
     meshDesc.m_indices.assign(indices, indices + sizeof(indices) / sizeof(GLuint));
 	m_mesh.setup(meshDesc);
-	/*
-	MeshManager& meshManager = MeshManager::get();
-	meshManager.registerMesh(meshName, meshDesc);
-	MeshManager::ConstMeshIterator begIt, endIt;
-	meshManager.getMeshes(meshName, begIt, endIt);
-	m_mesh = begIt._Ptr;
-	*/
 	
     m_transform.m_position = glm::vec3(2.0f, 0.0f, 0.0f);
     m_transform.m_rotation = glm::vec3(0.0f, 0.0f, 180.0f);
