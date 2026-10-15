@@ -12,7 +12,7 @@ TextureParameter::TextureParameter(
     CHECK_OGL_ERR(glUniform1i(uniformLoc, textureSlot))
 }
 
-void TextureParameter::ApplyParameter()
+void TextureParameter::ApplyParameter() const
 {
     if (m_texture)
     {

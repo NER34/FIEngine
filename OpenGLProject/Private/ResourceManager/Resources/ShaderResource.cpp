@@ -28,11 +28,11 @@ void ShaderResource::Reload()
     
     nlohmann::json shaderAsset;
     assetFile >> shaderAsset;
-    assetFile.close();
+    assetFile.close(); 
     
     ShaderType shaderType = shaderAsset.value("type", ShaderType::Invalid);
     const std::string shaderFilePath = shaderAsset.value("path", "");
-
+    
     if (shaderType == ShaderType::Invalid || shaderFilePath.empty())
     {
         LOG_ERROR("Invalid shader asset file: {}", assetPath.string());

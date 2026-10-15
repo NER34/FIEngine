@@ -10,7 +10,7 @@ Vector3Parameter::Vector3Parameter(
     CHECK_OGL_ERR(m_location = glGetUniformLocation(shaderProgramID, name.c_str()))
 }
 
-void Vector3Parameter::ApplyParameter()
+void Vector3Parameter::ApplyParameter() const
 {
     CHECK_OGL_ERR(glUniform3fv(m_location, 1, glm::value_ptr(m_vector)))
 }

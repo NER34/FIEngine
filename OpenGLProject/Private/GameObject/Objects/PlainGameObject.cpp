@@ -72,5 +72,5 @@ void PlainGameObject::update(float deltaTime)
 	position.z = sin(m_globalVal) / 2.0f;
 			
 	Renderer& renderer = Renderer::get();
-	renderer.addDraw(GeometryDrawDesc(m_mesh, m_material, m_transform));
+	//renderer.addDraw(GeometryDrawDesc(m_mesh, m_material, m_transform));
 }

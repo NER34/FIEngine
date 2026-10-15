@@ -5,6 +5,8 @@
 #include "Rendering/Mesh/Mesh.h"
 #include "ResourceManager/ResourceHandle.h"
 #include "ResourceManager/Resources/MeshResource.h"
+#include "ResourceManager/Resources/ShaderProgramResource.h"
+#include "ResourceManager/Resources/TextureResource.h"
 
 class MeshGameObject : public GameObject
 {
@@ -20,4 +22,6 @@ private:
     float m_globalVal = 0.0f;
     
     ResourceHandle<MeshResource> m_meshResourceHandle;
+    ResourceHandle<ShaderProgramResource> m_shaderProgResHandle;
+    ResourceHandle<TextureResource> m_textureResourceHandle;
 };

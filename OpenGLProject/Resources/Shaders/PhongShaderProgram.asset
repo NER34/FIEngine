@@ -1,0 +1,6 @@
+{
+  "shaders": [
+    "Shaders/VertexShader.asset",
+    "Shaders/PhongShader.asset"
+  ]
+}

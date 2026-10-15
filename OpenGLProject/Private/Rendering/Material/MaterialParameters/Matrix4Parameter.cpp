@@ -10,7 +10,7 @@ Matrix4Parameter::Matrix4Parameter(
     CHECK_OGL_ERR(m_location = glGetUniformLocation(shaderProgramID, name.c_str()))
 }
 
-void Matrix4Parameter::ApplyParameter()
+void Matrix4Parameter::ApplyParameter() const
 {
     CHECK_OGL_ERR(glUniformMatrix4fv(m_location, 1, false, glm::value_ptr(m_matrix)))
 }

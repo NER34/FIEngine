@@ -11,8 +11,7 @@
 
 class MaterialParamHandleBase
 {
-    friend class MaterialParametersPool;
-    uint32_t m_offset = UINT32_MAX;
+public:
     
     bool operator==(const MaterialParamHandleBase& other) const
     {
@@ -23,6 +22,11 @@ class MaterialParamHandleBase
     {
         return m_offset != UINT32_MAX;
     }
+
+private:
+    
+    friend class MaterialParametersPool;
+    uint32_t m_offset = UINT32_MAX;
 };
 
 template <typename TParam>
@@ -99,6 +103,54 @@ public:
         MaterialParamHandleBase m_handle;
     };
 
+    class const_iterator
+    {
+        friend class MaterialParametersPool;
+
+    public:
+        const IMaterialParameter* operator*() const
+        {
+            return m_pool->GetParameter(m_handle);
+        }
+
+        const IMaterialParameter* operator->() const
+        {
+            return m_pool->GetParameter(m_handle);
+        }
+
+        const_iterator& operator++()
+        {
+            m_handle = m_pool->NextHandle(m_handle);
+            return *this;
+        }
+
+        const_iterator operator++(int)
+        {
+            const_iterator previous = *this;
+            ++(*this);
+            return previous;
+        }
+
+        bool operator==(const const_iterator& other) const
+        {
+            return m_pool == other.m_pool && m_handle == other.m_handle;
+        }
+
+        bool operator!=(const const_iterator& other) const
+        {
+            return !(*this == other);
+        }
+
+    private:
+        const_iterator(const MaterialParametersPool* pool, MaterialParamHandleBase handle)
+            : m_pool(pool)
+            , m_handle(handle)
+        {}
+
+        const MaterialParametersPool* m_pool = nullptr;
+        MaterialParamHandleBase m_handle;
+    };
+
     iterator begin() noexcept
     {
         if (m_size > 0)
@@ -113,6 +165,22 @@ public:
     iterator end() noexcept
     {
         return iterator(this, MaterialParamHandleBase());
+    }
+
+    const_iterator begin() const noexcept
+    {
+        if (m_size > 0)
+        {
+            MaterialParamHandleBase handle;
+            handle.m_offset = 0;
+            return const_iterator(this, handle);
+        }
+        return end();
+    }
+
+    const_iterator end() const noexcept
+    {
+        return const_iterator(this, MaterialParamHandleBase());
     }
     
     void Reserve(uint32_t newCapacity)
@@ -146,11 +214,11 @@ public:
     {
         static_assert(std::is_base_of_v<IMaterialParameter, TParam>, "TParam must derive from IMaterialParameter");
     
-        if (m_capacity - sizeof(TParam) < m_size)
+        if (m_capacity < m_size + sizeof(TParam) )
         {
             constexpr uint32_t initPoolCapacity = sizeof(TParam);
             uint32_t newCapacity = m_capacity ? m_capacity : initPoolCapacity;
-            while (newCapacity - sizeof(TParam) < m_size)
+            while (newCapacity < m_size + sizeof(TParam))
             {
                 // TODO: fix overflow
                 newCapacity *= 2;
@@ -168,7 +236,7 @@ public:
         return handle;
     }
     
-    bool IsValidHandle(MaterialParamHandleBase handle)
+    bool IsValidHandle(MaterialParamHandleBase handle) const
     {
         if (handle.IsValid())
         {
@@ -180,17 +248,49 @@ public:
         return false;
     }
     
-    MaterialParamHandleBase NextHandle(MaterialParamHandleBase handle)
+    MaterialParamHandleBase NextHandle(MaterialParamHandleBase handle) const
     {
         if (handle.IsValid())
         {
-            if (IMaterialParameter* param = GetParameter(handle))
+            if (const IMaterialParameter* param = GetParameter(handle))
             {
                 handle.m_offset += param->GetParameterSize();
                 return IsValidHandle(handle) ? handle : MaterialParamHandleBase();
             }
         }
         return MaterialParamHandleBase();
+    }
+
+    template <typename TParam>
+    TParam* GetParameter(MaterialParamHandleBase handle)
+    {
+        static_assert(std::is_base_of_v<IMaterialParameter, TParam>, "TParam must derive from IMaterialParameter");
+
+        if (handle.m_offset <= m_size && sizeof(TParam) <= m_size - handle.m_offset)
+        {
+            auto it = m_paramHandles.find(handle.m_offset);
+            if (it != m_paramHandles.end() && it->second == TParam::GetStaticParameterType())
+            {
+                return reinterpret_cast<TParam*>(m_buffer + handle.m_offset);
+            }
+        }
+        return nullptr;
+    }
+
+    template <typename TParam>
+    const TParam* GetParameter(MaterialParamHandleBase handle) const
+    {
+        static_assert(std::is_base_of_v<IMaterialParameter, TParam>, "TParam must derive from IMaterialParameter");
+
+        if (handle.m_offset <= m_size && sizeof(TParam) <= m_size - handle.m_offset)
+        {
+            auto it = m_paramHandles.find(handle.m_offset);
+            if (it != m_paramHandles.end() && it->second == TParam::GetStaticParameterType())
+            {
+                return reinterpret_cast<const TParam*>(m_buffer + handle.m_offset);
+            }
+        }
+        return nullptr;
     }
     
     template <typename TParam>
@@ -208,12 +308,37 @@ public:
         }
         return nullptr;
     }
+
+    template <typename TParam>
+    const TParam* GetParameter(MaterialParamHandle<TParam> handle) const
+    {
+        static_assert(std::is_base_of_v<IMaterialParameter, TParam>, "TParam must derive from IMaterialParameter");
+
+        if (handle.m_offset <= m_size && sizeof(TParam) <= m_size - handle.m_offset)
+        {
+            auto it = m_paramHandles.find(handle.m_offset);
+            if (it != m_paramHandles.end() && it->second == TParam::GetStaticParameterType())
+            {
+                return reinterpret_cast<const TParam*>(m_buffer + handle.m_offset);
+            }
+        }
+        return nullptr;
+    }
     
     IMaterialParameter* GetParameter(MaterialParamHandleBase handle)
     {
         if (IsValidHandle(handle))
         {
             return reinterpret_cast<IMaterialParameter*>(m_buffer + handle.m_offset);
+        }
+        return nullptr;
+    }
+
+    const IMaterialParameter* GetParameter(MaterialParamHandleBase handle) const
+    {
+        if (IsValidHandle(handle))
+        {
+            return reinterpret_cast<const IMaterialParameter*>(m_buffer + handle.m_offset);
         }
         return nullptr;
     }

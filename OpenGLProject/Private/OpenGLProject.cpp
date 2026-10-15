@@ -16,6 +16,7 @@
 #include "Rendering/Camera.h"
 #include "Rendering/Renderer.h"
 #include "Rendering/Mesh/MeshManager.h"
+#include "ResourceManager/ResourceManager.h"
 #include "Utilities/Logger.h"
 #include "Window/GLFW/WindowGLFW.h"
 
@@ -35,16 +36,15 @@ int main()
 	});
 	
 	// Load GLAD and init OpenGL
+	CameraDesc cameraDesc;
+	cameraDesc.m_aspectRatio = (float)window.getWindowDesc().m_width / (float)window.getWindowDesc().m_height;
+	
 	RendererDesc rendererDesc;
 	rendererDesc.m_viewportDesc = {
 		0, 0,
 		(GLsizei)window.getWindowDesc().m_width,
 		(GLsizei)window.getWindowDesc().m_height
 	};
-
-	CameraDesc cameraDesc;
-	cameraDesc.m_aspectRatio = (float)window.getWindowDesc().m_width / (float)window.getWindowDesc().m_height;
-	
 	rendererDesc.m_cameraDesc = cameraDesc;
 	
 	Renderer& renderer = Renderer::get();

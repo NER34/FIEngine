@@ -29,7 +29,7 @@ public:
     }
     
     virtual uint32_t GetParameterSize() const = 0;
-    virtual void ApplyParameter() = 0;
+    virtual void ApplyParameter() const = 0;
     
 private:
     

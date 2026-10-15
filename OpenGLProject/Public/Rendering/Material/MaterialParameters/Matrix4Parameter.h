@@ -12,7 +12,7 @@ public:
     Matrix4Parameter() = delete;
     Matrix4Parameter(const std::string& name, GLuint shaderProgramID, const glm::mat4& matrix);
     
-    void ApplyParameter() override;
+    void ApplyParameter() const override;
     
 private:
     

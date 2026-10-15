@@ -71,3 +71,8 @@ const std::vector<Mesh>& MeshResource::GetMeshes() const
 {
     return m_meshes;
 }
+
+std::vector<Mesh>& MeshResource::GetMeshes()
+{
+    return m_meshes;
+}

@@ -14,6 +14,7 @@ public:
     void Free() override;
     
     const std::vector<Mesh>& GetMeshes() const;
+    std::vector<Mesh>& GetMeshes();
     
 private:
     

@@ -12,7 +12,7 @@ public:
     Vector3Parameter() = delete;
     Vector3Parameter(const std::string& name, GLuint shaderProgramID, const glm::vec3& matrix);
     
-    void ApplyParameter() override;
+    void ApplyParameter() const override;
     
 private:
     

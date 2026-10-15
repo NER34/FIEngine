@@ -16,6 +16,7 @@ public:
     void Free() override;
     
     const Texture* GetTexture() const;
+    Texture* GetTexture();
     
 private:
     

@@ -42,3 +42,8 @@ const Texture* TextureResource::GetTexture() const
 {
     return m_texture ? &m_texture.value() : nullptr;
 }
+
+Texture* TextureResource::GetTexture()
+{
+    return m_texture ? &m_texture.value() : nullptr;
+}

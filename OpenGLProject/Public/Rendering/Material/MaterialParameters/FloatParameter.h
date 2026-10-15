@@ -10,7 +10,7 @@ public:
     
     FloatParameter(const std::string& name, GLuint shaderProgramID, float value);
     
-    void ApplyParameter() override;
+    void ApplyParameter() const override;
     
 private:
     

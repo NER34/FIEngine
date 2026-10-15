@@ -1,4 +1,4 @@
 {
-  "type": "fragment",
+  "type": 1,
   "path": "Shaders/PhongShader.frag"
 }

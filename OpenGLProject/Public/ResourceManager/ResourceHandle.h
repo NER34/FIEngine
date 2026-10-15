@@ -32,6 +32,11 @@ public:
         return m_resourcePtr.get();
     }
     
+    TResource* Get()
+    {
+        return m_resourcePtr.get();
+    }
+    
 protected:
     
     template <typename T>
