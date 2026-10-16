@@ -11,7 +11,7 @@ class RendererParameters : public MaterialParameterBase<RendererParameters>
 {
 public:
     
-    RendererParameters() = delete;
+    RendererParameters() {};
     RendererParameters(GLuint shaderProgramID);
     
     void SetMesh(Mesh* mesh);

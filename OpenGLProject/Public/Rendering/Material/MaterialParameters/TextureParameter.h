@@ -10,7 +10,7 @@ class TextureParameter : public MaterialParameterBase<TextureParameter>
 {
 public:
     
-    TextureParameter() = delete;
+    TextureParameter() {};
     TextureParameter(const std::string& name, GLuint shaderProgramID, GLuint textureSlot, Texture* texture);
     
     void ApplyParameter() const override;

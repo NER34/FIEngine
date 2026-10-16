@@ -1,0 +1,14 @@
+{
+  "shaderProgram": "Shaders/PhongShaderProgram.asset",
+  "parameters": [
+    {
+      "type": "RendererParameters"
+    },
+    {
+      "type": "TextureParameter",
+      "name": "SolidColor",
+      "path": "Textures/Sting/Sting_Base_Color.png",
+      "slot": 0
+    }
+  ]
+}

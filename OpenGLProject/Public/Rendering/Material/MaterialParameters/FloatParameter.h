@@ -4,10 +4,11 @@
 #include "glad/glad.h"
 #include "Rendering/Material/MaterialParameter.h"
 
-class FloatParameter : public MaterialParameterBase<FloatParameter/*, MaterialParamType::Float*/>
+class FloatParameter : public MaterialParameterBase<FloatParameter>
 {
 public:
     
+    FloatParameter() {}
     FloatParameter(const std::string& name, GLuint shaderProgramID, float value);
     
     void ApplyParameter() const override;

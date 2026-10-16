@@ -9,7 +9,7 @@ class Matrix4Parameter : public MaterialParameterBase<Matrix4Parameter>
 {
 public:
     
-    Matrix4Parameter() = delete;
+    Matrix4Parameter() {};
     Matrix4Parameter(const std::string& name, GLuint shaderProgramID, const glm::mat4& matrix);
     
     void ApplyParameter() const override;

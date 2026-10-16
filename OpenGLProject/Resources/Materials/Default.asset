@@ -1,0 +1,14 @@
+{
+  "shaderProgram": "Shaders/DefaultShaderProgram.asset",
+  "parameters": [
+    {
+      "type": "RendererParameters"
+    },
+    {
+      "type": "TextureParameter",
+      "name": "SolidColor",
+      "path": "Textures/test_image.png",
+      "slot": 0
+    }
+  ]
+}

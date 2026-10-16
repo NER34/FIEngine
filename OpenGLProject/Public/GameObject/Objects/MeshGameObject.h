@@ -4,6 +4,7 @@
 #include "Rendering/Material/Material.h"
 #include "Rendering/Mesh/Mesh.h"
 #include "ResourceManager/ResourceHandle.h"
+#include "ResourceManager/Resources/MaterialResource.h"
 #include "ResourceManager/Resources/MeshResource.h"
 #include "ResourceManager/Resources/ShaderProgramResource.h"
 #include "ResourceManager/Resources/TextureResource.h"
@@ -22,6 +23,11 @@ private:
     float m_globalVal = 0.0f;
     
     ResourceHandle<MeshResource> m_meshResourceHandle;
+    
+    ResourceHandle<MaterialResource> m_materialResourceHandle;
+    /*
     ResourceHandle<ShaderProgramResource> m_shaderProgResHandle;
     ResourceHandle<TextureResource> m_textureResourceHandle;
+    */
+
 };

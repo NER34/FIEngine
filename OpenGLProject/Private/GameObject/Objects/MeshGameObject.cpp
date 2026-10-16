@@ -14,6 +14,8 @@ namespace
 	const char* shaderProgramPath = "Shaders/PhongShaderProgram.asset";
 	
 	const char* meshPath = "Meshes/Sting-Sword-lowpoly.obj";
+	const char* materialPath = "Materials/Phong.asset";
+	
 	const char* meshTexturePath = "Textures/Sting/Sting_Base_Color.png";
 	const std::string meshName = "sword";
 }
@@ -23,7 +25,10 @@ void MeshGameObject::beginPlay()
     auto resourcesPath = getResourcesPath();
 		
 	ResourceManager& resourceManager = ResourceManager::Get();
+	
 	m_meshResourceHandle = resourceManager.LoadResource<MeshResource>(meshPath);
+	m_materialResourceHandle = resourceManager.LoadResource<MaterialResource>(materialPath);
+	/*
 	m_shaderProgResHandle = resourceManager.LoadResource<ShaderProgramResource>(shaderProgramPath);
     m_textureResourceHandle = resourceManager.LoadResource<TextureResource>(meshTexturePath);
 	
@@ -37,17 +42,9 @@ void MeshGameObject::beginPlay()
 		"SolidColor", shaderProgram->getShaderProgramID(), 0, textureResource->GetTexture()
 		));
 	m_material.deactivate();
-	/*
-    MaterialDesc materialDesc;
-    materialDesc.m_shadersDesc = {
-		{ ShaderType::Vertex, (getResourcesPath() / vertShaderPath).string() },
-		{ ShaderType::Fragment, (getResourcesPath() / fragShaderPath).string() }
-    };
-    materialDesc.m_texturesDesc = {
-		{ "SolidColor", meshTexturePath }
-    };
-    m_material.setup(materialDesc);
-    */
+	*/
+	
+	
 	
     m_transform.m_position = glm::vec3(2.0f, 2.0f, 0.0f);
     m_transform.m_rotation = glm::vec3(0.0f, 0.0f, 180.0f);
@@ -64,10 +61,11 @@ void MeshGameObject::update(float deltaTime)
 	*/
 	
 	MeshResource* meshResource = m_meshResourceHandle.Get();
-			
+	MaterialResource* materialResource = m_materialResourceHandle.Get();
+	
 	Renderer& renderer = Renderer::get();
 	for (auto& mesh : meshResource->GetMeshes())
 	{
-		renderer.addDraw(GeometryDrawDesc(mesh, m_material, m_transform));
+		renderer.addDraw(GeometryDrawDesc(mesh, *materialResource->GetMaterial(), m_transform));
 	}
 }

@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include <cstdint>
+#include <json.h>
 #include <memory>
 #include <type_traits>
 #include <typeindex>
@@ -22,6 +23,20 @@ public:
     
     IMaterialParameter() = delete;
     virtual ~IMaterialParameter() = default;
+    virtual void ApplyParameter() const = 0;
+    
+    //virtual void Deserialize(const std::string& name, unsigned int shaderProgramID, nlohmann::json& data) = 0;
+    
+private:
+    
+    friend class MaterialParametersPool;
+    
+    template <typename TSelf>
+    friend class MaterialParameterBase;
+    
+    IMaterialParameter(std::type_index type)
+        : m_type(type)
+    {} 
     
     std::type_index GetParameterType() const
     {
@@ -29,18 +44,6 @@ public:
     }
     
     virtual uint32_t GetParameterSize() const = 0;
-    virtual void ApplyParameter() const = 0;
-    
-private:
-    
-    friend class MaterialParametersPool;
-    
-    template <typename TSelf/*, MaterialParamType Type*/>
-    friend class MaterialParameterBase;
-    
-    IMaterialParameter(std::type_index type)
-        : m_type(type)
-    {}
     
     virtual void CopyParameter(void* buffer = nullptr) = 0;
     virtual void MoveParameter(void* buffer = nullptr) noexcept = 0;

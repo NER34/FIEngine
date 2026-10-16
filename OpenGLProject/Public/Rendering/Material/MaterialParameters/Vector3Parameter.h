@@ -9,7 +9,7 @@ class Vector3Parameter : public MaterialParameterBase<Vector3Parameter>
 {
 public:
     
-    Vector3Parameter() = delete;
+    Vector3Parameter() {};
     Vector3Parameter(const std::string& name, GLuint shaderProgramID, const glm::vec3& matrix);
     
     void ApplyParameter() const override;

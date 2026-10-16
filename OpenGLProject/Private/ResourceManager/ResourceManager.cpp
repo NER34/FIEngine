@@ -3,6 +3,7 @@
 #include <ranges>
 
 #include "ResourceManager/ResourceContainer.h"
+#include "ResourceManager/Resources/MaterialResource.h"
 #include "ResourceManager/Resources/MeshResource.h"
 #include "ResourceManager/Resources/ShaderProgramResource.h"
 #include "ResourceManager/Resources/ShaderResource.h"
@@ -25,6 +26,12 @@ ResourceManager& ResourceManager::Get()
 
 void ResourceManager::Initialize()
 {
+    if (!m_registeredContainers.empty())
+    {
+        return;
+    }
+
+    RegisterResourceType<ResourceContainer<MaterialResource>, MaterialResource>();
     RegisterResourceType<ResourceContainer<MeshResource>, MeshResource>();
     RegisterResourceType<ResourceContainer<ShaderProgramResource>, ShaderProgramResource>();
     RegisterResourceType<ResourceContainer<ShaderResource>, ShaderResource>();
