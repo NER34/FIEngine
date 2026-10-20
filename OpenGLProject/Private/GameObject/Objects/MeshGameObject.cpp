@@ -21,30 +21,11 @@ namespace
 }
 
 void MeshGameObject::beginPlay()
-{
-    auto resourcesPath = getResourcesPath();
-		
+{		
 	ResourceManager& resourceManager = ResourceManager::Get();
 	
 	m_meshResourceHandle = resourceManager.LoadResource<MeshResource>(meshPath);
 	m_materialResourceHandle = resourceManager.LoadResource<MaterialResource>(materialPath);
-	/*
-	m_shaderProgResHandle = resourceManager.LoadResource<ShaderProgramResource>(shaderProgramPath);
-    m_textureResourceHandle = resourceManager.LoadResource<TextureResource>(meshTexturePath);
-	
-	auto* textureResource = m_textureResourceHandle.Get();
-	auto* shaderProgramResource = m_shaderProgResHandle.Get();
-	auto* shaderProgram = shaderProgramResource->GetShaderProgram();
-	m_material.SetShaderProgram(shaderProgram);
-	m_material.activate();
-	m_material.PushParameter("rendererParams", RendererParameters(shaderProgram->getShaderProgramID()));
-	m_material.PushParameter("SolidColor", TextureParameter(
-		"SolidColor", shaderProgram->getShaderProgramID(), 0, textureResource->GetTexture()
-		));
-	m_material.deactivate();
-	*/
-	
-	
 	
     m_transform.m_position = glm::vec3(2.0f, 2.0f, 0.0f);
     m_transform.m_rotation = glm::vec3(0.0f, 0.0f, 180.0f);

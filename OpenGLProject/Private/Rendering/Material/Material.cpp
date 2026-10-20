@@ -1,31 +1,5 @@
 #include "Rendering/Material/Material.h"
 
-/*
-Material::Material(Material&& other) noexcept
-{
-    m_shaderProgram = other.m_shaderProgram;
-    m_paramsBuffer = std::move(other.m_paramsBuffer);
-    m_currBufferOffset = other.m_currBufferOffset;
-    
-    other.m_shaderProgram = nullptr;
-    other.m_currBufferOffset = 0;
-}
-
-Material& Material::operator=(Material&& other) noexcept
-{
-    if (this != &other)
-    {
-        m_shaderProgram = other.m_shaderProgram;
-        m_paramsBuffer = std::move(other.m_paramsBuffer);
-        m_currBufferOffset = other.m_currBufferOffset;
-    
-        other.m_shaderProgram = nullptr;
-        other.m_currBufferOffset = 0;
-    }
-    return *this;
-}
-*/
-
 Material::~Material()
 {
     clearMaterial();
@@ -42,9 +16,9 @@ void Material::activate() const
     {
         m_shaderProgram->activate();
         
-        for (const IMaterialParameter* parameter : m_parametersPool)
+        for (const IMaterialParameter& parameter : m_parameters)
         {
-            parameter->ApplyParameter();
+            parameter.ApplyParameter();
         }
     }
     else
@@ -74,5 +48,5 @@ bool Material::isValid() const
 void Material::clearMaterial()
 {
     m_shaderProgram = nullptr;
-    m_parametersPool.ClearParameters();
+    m_parameters.ClearParameters();
 }

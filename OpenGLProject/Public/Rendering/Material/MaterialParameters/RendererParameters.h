@@ -14,14 +14,12 @@ public:
     RendererParameters() {};
     RendererParameters(GLuint shaderProgramID);
     
-    void SetMesh(Mesh* mesh);
     void SetTransform(const Transform& transform);
     
     void ApplyParameter() const override;
 
 private:
     
-    Mesh* m_mesh = nullptr;
     Transform m_transform;
     GLint m_projViewMatLoc = -1;
     GLint m_modelMatLoc = -1;

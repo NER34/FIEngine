@@ -1,11 +1,6 @@
 ﻿#pragma once
 
-#include <cstdint>
-#include <json.h>
-#include <memory>
-#include <type_traits>
 #include <typeindex>
-#include <utility>
 
 enum class MaterialParamType : unsigned char
 {
@@ -29,7 +24,7 @@ public:
     
 private:
     
-    friend class MaterialParametersPool;
+    friend class MaterialParameters;
     
     template <typename TSelf>
     friend class MaterialParameterBase;
@@ -42,11 +37,6 @@ private:
     {
         return m_type;
     }
-    
-    virtual uint32_t GetParameterSize() const = 0;
-    
-    virtual void CopyParameter(void* buffer = nullptr) = 0;
-    virtual void MoveParameter(void* buffer = nullptr) noexcept = 0;
     
 private:
     
@@ -66,31 +56,6 @@ public:
     static std::type_index GetStaticParameterType()
     {
         return std::type_index(typeid(TSelf));
-    }
-    
-    uint32_t GetParameterSize() const final
-    {
-        return sizeof(TSelf);
-    }
-    
-private:
-    
-    void CopyParameter(void* buffer) final
-    {
-        if (buffer)
-        {
-            new (buffer) TSelf(*static_cast<TSelf*>(this));
-        }
-    }
-    
-    void MoveParameter(void* buffer) noexcept final
-    {
-        static_assert(std::is_nothrow_move_constructible_v<TSelf>);
-        
-        if (buffer)
-        {
-            new (buffer) TSelf(std::move(*static_cast<TSelf*>(this)));
-        }
     }
     
 };

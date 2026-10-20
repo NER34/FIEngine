@@ -13,11 +13,6 @@ RendererParameters::RendererParameters(GLuint shaderProgramID)
     CHECK_OGL_ERR(m_viewPosLoc      = glGetUniformLocation(shaderProgramID, "viewPos"))
 }
 
-void RendererParameters::SetMesh(Mesh* mesh)
-{
-    m_mesh = mesh;
-}
-
 void RendererParameters::SetTransform(const Transform& transform)
 {
     m_transform = transform;
@@ -25,31 +20,28 @@ void RendererParameters::SetTransform(const Transform& transform)
 
 void RendererParameters::ApplyParameter() const
 {
-    if (m_mesh)
-    {
-        Renderer& renderer = Renderer::get();
-        glm::mat4 projMat = renderer.getCamera().getProjectionMatrix();
-        glm::mat4 viewMat = renderer.getCamera().getViewMatrix();
-        glm::mat4 viewProjMat = projMat * viewMat * toLeftHandTransformMat;
-        CHECK_OGL_ERR(glUniformMatrix4fv(
-            m_modelMatLoc, 1, false, 
-            glm::value_ptr(m_transform.getModelMatrix())
-            ))
-        CHECK_OGL_ERR(glUniformMatrix4fv(
-            m_projViewMatLoc, 1, false, 
-            glm::value_ptr(viewProjMat)
-            ))
-        CHECK_OGL_ERR(glUniform3fv(
-            m_lightPosLoc, 1, 
-            glm::value_ptr(renderer.getLightPoint().getPosition())
-            ))
-        CHECK_OGL_ERR(glUniform3fv(
-            m_lightColorLoc, 1, 
-            glm::value_ptr(renderer.getLightPoint().getColor())
-            ))
-        CHECK_OGL_ERR(glUniform3fv(
-            m_viewPosLoc, 1, 
-            glm::value_ptr(renderer.getCamera().getPosition())
-            ))
-    }
+    Renderer& renderer = Renderer::get();
+    glm::mat4 projMat = renderer.getCamera().getProjectionMatrix();
+    glm::mat4 viewMat = renderer.getCamera().getViewMatrix();
+    glm::mat4 viewProjMat = projMat * viewMat * toLeftHandTransformMat;
+    CHECK_OGL_ERR(glUniformMatrix4fv(
+        m_modelMatLoc, 1, false, 
+        glm::value_ptr(m_transform.getModelMatrix())
+        ))
+    CHECK_OGL_ERR(glUniformMatrix4fv(
+        m_projViewMatLoc, 1, false, 
+        glm::value_ptr(viewProjMat)
+        ))
+    CHECK_OGL_ERR(glUniform3fv(
+        m_lightPosLoc, 1, 
+        glm::value_ptr(renderer.getLightPoint().getPosition())
+        ))
+    CHECK_OGL_ERR(glUniform3fv(
+        m_lightColorLoc, 1, 
+        glm::value_ptr(renderer.getLightPoint().getColor())
+        ))
+    CHECK_OGL_ERR(glUniform3fv(
+        m_viewPosLoc, 1, 
+        glm::value_ptr(renderer.getCamera().getPosition())
+        ))
 }

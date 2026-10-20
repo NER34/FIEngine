@@ -23,12 +23,11 @@ void Renderer::render()
     */
     
     for (const auto& drawDesc : m_frontDrawList)
-    {        
-        auto* param = drawDesc.m_material.GetParameter<RendererParameters>("rendererParams");
-        if (param)
+    {
+        if (auto* param = drawDesc.m_material.GetParameter<RendererParameters>("rendererParams"))
         {
-            param->SetMesh(&drawDesc.m_mesh);
             param->SetTransform(drawDesc.m_transform);
+            
             drawDesc.m_material.activate();
             //drawDesc.m_material.setUniform("projViewMat", viewProjMat);
             //drawDesc.m_material.setUniform("modelMat", modelMat);
