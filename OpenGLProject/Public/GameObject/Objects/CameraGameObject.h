@@ -6,8 +6,8 @@ class CameraGameObject : public GameObject
 {
 public:
     
-    void beginPlay() override;
-    void update(float deltaTime);
+    void BeginPlay() override;
+    void Update(float deltaTime);
     
 private:
     

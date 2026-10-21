@@ -4,8 +4,8 @@ class GameObject
 {
 public:
     
-    virtual void beginPlay() {}
-    virtual void update(float deltaTime) {}
-    virtual void endPlay() {}
+    virtual void BeginPlay() {}
+    virtual void Update(float deltaTime) {}
+    virtual void EndPlay() {}
     
 };

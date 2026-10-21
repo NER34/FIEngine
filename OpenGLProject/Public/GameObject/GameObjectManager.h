@@ -18,7 +18,7 @@ public:
     T* createGameObject()
     {
         T* gameObject = new T();
-        gameObject->beginPlay();
+        gameObject->BeginPlay();
         m_gameObjects.insert(gameObject);
         return gameObject;
     }
@@ -26,7 +26,7 @@ public:
     void destroyGameObject(GameObject* gameObject);
     void destroyAllGameObjects();
     
-    void update(float deltaTime);
+    void Update(float deltaTime);
 
 private:
     

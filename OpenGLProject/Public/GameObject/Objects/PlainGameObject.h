@@ -9,8 +9,8 @@ class PlainGameObject : public GameObject
 {
 public:
     
-    void beginPlay() override;
-    void update(float deltaTime) override;
+    void BeginPlay() override;
+    void Update(float deltaTime) override;
     
 private:
     

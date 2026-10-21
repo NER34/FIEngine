@@ -5,7 +5,7 @@
 #include "Rendering/Camera.h"
 #include "Rendering/Renderer.h"
 
-void CameraGameObject::beginPlay()
+void CameraGameObject::BeginPlay()
 {
     FIE::IInputManager& inputManager = FIE::IInputManager::Get();
     FIE::InputContext* inputContext = inputManager.getInputContext();
@@ -48,7 +48,7 @@ void CameraGameObject::beginPlay()
 	);
 }
 
-void CameraGameObject::update(float deltaTime)
+void CameraGameObject::Update(float deltaTime)
 {
 	if (!m_followMouse)
 	{

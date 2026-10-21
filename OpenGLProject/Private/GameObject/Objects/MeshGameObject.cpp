@@ -20,7 +20,7 @@ namespace
 	const std::string meshName = "sword";
 }
 
-void MeshGameObject::beginPlay()
+void MeshGameObject::BeginPlay()
 {		
 	ResourceManager& resourceManager = ResourceManager::Get();
 	
@@ -31,7 +31,7 @@ void MeshGameObject::beginPlay()
     m_transform.m_rotation = glm::vec3(0.0f, 0.0f, 180.0f);
 }
 
-void MeshGameObject::update(float deltaTime)
+void MeshGameObject::Update(float deltaTime)
 {
 	m_globalVal += deltaTime;
 

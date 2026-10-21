@@ -28,7 +28,7 @@ namespace
     };
 }
 
-void PlainGameObject::beginPlay()
+void PlainGameObject::BeginPlay()
 {
     ResourceManager& resourceManager = ResourceManager::Get();
     m_materialResourceHandle = resourceManager.LoadResource<MaterialResource>(materialPath);
@@ -45,7 +45,7 @@ void PlainGameObject::beginPlay()
     m_transform.m_rotation = glm::vec3(0.0f, 0.0f, 180.0f);
 }
 
-void PlainGameObject::update(float deltaTime)
+void PlainGameObject::Update(float deltaTime)
 {
     m_globalVal += deltaTime;
 

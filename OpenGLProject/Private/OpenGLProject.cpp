@@ -65,7 +65,7 @@ int main()
 		prevTime = currTime;
 		
 		inputManager.update();
-		gameObjectManager.update(deltaTime);
+		gameObjectManager.Update(deltaTime);
 		renderer.render();
 		window.update();
 	}

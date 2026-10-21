@@ -16,7 +16,7 @@ void GameObjectManager::destroyGameObject(GameObject* gameObject)
     auto it = m_gameObjects.find(gameObject);
     if (it != m_gameObjects.end())
     {
-        gameObject->endPlay();
+        gameObject->EndPlay();
         delete gameObject;
         m_gameObjects.erase(it);
     }
@@ -26,16 +26,16 @@ void GameObjectManager::destroyAllGameObjects()
 {
     for (GameObject* gameObject : m_gameObjects)
     {
-        gameObject->endPlay();
+        gameObject->EndPlay();
         delete gameObject;
     }
     m_gameObjects.clear();
 }
 
-void GameObjectManager::update(float deltaTime)
+void GameObjectManager::Update(float deltaTime)
 {
     for (GameObject* gameObject : m_gameObjects)
     {
-        gameObject->update(deltaTime);
+        gameObject->Update(deltaTime);
     }
 }
