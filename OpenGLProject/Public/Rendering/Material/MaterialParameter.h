@@ -1,6 +1,9 @@
 ﻿#pragma once
 
+#include <json.h>
 #include <typeindex>
+
+#include "Utilities/Logger.h"
 
 class ShaderProgram;
 
@@ -18,29 +21,41 @@ class IMaterialParameter
 {
 public:
     
-    IMaterialParameter() = delete;
+    IMaterialParameter() = default;
     virtual ~IMaterialParameter() = default;
+    
     virtual void ApplyParameter(ShaderProgram* shaderProgram) const = 0;
+    
+    virtual bool Deserialize(const nlohmann::json& data)
+    {
+        if (!data.contains("name") || !data["name"].is_string())
+        {
+            LOG_ERROR("Material parameter is missing its name");
+            return false;
+        }
+        SetName(data["name"]);
+        return true;
+    }
+    
+    void SetName(const std::string& name)
+    {
+        m_name = name;
+    }
+    
+    const std::string& GetName() const
+    {
+        return m_name;
+    }
     
 private:
     
     friend class MaterialParameters;
     
-    template <typename TSelf>
-    friend class MaterialParameterBase;
+    virtual std::type_index GetParameterType() const = 0;
     
-    IMaterialParameter(std::type_index type)
-        : m_type(type)
-    {} 
+protected:
     
-    std::type_index GetParameterType() const
-    {
-        return m_type;
-    }
-    
-private:
-    
-    std::type_index m_type;
+    std::string m_name;
     
 };
 
@@ -50,12 +65,21 @@ class MaterialParameterBase : public IMaterialParameter
 public:
     
     MaterialParameterBase()
-        : IMaterialParameter(std::type_index(typeid(TSelf)))
+        : m_type(std::type_index(typeid(TSelf)))
     {}
 
     static std::type_index GetStaticParameterType()
     {
         return std::type_index(typeid(TSelf));
     }
+    
+private:
+    
+    std::type_index GetParameterType() const final
+    {
+        return m_type;
+    }
+    
+    std::type_index m_type;
     
 };

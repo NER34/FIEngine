@@ -10,16 +10,11 @@ class FloatParameter : public MaterialParameterBase<FloatParameter>
 {
 public:
     
-    FloatParameter() {}
-    FloatParameter(const std::string& name, float value)
-        : m_name(name), m_value(value)
-    {}
-    
     void ApplyParameter(ShaderProgram* shaderProgram) const override;
+    bool Deserialize(const nlohmann::json& data) override;
     
 private:
     
-    std::string m_name;
     float m_value = 0.0f;
     
 };

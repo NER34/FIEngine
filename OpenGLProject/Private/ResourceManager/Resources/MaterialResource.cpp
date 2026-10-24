@@ -44,22 +44,12 @@ void MaterialResource::Reload()
         LOG_ERROR("Invalid material file {}: shaderProgram is missing", fullPath);
         return;
     }
-
-    if (materialAsset.contains("textures") && !materialAsset["textures"].is_array())
-    {
-        LOG_ERROR("Invalid material file {}: textures must be an array", fullPath);
-        return;
-    }
-
     ResourceManager& resourceManager = ResourceManager::Get();
-    m_shaderProgramResource = resourceManager.LoadResource<ShaderProgramResource>(
-        materialAsset["shaderProgram"].get<std::string>()
-        );
+    m_shaderProgramResource = resourceManager.LoadResource<ShaderProgramResource>(materialAsset["shaderProgram"]);
 
     ShaderProgramResource* shaderProgramResource = m_shaderProgramResource.Get();
-    ShaderProgram* shaderProgram = shaderProgramResource
-        ? shaderProgramResource->GetShaderProgram()
-        : nullptr;
+    ShaderProgram* shaderProgram = shaderProgramResource ? shaderProgramResource->GetShaderProgram() : nullptr;
+    
     if (!m_shaderProgramResource.IsValid() || shaderProgram == nullptr || !shaderProgram->IsValid())
     {
         LOG_ERROR("Failed to load shader program for material: {}", fullPath);
@@ -78,8 +68,8 @@ void MaterialResource::Reload()
     }
 
     shaderProgram->Activate();
+    
     bool parametersValid = true;
-
     if (materialAsset.contains("parameters"))
     {
         for (const auto& parameter : materialAsset["parameters"])
@@ -122,134 +112,51 @@ bool MaterialResource::IsValid() const
     return m_material && m_material->isValid();
 }
 
+namespace 
+{
+    template<typename TParam>
+    bool PushParameter(Material& material, const nlohmann::json& json)
+    {
+        TParam parameter;
+        if (!parameter.Deserialize(json))
+        {
+            return false;
+        }
+        material.PushParameter(parameter.GetName(), std::move(parameter));
+        return true;
+    };
+}
+
 bool MaterialResource::AddParameter(const ShaderProgram* shaderProgram, const nlohmann::json& json)
 {
-    if (shaderProgram == nullptr || !shaderProgram->IsValid() ||
-        !json.is_object() || !json.contains("type") || !json["type"].is_string())
+    if (shaderProgram == nullptr || !shaderProgram->IsValid())
+    {
+        LOG_ERROR("Shader program is invalid");
+        return false;
+    }
+
+    if (!json.is_object() || !json.contains("type") || !json["type"].is_string())
     {
         LOG_ERROR("Invalid material parameter definition");
         return false;
     }
 
     const std::string type = json["type"];
-    const GLuint shaderProgramID = shaderProgram->GetShaderProgramID();
-
     if (type == "FloatParameter")
     {
-        if (!json.contains("name") || !json["name"].is_string())
-        {
-            LOG_ERROR("Material parameter is missing its name");
-            return false;
-        }
-        const std::string name = json["name"];
-
-        if (!json.contains("value") || !json["value"].is_number())
-        {
-            LOG_ERROR("Float material parameter {} has an invalid value", name);
-            return false;
-        }
-
-        m_material->PushParameter(name, FloatParameter(name, json["value"]));
-        return true;
+        return PushParameter<FloatParameter>(m_material.value(), json);
     }
-
     if (type == "Vector3Parameter")
     {
-        if (!json.contains("name") || !json["name"].is_string())
-        {
-            LOG_ERROR("Material parameter is missing its name");
-            return false;
-        }
-        const std::string name = json["name"];
-
-        if (!json.contains("value") || !json["value"].is_array() || json["value"].size() != 3)
-        {
-            LOG_ERROR("Vector3 material parameter {} must contain three values", name);
-            return false;
-        }
-
-        glm::vec3 value;
-        for (std::size_t index = 0; index < 3; ++index)
-        {
-            if (!json["value"][index].is_number())
-            {
-                LOG_ERROR("Vector3 material parameter {} has an invalid value", name);
-                return false;
-            }
-            value[index] = json["value"][index];
-        }
-
-        m_material->PushParameter(name, Vector3Parameter(name, value));
-        return true;
+        return PushParameter<Vector3Parameter>(m_material.value(), json);
     }
-
     if (type == "Matrix4Parameter")
     {
-        if (!json.contains("name") || !json["name"].is_string())
-        {
-            LOG_ERROR("Material parameter is missing its name");
-            return false;
-        }
-        const std::string name = json["name"];
-
-        if (!json.contains("value") || !json["value"].is_array() || json["value"].size() != 16)
-        {
-            LOG_ERROR("Matrix4 material parameter {} must contain sixteen values", name);
-            return false;
-        }
-
-        glm::mat4 value(1.0f);
-        for (std::size_t index = 0; index < 16; ++index)
-        {
-            if (!json["value"][index].is_number())
-            {
-                LOG_ERROR("Matrix4 material parameter {} has an invalid value", name);
-                return false;
-            }
-            value[index % 4][index / 4] = json["value"][index].get<float>();
-        }
-
-        m_material->PushParameter(name, Matrix4Parameter(name, value));
-        return true;
+        return PushParameter<Matrix4Parameter>(m_material.value(), json);
     }
-
     if (type == "TextureParameter")
     {
-        if (!json.contains("name") || !json["name"].is_string())
-        {
-            LOG_ERROR("Material parameter is missing its name");
-            return false;
-        }
-        const std::string name = json["name"];
-
-        if (!json.contains("slot") || !json["slot"].is_number())
-        {
-            LOG_ERROR("Texture material parameter {} has an invalid slot", name);
-            return false;
-        }
-
-        if (!json.contains("path") || !json["path"].is_string())
-        {
-            LOG_ERROR("Texture material parameter {} has invalid path", name);
-            return false;
-        }
-
-        const GLuint textureSlot = json["slot"];
-        auto textureResource = ResourceManager::Get().LoadResource<TextureResource>(json["path"]);
-
-        Texture* texture = textureResource.IsValid() ? textureResource.Get()->GetTexture() : nullptr;
-        if (texture == nullptr || !texture->isValid())
-        {
-            LOG_ERROR(
-                "Failed to load texture for material parameter {}: {}", 
-                name, json["path"].get<std::string>()
-                );
-            return false;
-        }
-
-        m_textureResources.push_back(textureResource);
-        m_material->PushParameter(name, TextureParameter(name, texture, textureSlot));
-        return true;
+        return PushParameter<TextureParameter>(m_material.value(), json);
     }
 
     LOG_ERROR("Unsupported material parameter type: {}", type);
