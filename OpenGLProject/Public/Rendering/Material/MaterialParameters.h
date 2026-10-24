@@ -1,20 +1,18 @@
 #pragma once
 
-#include <cstddef>
 #include <iterator>
 #include <memory>
 #include <string>
 #include <type_traits>
 #include <unordered_map>
 #include <utility>
-#include <vector>
 
 #include "MaterialParameter.h"
 #include "Utilities/Logger.h"
 
 class MaterialParameters
 {
-    using ParameterPtr = std::shared_ptr<IMaterialParameter>;
+    using ParameterPtr = std::unique_ptr<IMaterialParameter>;
     using Storage = std::unordered_map<std::string, ParameterPtr>;
 
 public:
@@ -187,8 +185,8 @@ public:
     {
         static_assert(std::is_base_of_v<IMaterialParameter, TParam>, "TParam must derive from IMaterialParameter");
 
-        auto parameter = std::make_shared<TParam>(std::forward<Args>(args)...);
-        auto [it, inserted] = m_parameters.emplace(name, parameter);
+        auto parameter = std::make_unique<TParam>(std::forward<Args>(args)...);
+        auto [it, inserted] = m_parameters.emplace(name, std::move(parameter));
 
         if (!inserted)
         {

@@ -14,7 +14,7 @@ void MeshResource::Reload()
     Free();
     
     Assimp::Importer importer;
-    std::string fullPath = (getResourcesPath() / GetFilePath()).string();
+    std::string fullPath = (GetResourcesPath() / GetFilePath()).string();
     auto* scene = importer.ReadFile(
         fullPath.c_str(),
         aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_JoinIdenticalVertices

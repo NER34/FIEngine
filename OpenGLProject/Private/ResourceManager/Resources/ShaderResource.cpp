@@ -17,7 +17,7 @@ void ShaderResource::Reload()
 {
     Free();
     
-    const auto assetPath = getResourcesPath() / GetFilePath();
+    const auto assetPath = GetResourcesPath() / GetFilePath();
     std::ifstream assetFile(assetPath);
 
     if (!assetFile.is_open())
@@ -39,7 +39,7 @@ void ShaderResource::Reload()
         return;
     }
     
-    const std::filesystem::path shaderPath = getResourcesPath() / shaderFilePath;
+    const std::filesystem::path shaderPath = GetResourcesPath() / shaderFilePath;
     std::ifstream shaderFile(shaderPath);
 
     if (!shaderFile.is_open())
@@ -76,5 +76,5 @@ const Shader* ShaderResource::GetShader() const
 
 bool ShaderResource::IsValid() const
 {
-    return m_shader && m_shader->isValid();
+    return m_shader && m_shader->IsValid();
 }

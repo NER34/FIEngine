@@ -1,7 +1,5 @@
 ﻿#include "Rendering/Renderer.h"
 
-#include "Rendering/Material/MaterialParameters/RendererParameters.h"
-
 Renderer& Renderer::get()
 {
     static Renderer instance;
@@ -16,29 +14,26 @@ void Renderer::render()
     glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
-    /*
     glm::mat4 projMat = m_camera.getProjectionMatrix();
     glm::mat4 viewMat = m_camera.getViewMatrix();
     glm::mat4 viewProjMat = projMat * viewMat * toLeftHandTransformMat;
-    */
     
     for (const auto& drawDesc : m_frontDrawList)
     {
-        if (auto* param = drawDesc.m_material.GetParameter<RendererParameters>("rendererParams"))
-        {
-            param->SetTransform(drawDesc.m_transform);
-            
-            drawDesc.m_material.activate();
-            //drawDesc.m_material.setUniform("projViewMat", viewProjMat);
-            //drawDesc.m_material.setUniform("modelMat", modelMat);
-            //drawDesc.m_material.setUniform("lightPos", m_lightPoint.getPosition());
-            //drawDesc.m_material.setUniform("lightColor", m_lightPoint.getColor());
-            //drawDesc.m_material.setUniform("viewPos", m_camera.getPosition());
-            
-            drawDesc.m_mesh.draw();
-            
-            drawDesc.m_material.deactivate();
-        }
+        glm::mat4 modelMat = drawDesc.m_transform.GetModelMatrix();
+        auto* shaderProgram = drawDesc.m_material.GetShaderProgram();
+        
+        drawDesc.m_material.activate();
+        
+        shaderProgram->SetUniformMat4("projViewMat", viewProjMat);
+        shaderProgram->SetUniformMat4("modelMat", modelMat);
+        shaderProgram->SetUniformFloat3("lightPos", m_lightPoint.getPosition());
+        shaderProgram->SetUniformFloat3("lightColor", m_lightPoint.getColor());
+        shaderProgram->SetUniformFloat3("viewPos", m_camera.getPosition());
+        
+        drawDesc.m_mesh.draw();
+        
+        drawDesc.m_material.deactivate();
     }
 }
 

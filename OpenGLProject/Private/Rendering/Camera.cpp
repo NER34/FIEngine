@@ -25,9 +25,9 @@ const Transform& Camera::getTransform() const
 glm::mat4 Camera::getViewMatrix() const
 {
     return glm::lookAt(
-        toOGLCoordSys(m_transform.m_position),
-        toOGLCoordSys(m_transform.m_position + m_transform.getForwardVector()),
-        toOGLCoordSys(m_cameraDesc.m_up)
+        ToOGLCoordSys(m_transform.m_position),
+        ToOGLCoordSys(m_transform.m_position + m_transform.GetForwardVector()),
+        ToOGLCoordSys(m_cameraDesc.m_up)
         );
 }
 

@@ -13,7 +13,7 @@ void TextureResource::Reload()
 {
     Free();
     
-    std::string texturePath = (getResourcesPath() / GetFilePath()).string();
+    std::string texturePath = (GetResourcesPath() / GetFilePath()).string();
     TextureDesc textureDesc;
     textureDesc.data = stbi_load(
         texturePath.c_str(), 

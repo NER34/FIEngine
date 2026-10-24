@@ -16,7 +16,7 @@ const std::unordered_map<ShaderType, GLenum> g_enumToGLenum =
 Shader::Shader(const ShaderDesc& desc)
     : m_shaderType(desc.m_shaderType)
 {
-    createShader(desc);
+    CreateShader(desc);
 }
 
 Shader::Shader(Shader&& other) noexcept
@@ -39,38 +39,38 @@ Shader& Shader::operator=(Shader&& other) noexcept
 
 Shader::~Shader()
 {
-    destroyShader();
+    DestroyShader();
 }
 
-void Shader::setup(const ShaderDesc& desc)
+void Shader::Setup(const ShaderDesc& desc)
 {
     m_shaderType = desc.m_shaderType;
     
-    destroyShader();
-    createShader(desc);
+    DestroyShader();
+    CreateShader(desc);
 }
 
-bool Shader::isValid() const
+bool Shader::IsValid() const
 {
     return m_shaderID != 0;
 }
 
-ShaderType Shader::getShaderType() const
+ShaderType Shader::GetShaderType() const
 {
     return m_shaderType;
 }
 
-GLenum Shader::getGLShaderType() const
+GLenum Shader::GetGLShaderType() const
 {
     return g_enumToGLenum.at(m_shaderType);
 }
 
-GLuint Shader::getShaderID() const
+GLuint Shader::GetShaderID() const
 {
     return m_shaderID;
 }
 
-void Shader::createShader(const ShaderDesc& desc)
+void Shader::CreateShader(const ShaderDesc& desc)
 {
     
     /*
@@ -92,7 +92,7 @@ void Shader::createShader(const ShaderDesc& desc)
     int shaderDataSize = static_cast<GLint>(shaderData.size());
     */
 
-    CHECK_OGL_ERR(m_shaderID = glCreateShader(getGLShaderType()))
+    CHECK_OGL_ERR(m_shaderID = glCreateShader(GetGLShaderType()))
     CHECK_OGL_ERR(glShaderSource(m_shaderID, 1, &desc.m_shaderDataPtr, &desc.m_shaderDataSize))
     CHECK_OGL_ERR(glCompileShader(m_shaderID))
 
@@ -109,7 +109,7 @@ void Shader::createShader(const ShaderDesc& desc)
     }
 }
 
-void Shader::destroyShader()
+void Shader::DestroyShader()
 {
     CHECK_OGL_ERR(glDeleteShader(m_shaderID))
     m_shaderID = 0;

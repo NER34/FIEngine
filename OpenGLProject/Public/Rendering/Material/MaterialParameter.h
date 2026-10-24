@@ -2,6 +2,8 @@
 
 #include <typeindex>
 
+class ShaderProgram;
+
 enum class MaterialParamType : unsigned char
 {
     Float = 0,
@@ -18,9 +20,7 @@ public:
     
     IMaterialParameter() = delete;
     virtual ~IMaterialParameter() = default;
-    virtual void ApplyParameter() const = 0;
-    
-    //virtual void Deserialize(const std::string& name, unsigned int shaderProgramID, nlohmann::json& data) = 0;
+    virtual void ApplyParameter(ShaderProgram* shaderProgram) const = 0;
     
 private:
     

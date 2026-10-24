@@ -24,7 +24,7 @@ const std::string& ResourceBase::GetFilePath() const
 
 std::string ResourceBase::GetFullFilePath() const
 {
-    return (getResourcesPath() / m_filePath).string();
+    return (GetResourcesPath() / m_filePath).string();
 }
 
 /*

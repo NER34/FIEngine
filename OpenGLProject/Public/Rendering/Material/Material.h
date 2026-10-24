@@ -36,7 +36,8 @@ public:
 
     ~Material();
     
-    void SetShaderProgram(const ShaderProgram* shaderProgram);
+    void SetShaderProgram(ShaderProgram* shaderProgram);
+    ShaderProgram* GetShaderProgram() const;
     
     void activate() const;
     void deactivate() const;
@@ -75,7 +76,7 @@ protected:
     
 private:
     
-    const ShaderProgram* m_shaderProgram = nullptr;
+    ShaderProgram* m_shaderProgram = nullptr;
     MaterialParameters m_parameters;
     
 };

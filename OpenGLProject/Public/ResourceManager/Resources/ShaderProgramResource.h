@@ -18,7 +18,7 @@ public:
     void Reload() override;
     void Free() override;
     
-    const ShaderProgram* GetShaderProgram() const;
+    ShaderProgram* GetShaderProgram();
 
 private:
     

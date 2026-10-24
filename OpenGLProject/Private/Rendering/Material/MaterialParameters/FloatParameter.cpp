@@ -1,15 +1,8 @@
 ﻿#include "Rendering/Material/MaterialParameters/FloatParameter.h"
 
-#include "Rendering/Validation.h"
+#include "Rendering/Material/ShaderProgram.h"
 
-FloatParameter::FloatParameter(
-    const std::string& name, GLuint shaderProgramID, float value) 
-    : m_value(value)
+void FloatParameter::ApplyParameter(ShaderProgram* shaderProgram) const
 {
-    CHECK_OGL_ERR(m_location = glGetUniformLocation(shaderProgramID, name.c_str()))
-}
-
-void FloatParameter::ApplyParameter() const
-{
-    CHECK_OGL_ERR(glUniform1fv(m_location, 1, &m_value))
+    shaderProgram->SetUniformFloat(m_name, m_value);
 }

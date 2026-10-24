@@ -57,8 +57,8 @@ void CameraGameObject::Update(float deltaTime)
 	
 	Camera& camera = Renderer::get().getCamera();
 	
-	auto cameraForward =  camera.getTransform().getForwardVector();
-	auto cameraRight = camera.getTransform().getRightVector();
+	auto cameraForward =  camera.getTransform().GetForwardVector();
+	auto cameraRight = camera.getTransform().GetRightVector();
 	
 	auto cameraPos = camera.getPosition();
 	cameraPos += cameraForward * m_cameraMovSpeed * deltaTime * (float)m_cameraMovDir.m_forwardMult;

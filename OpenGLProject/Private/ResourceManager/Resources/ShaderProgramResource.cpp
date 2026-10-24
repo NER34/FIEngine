@@ -68,7 +68,7 @@ void ShaderProgramResource::Free()
     m_shaderResources.clear();
 }
 
-const ShaderProgram* ShaderProgramResource::GetShaderProgram() const
+ShaderProgram* ShaderProgramResource::GetShaderProgram()
 {
     return m_shaderProgram ? &m_shaderProgram.value() : nullptr;
 }

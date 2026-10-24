@@ -40,18 +40,18 @@ public:
     
     ~Shader();
     
-    void setup(const ShaderDesc& desc);
+    void Setup(const ShaderDesc& desc);
     
-    bool isValid() const;
+    bool IsValid() const;
     
-    ShaderType getShaderType() const;
-    GLenum getGLShaderType() const;
-    GLuint getShaderID() const;
+    ShaderType GetShaderType() const;
+    GLenum GetGLShaderType() const;
+    GLuint GetShaderID() const;
     
 protected:
     
-    void createShader(const ShaderDesc& desc);
-    void destroyShader();
+    void CreateShader(const ShaderDesc& desc);
+    void DestroyShader();
     
 private:
     

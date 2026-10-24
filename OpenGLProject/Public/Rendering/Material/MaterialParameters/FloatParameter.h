@@ -4,18 +4,22 @@
 #include "glad/glad.h"
 #include "Rendering/Material/MaterialParameter.h"
 
+class ShaderProgram;
+
 class FloatParameter : public MaterialParameterBase<FloatParameter>
 {
 public:
     
     FloatParameter() {}
-    FloatParameter(const std::string& name, GLuint shaderProgramID, float value);
+    FloatParameter(const std::string& name, float value)
+        : m_name(name), m_value(value)
+    {}
     
-    void ApplyParameter() const override;
+    void ApplyParameter(ShaderProgram* shaderProgram) const override;
     
 private:
     
-    GLint m_location = -1;
+    std::string m_name;
     float m_value = 0.0f;
     
 };
