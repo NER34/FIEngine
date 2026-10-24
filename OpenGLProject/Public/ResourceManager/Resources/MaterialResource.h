@@ -30,5 +30,4 @@ private:
     
     std::optional<Material> m_material;
     ResourceHandle<ShaderProgramResource> m_shaderProgramResource;
-    std::vector<ResourceHandle<TextureResource>> m_textureResources;
 };

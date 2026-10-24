@@ -93,7 +93,6 @@ void MaterialResource::Reload()
 void MaterialResource::Free()
 {
     m_material.reset();
-    m_textureResources.clear();
     m_shaderProgramResource = ResourceHandle<ShaderProgramResource>();
 }
 
