@@ -2,7 +2,7 @@
 
 #include "Camera.h"
 #include "LightPoint.h"
-#include "Rendering/Mesh/Mesh.h"
+#include "Rendering/Mesh.h"
 #include "Rendering/Material/Material.h"
 
 struct GeometryDrawDesc

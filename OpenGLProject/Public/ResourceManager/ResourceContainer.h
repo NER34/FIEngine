@@ -14,26 +14,7 @@ public:
     
     IResourceContainer() = default;
     virtual ~IResourceContainer() = default;
-
-    /*
-    template <typename TResource>
-    ResourceHandle<TResource> AllocateResource(const std::string& name, const std::string& filePath)
-    {
-        ResourceHandle<TResource> handle;        
-        AllocateResource_Internal(name, filePath, handle);
-        return handle;
-    }
     
-    virtual void AllocateResource_Internal(const std::string& name, const std::string& filePath, ResourceHandleBase& outHandle) = 0;
-    virtual void FreeResource(const std::string& name) = 0;
-    
-    template <typename TResource>
-    const TResource* GetResource(const std::string& name) const
-    {
-        return static_cast<const TResource*>(GetResource(name));
-    }
-    virtual const ResourceBase* GetResource(const std::string& name) const = 0;
-    */
     virtual void FreeAllResources() = 0;
     
 };
@@ -45,14 +26,25 @@ class ResourceContainer : public IResourceContainer
     
 public:
     
-    //void AllocateResource_Internal(const std::string& name, const std::string& filePath, ResourceHandleBase& outHandle) //override
-    ResourceHandle<TResource> LoadResource(const std::string& filePath/*, ResourceHandleBase& outHandle*/) //override
+    template<typename... TArgs>
+    ResourceHandle<TResource> CreateResource(const std::string& name, TArgs&&... args)
+    {
+        auto [it, inserted] = m_resources.try_emplace(name, std::make_shared<TResource>());
+        if (inserted)
+        {
+            it->second->m_filePath = name;
+        }
+        ResourceHandle<TResource> handle;
+        handle.m_resourcePtr = it->second;
+        return handle;
+    }
+    
+    ResourceHandle<TResource> LoadResource(const std::string& filePath)
     {
         auto [it, inserted] = m_resources.try_emplace(filePath, std::make_shared<TResource>());
         if (inserted)
         {
             it->second->m_filePath = filePath;
-            //it->second->SetName(name);
             it->second->Reload();
         }
         ResourceHandle<TResource> handle;
@@ -60,19 +52,7 @@ public:
         return handle;
     }
     
-    /*
-    ResourceHandle<TResource> GetResource(const std::string& name) const //override
-    {
-        ResourceHandle<TResource> handle;
-        if (auto it = m_resources.find(name); it != m_resources.end())
-        {
-            handle.m_resourcePtr = it->second;
-        }
-        return handle;
-    }
-    */
-    
-    void FreeResource(const std::string& filePath) //override
+    void FreeResource(const std::string& filePath)
     {
         if (auto it = m_resources.find(filePath); it != m_resources.end())
         {

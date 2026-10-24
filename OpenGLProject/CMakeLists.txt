@@ -31,6 +31,7 @@ target_link_libraries(OpenGLProject
 		assimp
 		json
 		stduuid
+		entt
 )
 
 add_custom_command(

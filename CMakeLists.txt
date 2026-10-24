@@ -20,6 +20,7 @@ add_subdirectory("ThirdParty/stb")
 add_subdirectory("ThirdParty/assimp")
 add_subdirectory("ThirdParty/json")
 add_subdirectory("ThirdParty/stduuid")
+add_subdirectory("ThirdParty/entt")
 add_subdirectory("OpenGLProject")
 
 set(VS_STARTUP_PROJECT OpenGLProject)

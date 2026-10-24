@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "Rendering/Mesh/Mesh.h"
+#include "Rendering/Mesh.h"
 #include "ResourceManager/ResourceBase.h"
 
 class MeshResource : public ResourceBase
@@ -12,6 +12,8 @@ public:
     
     void Reload() override;
     void Free() override;
+    
+    void AddMesh(Mesh&& mesh);
     
     const std::vector<Mesh>& GetMeshes() const;
     std::vector<Mesh>& GetMeshes();

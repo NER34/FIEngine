@@ -1,9 +1,9 @@
 ﻿#pragma once
 
 #include "GameObject/GameObject.h"
-#include "Rendering/Mesh/Mesh.h"
 #include "ResourceManager/ResourceHandle.h"
 #include "ResourceManager/Resources/MaterialResource.h"
+#include "ResourceManager/Resources/MeshResource.h"
 
 class PlainGameObject : public GameObject
 {
@@ -14,10 +14,10 @@ public:
     
 private:
     
-    Mesh m_mesh;
     Transform m_transform;
     float m_globalVal = 0.0f;
     
+    ResourceHandle<MeshResource> m_meshResourceHandle;
     ResourceHandle<MaterialResource> m_materialResourceHandle;
     
 };

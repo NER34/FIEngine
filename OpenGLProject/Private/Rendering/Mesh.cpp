@@ -1,4 +1,4 @@
-﻿#include "Rendering/Mesh/Mesh.h"
+﻿#include "Rendering/Mesh.h"
 
 #include "Rendering/Validation.h"
 #include "Utilities/Utilities.h"

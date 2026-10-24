@@ -39,7 +39,12 @@ void PlainGameObject::BeginPlay()
     meshDesc.m_uvCoords.assign(uvs, uvs + meshDesc.m_numVerts * 2);
     meshDesc.m_normals.resize(meshDesc.m_numVerts * 3, 0.0f);
     meshDesc.m_indices.assign(indices, indices + sizeof(indices) / sizeof(GLuint));
-    m_mesh.setup(meshDesc);
+    
+    m_meshResourceHandle = ResourceManager::Get().CreateResource<MeshResource>("plane");
+    if (m_meshResourceHandle.IsValid())
+    {
+        m_meshResourceHandle.Get()->AddMesh(Mesh(meshDesc));
+    }
 
     m_transform.m_position = glm::vec3(2.0f, 0.0f, 0.0f);
     m_transform.m_rotation = glm::vec3(0.0f, 0.0f, 180.0f);
@@ -59,7 +64,12 @@ void PlainGameObject::Update(float deltaTime)
     position.z = sin(m_globalVal) / 2.0f;
     
 	MaterialResource* materialResource = m_materialResourceHandle.Get();
+    MeshResource* meshResource = m_meshResourceHandle.Get();
 
     Renderer& renderer = Renderer::get();
-    renderer.addDraw(GeometryDrawDesc(m_mesh, *materialResource->GetMaterial(), m_transform));
+    renderer.addDraw(GeometryDrawDesc(
+        meshResource->GetMeshes()[0], 
+        *materialResource->GetMaterial(), 
+        m_transform
+        ));
 }

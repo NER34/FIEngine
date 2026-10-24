@@ -1,23 +1,13 @@
 ﻿#include "GameObject/Objects/MeshGameObject.h"
 
 #include "Rendering/Renderer.h"
-#include "Rendering/Material/MaterialParameters/RendererParameters.h"
-#include "Rendering/Material/MaterialParameters/TextureParameter.h"
-#include "Rendering/Mesh/MeshManager.h"
 #include "ResourceManager/ResourceManager.h"
 #include "ResourceManager/Resources/MeshResource.h"
 
 namespace
 {
-	const char* vertShaderPath = "Shaders/VertexShader.vert";
-	const char* fragShaderPath = "Shaders/PhongShader.frag";
-	const char* shaderProgramPath = "Shaders/PhongShaderProgram.asset";
-	
 	const char* meshPath = "Meshes/Sting-Sword-lowpoly.obj";
 	const char* materialPath = "Materials/Phong.asset";
-	
-	const char* meshTexturePath = "Textures/Sting/Sting_Base_Color.png";
-	const std::string meshName = "sword";
 }
 
 void MeshGameObject::BeginPlay()
@@ -35,12 +25,6 @@ void MeshGameObject::Update(float deltaTime)
 {
 	m_globalVal += deltaTime;
 
-	/*
-	MeshManager& meshManager = MeshManager::get();
-	MeshManager::ConstMeshIterator begIt, endIt;
-	meshManager.getMeshes(meshName, begIt, endIt);
-	*/
-	
 	MeshResource* meshResource = m_meshResourceHandle.Get();
 	MaterialResource* materialResource = m_materialResourceHandle.Get();
 	

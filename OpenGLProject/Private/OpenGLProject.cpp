@@ -15,8 +15,6 @@
 #include "InputSystem/InputManager.h"
 #include "Rendering/Camera.h"
 #include "Rendering/Renderer.h"
-#include "Rendering/Mesh/MeshManager.h"
-#include "ResourceManager/ResourceManager.h"
 #include "Utilities/Logger.h"
 #include "Window/GLFW/WindowGLFW.h"
 
@@ -50,8 +48,6 @@ int main()
 	Renderer& renderer = Renderer::get();
 	renderer.initialize(rendererDesc);
 	
-	ResourceManager::Get().Initialize();
-	
 	GameObjectManager& gameObjectManager = GameObjectManager::get();
 	gameObjectManager.createGameObject<CameraGameObject>();
 	gameObjectManager.createGameObject<PlainGameObject>();
@@ -71,8 +67,6 @@ int main()
 	}
 	
 	gameObjectManager.destroyAllGameObjects();
-	MeshManager& meshManager = MeshManager::get();
-	meshManager.clearAllMeshes();
 	
 	return 0;
 }

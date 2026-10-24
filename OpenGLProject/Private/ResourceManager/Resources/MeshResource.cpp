@@ -67,6 +67,11 @@ void MeshResource::Free()
     m_meshes.clear();
 }
 
+void MeshResource::AddMesh(Mesh&& mesh)
+{
+    m_meshes.push_back(std::move(mesh));
+}
+
 const std::vector<Mesh>& MeshResource::GetMeshes() const
 {
     return m_meshes;
