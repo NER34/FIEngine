@@ -45,18 +45,14 @@ namespace
         }
         outValue = data[key];
     }
+
+    IMPLEMENT_COMPONENT_DESERIALIZE(Deserialize, CameraComponent)
+    {
+        DeserializeVector3(data, "up", component.m_up);
+        DeserializeFloat(data, "fov", component.m_fov);
+        DeserializeFloat(data, "nearClipPlane", component.m_nearClipPlane);
+        DeserializeFloat(data, "farClipPlane", component.m_farClipPlane);
+    }
 }
 
-void Deserialize(
-    CameraComponent& component,
-    const nlohmann::json& data,
-    const std::unordered_map<uint32_t, entt::entity>& entityIDMap
-    )
-{
-    DeserializeVector3(data, "up", component.m_up);
-    DeserializeFloat(data, "fov", component.m_fov);
-    DeserializeFloat(data, "nearClipPlane", component.m_nearClipPlane);
-    DeserializeFloat(data, "farClipPlane", component.m_farClipPlane);
-}
-
-REGISTER_COMPONENT_FACTORY(CameraComponent, Deserialize)
+REGISTER_COMPONENT_FACTORY(CameraComponent, ::Deserialize, [](auto&...){})

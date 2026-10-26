@@ -30,17 +30,13 @@ namespace
             outVector[index] = value[index];
         }
     }
+
+    IMPLEMENT_COMPONENT_DESERIALIZE(Deserialize, TransformComponent)
+    {
+        DeserializeVector3(data, "position", component.m_transform.m_position);
+        DeserializeVector3(data, "rotation", component.m_transform.m_rotation);
+        DeserializeVector3(data, "scale", component.m_transform.m_scale);
+    }
 }
 
-void Deserialize(
-    TransformComponent& component,
-    const nlohmann::json& data,
-    const std::unordered_map<uint32_t, entt::entity>& entityIDMap
-    )
-{
-    DeserializeVector3(data, "position", component.m_transform.m_position);
-    DeserializeVector3(data, "rotation", component.m_transform.m_rotation);
-    DeserializeVector3(data, "scale", component.m_transform.m_scale);
-}
-
-REGISTER_COMPONENT_FACTORY(TransformComponent, Deserialize)
+REGISTER_COMPONENT_FACTORY(TransformComponent, ::Deserialize, [](auto&...){})

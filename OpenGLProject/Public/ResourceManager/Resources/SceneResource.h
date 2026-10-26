@@ -14,9 +14,12 @@ public:
     
     void Reload() override;
     void Free() override;
-    
+
 private:
     
-    std::vector<entt::entity> m_entities;
+    friend class SceneManager;
+    void CopyToRegistry(entt::registry& other) const;
+    
+    entt::registry m_registry;
     
 };

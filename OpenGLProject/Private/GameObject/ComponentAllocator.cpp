@@ -1,5 +1,7 @@
 ﻿#include "GameObject/ComponentAllocator.h"
 
+#include <ranges>
+
 #include "GameObject/ComponentFactory.h"
 
 ComponentAllocator& ComponentAllocator::Get()
@@ -22,7 +24,19 @@ void ComponentAllocator::AddComponentDeserialized(
     }
 }
 
-bool ComponentAllocator::IsValidComponentName(const std::string& name)
+void ComponentAllocator::CopyComponents(
+    const entt::registry& from, 
+    entt::registry& to,
+    const std::unordered_map<entt::entity, entt::entity>& entityIDMap
+    )
+{
+    for (const auto& factory : m_componentFactories | std::views::values)
+    {
+        factory->Copy(from, to, entityIDMap);
+    }
+}
+
+bool ComponentAllocator::IsValidComponentName(const std::string& name) const
 {
     return m_componentFactories.contains(name);
 }

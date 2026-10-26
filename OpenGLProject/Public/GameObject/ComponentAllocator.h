@@ -23,7 +23,13 @@ public:
         const std::unordered_map<uint32_t, entt::entity>& entityIDMap
         );
     
-    bool IsValidComponentName(const std::string& name);
+    void CopyComponents(
+        const entt::registry& from,
+        entt::registry& to,
+        const std::unordered_map<entt::entity, entt::entity>& entityIDMap
+        );
+    
+    bool IsValidComponentName(const std::string& name) const;
     
     template<typename TFactory>
     bool RegisterComponentFactory(const std::string& name, TFactory&& factory)
@@ -42,5 +48,13 @@ private:
     std::unordered_map<std::string, std::unique_ptr<IComponentFactory>> m_componentFactories;
 };
 
-#define REGISTER_COMPONENT_FACTORY(TComponent, DeserializeFunc) \
-    template<> bool ComponentFactory<TComponent>::s_registered = ComponentAllocator::Get().RegisterComponentFactory(#TComponent, ComponentFactory<TComponent>(DeserializeFunc));
+#define IMPLEMENT_COMPONENT_DESERIALIZE(FuncName, TComponent) \
+    void FuncName(TComponent& component, const nlohmann::json& data, const std::unordered_map<uint32_t, entt::entity>& entityIDMap)
+
+#define IMPLEMENT_COMPONENT_COPY(FuncName, TComponent) \
+    void FuncName(const TComponent& from, TComponent& to, const std::unordered_map<entt::entity, entt::entity>& entityIDMap)
+
+#define REGISTER_COMPONENT_FACTORY(TComponent, DeserializeFunc, CopyFunc) \
+    template<> bool ComponentFactory<TComponent>::s_registered = ComponentAllocator::Get().RegisterComponentFactory( \
+        #TComponent, ComponentFactory<TComponent>(DeserializeFunc, CopyFunc) \
+    );

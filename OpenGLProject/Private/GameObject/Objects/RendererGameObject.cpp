@@ -1,4 +1,4 @@
-﻿#include "RendererGameObject.h"
+﻿#include "GameObject/Objects/RendererGameObject.h"
 
 #include "GameObject/Components/MeshComponent.h"
 #include "GameObject/Components/TransformComponent.h"
@@ -7,9 +7,8 @@
 
 void RendererGameObject::Update(float deltaTime)
 {
-    auto& registry = SceneManager::Get().GetRegistry();
     auto& renderer = Renderer::get();
-    registry.view<TransformComponent, MeshComponent>().each(
+    SceneManager::Get().View<TransformComponent, MeshComponent>().each(
         [&](entt::entity entity, const TransformComponent& transform, const MeshComponent& meshComponent)
         {
             GeometryDrawDesc desc = {

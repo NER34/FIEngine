@@ -17,6 +17,8 @@
 #include "InputSystem/InputManager.h"
 #include "Rendering/Camera.h"
 #include "Rendering/Renderer.h"
+#include "ResourceManager/ResourceManager.h"
+#include "Scene/SceneManager.h"
 #include "Utilities/Logger.h"
 #include "Window/GLFW/WindowGLFW.h"
 
@@ -70,7 +72,9 @@ int main()
 		window.update();
 	}
 	
+	SceneManager::Get().Free();
 	gameObjectManager.destroyAllGameObjects();
+	ResourceManager::Get().FreeAllResources();
 	
 	return 0;
 }

@@ -4,7 +4,6 @@
 #include <json.h>
 
 #include "GameObject/ComponentAllocator.h"
-#include "Scene/SceneManager.h"
 #include "Utilities/Logger.h"
 
 SceneResource::~SceneResource()
@@ -50,7 +49,6 @@ void SceneResource::Reload()
         return;
     }
     
-    auto& registry = SceneManager::Get().GetRegistry();
     std::unordered_map<uint32_t, entt::entity> entityIDMap;
     for (const auto& entity : sceneAsset["entities"])
     {
@@ -69,9 +67,8 @@ void SceneResource::Reload()
             Free();
             return;
         }
-        entt::entity entityID = registry.create();
-        m_entities.push_back(entityID);
-        entityIDMap.insert({ entity, entityID });
+        
+        entityIDMap.insert({ entity, m_registry.create() });
     }
     
     auto& componentAllocator = ComponentAllocator::Get();
@@ -121,19 +118,24 @@ void SceneResource::Reload()
             Free();
             return;
         }
-
+        
         componentAllocator.AddComponentDeserialized(
-            type, registry, entityIDMap[rawEntityID], component["data"], entityIDMap
+            type, m_registry, entityIDMap[rawEntityID], component["data"], entityIDMap
             );
     }
 }
 
 void SceneResource::Free()
 {
-    entt::registry& registry = SceneManager::Get().GetRegistry();
-    for (auto entity : m_entities)
+    m_registry.clear();
+}
+
+void SceneResource::CopyToRegistry(entt::registry& other) const
+{
+    std::unordered_map<entt::entity, entt::entity> entityIDMap;
+    for (auto [entity] : m_registry.storage<entt::entity>()->each())
     {
-        registry.destroy(entity);
+        entityIDMap.insert({ entity, other.create() });
     }
-    m_entities.clear();
+    ComponentAllocator::Get().CopyComponents(m_registry, other, entityIDMap);
 }

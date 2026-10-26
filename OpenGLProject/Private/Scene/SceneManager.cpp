@@ -6,7 +6,17 @@ SceneManager& SceneManager::Get()
     return instance;
 }
 
-entt::registry& SceneManager::GetRegistry()
+SceneManager::~SceneManager()
 {
-    return m_registry;
+    Free();
+}
+
+void SceneManager::InstantiateScene(const ResourceHandle<SceneResource>& scene)
+{
+    scene.Get()->CopyToRegistry(m_registry);
+}
+
+void SceneManager::Free()
+{
+    m_registry.clear();
 }
