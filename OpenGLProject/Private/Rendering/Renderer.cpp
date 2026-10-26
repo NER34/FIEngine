@@ -21,19 +21,25 @@ void Renderer::render()
     for (const auto& drawDesc : m_frontDrawList)
     {
         glm::mat4 modelMat = drawDesc.m_transform.GetModelMatrix();
-        auto* shaderProgram = drawDesc.m_material.GetShaderProgram();
-        
-        drawDesc.m_material.activate();
-        
-        shaderProgram->SetUniformMat4("projViewMat", viewProjMat);
-        shaderProgram->SetUniformMat4("modelMat", modelMat);
-        shaderProgram->SetUniformFloat3("lightPos", m_lightPoint.getPosition());
-        shaderProgram->SetUniformFloat3("lightColor", m_lightPoint.getColor());
-        shaderProgram->SetUniformFloat3("viewPos", m_camera.getPosition());
-        
-        drawDesc.m_mesh.draw();
-        
-        drawDesc.m_material.deactivate();
+        auto& meshes = drawDesc.m_mesh.Get()->GetMeshes();
+        for (size_t i = 0; i < meshes.size(); i++)
+        {
+            auto& mesh = meshes[i];
+            auto* material = drawDesc.m_material.Get()->GetMaterial();
+            auto* shaderProgram = material->GetShaderProgram();
+            
+            material->activate();
+            
+            shaderProgram->SetUniformMat4("projViewMat", viewProjMat);
+            shaderProgram->SetUniformMat4("modelMat", modelMat);
+            shaderProgram->SetUniformFloat3("lightPos", m_lightPoint.getPosition());
+            shaderProgram->SetUniformFloat3("lightColor", m_lightPoint.getColor());
+            shaderProgram->SetUniformFloat3("viewPos", m_camera.getPosition());
+            
+            mesh.draw();
+            
+            material->deactivate();
+        }
     }
 }
 

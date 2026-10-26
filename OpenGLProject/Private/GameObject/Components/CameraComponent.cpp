@@ -1,0 +1,62 @@
+﻿#include "GameObject/Components/CameraComponent.h"
+
+#include "GameObject/ComponentAllocator.h"
+#include "GameObject/ComponentFactory.h"
+#include "Utilities/Logger.h"
+
+namespace
+{
+    void DeserializeVector3(const nlohmann::json& data, const char* key, glm::vec3& outVector)
+    {
+        if (!data.contains(key))
+        {
+            return;
+        }
+
+        const nlohmann::json& value = data[key];
+        if (!value.is_array() || value.size() != 3)
+        {
+            LOG_ERROR("Camera component {} must contain three values", key);
+            return;
+        }
+
+        for (std::size_t index = 0; index < 3; ++index)
+        {
+            if (!value[index].is_number())
+            {
+                LOG_ERROR("Camera component {} has an invalid value", key);
+                return;
+            }
+            outVector[index] = value[index];
+        }
+    }
+
+    void DeserializeFloat(const nlohmann::json& data, const char* key, float& outValue)
+    {
+        if (!data.contains(key))
+        {
+            return;
+        }
+
+        if (!data[key].is_number())
+        {
+            LOG_ERROR("Camera component {} has an invalid value", key);
+            return;
+        }
+        outValue = data[key];
+    }
+}
+
+void Deserialize(
+    CameraComponent& component,
+    const nlohmann::json& data,
+    const std::unordered_map<uint32_t, entt::entity>& entityIDMap
+    )
+{
+    DeserializeVector3(data, "up", component.m_up);
+    DeserializeFloat(data, "fov", component.m_fov);
+    DeserializeFloat(data, "nearClipPlane", component.m_nearClipPlane);
+    DeserializeFloat(data, "farClipPlane", component.m_farClipPlane);
+}
+
+REGISTER_COMPONENT_FACTORY(CameraComponent, Deserialize)

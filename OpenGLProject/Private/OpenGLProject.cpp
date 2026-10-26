@@ -9,6 +9,8 @@
 #include "GameObject/Objects/CameraGameObject.h"
 #include "GameObject/Objects/MeshGameObject.h"
 #include "GameObject/Objects/PlainGameObject.h"
+#include "GameObject/Objects/RendererGameObject.h"
+#include "GameObject/Objects/SceneGameObject.h"
 #include "glad/glad.h"
 
 #include "InputSystem/InputContext.h"
@@ -49,9 +51,11 @@ int main()
 	renderer.initialize(rendererDesc);
 	
 	GameObjectManager& gameObjectManager = GameObjectManager::get();
-	gameObjectManager.createGameObject<CameraGameObject>();
-	gameObjectManager.createGameObject<PlainGameObject>();
-	gameObjectManager.createGameObject<MeshGameObject>();
+	//gameObjectManager.createGameObject<CameraGameObject>();
+	//gameObjectManager.createGameObject<PlainGameObject>();
+	//gameObjectManager.createGameObject<MeshGameObject>();
+	gameObjectManager.createGameObject<SceneGameObject>();
+	gameObjectManager.createGameObject<RendererGameObject>();
 	
 	auto prevTime = std::chrono::high_resolution_clock::now(); 
 	while (!window.isWindowShouldClose())

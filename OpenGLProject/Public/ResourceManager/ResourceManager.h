@@ -41,18 +41,6 @@ public:
         return container->LoadResource(filePath);
     }
     
-    /*
-    template<typename TResource>
-    const TResource* GetResource(const std::string& name) const
-    {
-        if (auto it = m_registeredContainers.find(typeid(TResource)); it != m_registeredContainers.end())
-        {
-            return it->second->GetResource<TResource>(name);
-        }
-        return nullptr;
-    }
-    */
-    
     template<typename TResource>
     void FreeResource(const std::string& filePath)
     {
@@ -62,11 +50,6 @@ public:
             container->FreeResource(filePath);
         }
     }
-    
-    /*
-    void LoadResource_Internal(const std::string& name, const std::string& fileName, IResourceContainer* container);
-    void FreeResource_Internal(const std::string& name, IResourceContainer* container);
-    */
     
 private:
     

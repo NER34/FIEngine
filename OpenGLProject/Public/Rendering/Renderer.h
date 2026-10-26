@@ -4,6 +4,9 @@
 #include "LightPoint.h"
 #include "Rendering/Mesh.h"
 #include "Rendering/Material/Material.h"
+#include "ResourceManager/ResourceHandle.h"
+#include "ResourceManager/Resources/MaterialResource.h"
+#include "ResourceManager/Resources/MeshResource.h"
 
 struct GeometryDrawDesc
 {
@@ -13,18 +16,22 @@ struct GeometryDrawDesc
         , m_material(other.m_material)
         , m_transform(other.m_transform)
     {}
-    GeometryDrawDesc(Mesh& mesh, Material& material)
+    GeometryDrawDesc(const ResourceHandle<MeshResource>& mesh, const ResourceHandle<MaterialResource>& material)
         : m_mesh(mesh)
         , m_material(material)
     {}
-    GeometryDrawDesc(Mesh& mesh, Material& material, const Transform& transform)
+    GeometryDrawDesc(
+        const ResourceHandle<MeshResource>& mesh, 
+        const ResourceHandle<MaterialResource>& material, 
+        const Transform& transform
+        ) 
         : m_mesh(mesh)
         , m_material(material)
         , m_transform(transform)
     {}
     
-    Mesh& m_mesh;
-    Material& m_material;
+    ResourceHandle<MeshResource> m_mesh;
+    ResourceHandle<MaterialResource> m_material;
     Transform m_transform;
 };
 

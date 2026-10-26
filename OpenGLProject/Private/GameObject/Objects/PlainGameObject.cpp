@@ -66,10 +66,13 @@ void PlainGameObject::Update(float deltaTime)
 	MaterialResource* materialResource = m_materialResourceHandle.Get();
     MeshResource* meshResource = m_meshResourceHandle.Get();
 
+    /*
     Renderer& renderer = Renderer::get();
     renderer.addDraw(GeometryDrawDesc(
         meshResource->GetMeshes()[0], 
         *materialResource->GetMaterial(), 
         m_transform
         ));
+        */
+    
 }

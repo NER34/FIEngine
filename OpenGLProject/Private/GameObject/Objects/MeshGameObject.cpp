@@ -28,9 +28,12 @@ void MeshGameObject::Update(float deltaTime)
 	MeshResource* meshResource = m_meshResourceHandle.Get();
 	MaterialResource* materialResource = m_materialResourceHandle.Get();
 	
+	/*
 	Renderer& renderer = Renderer::get();
 	for (auto& mesh : meshResource->GetMeshes())
 	{
 		renderer.addDraw(GeometryDrawDesc(mesh, *materialResource->GetMaterial(), m_transform));
 	}
+	*/
+	
 }
