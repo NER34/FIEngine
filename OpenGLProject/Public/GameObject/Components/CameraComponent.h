@@ -1,6 +1,7 @@
 ﻿#pragma once
 
-#include "glm/vec3.hpp"
+#include "glm/glm.hpp"
+#include "Utilities/Utilities.h"
 
 class CameraComponent
 {
@@ -9,4 +10,8 @@ public:
     float m_fov = 90.0f;
     float m_nearClipPlane = 0.1f;
     float m_farClipPlane = 100.0f;
+    
+    glm::mat4 GetViewMatrix(const Transform& transform) const;
+    glm::mat4 GetProjectionMatrix(float aspectRatio) const;
+    
 };

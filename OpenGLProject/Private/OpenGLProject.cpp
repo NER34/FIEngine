@@ -72,8 +72,9 @@ int main()
 		window.update();
 	}
 	
-	SceneManager::Get().Free();
+	//inputManager.setInputContext(nullptr);
 	gameObjectManager.destroyAllGameObjects();
+	SceneManager::Get().Free();
 	ResourceManager::Get().FreeAllResources();
 	
 	return 0;

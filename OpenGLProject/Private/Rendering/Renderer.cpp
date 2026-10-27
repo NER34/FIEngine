@@ -1,5 +1,10 @@
 ﻿#include "Rendering/Renderer.h"
 
+#include "GameObject/Components/CameraComponent.h"
+#include "GameObject/Components/LightComponent.h"
+#include "GameObject/Components/TransformComponent.h"
+#include "Scene/SceneManager.h"
+
 Renderer& Renderer::get()
 {
     static Renderer instance;
@@ -14,9 +19,29 @@ void Renderer::render()
     glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
-    glm::mat4 projMat = m_camera.getProjectionMatrix();
-    glm::mat4 viewMat = m_camera.getViewMatrix();
+    // Camera
+    auto cameraView = SceneManager::Get().View<CameraComponent, TransformComponent>();
+    auto cameraEntity = cameraView.begin();                                                    
+    if (cameraEntity == cameraView.end())                                                      
+    {                                                                          
+        return; // no camera in the scene, nothing to render                   
+    }   
+    const auto& [camera, cameraTransform] = cameraView.get<CameraComponent, TransformComponent>(*cameraEntity);
+    glm::mat4 projMat = camera.GetProjectionMatrix(m_camera.getCameraDesc().m_aspectRatio);
+    glm::mat4 viewMat = camera.GetViewMatrix(cameraTransform.m_transform);
     glm::mat4 viewProjMat = projMat * viewMat * toLeftHandTransformMat;
+    
+    // Light
+    glm::vec3 lightPos = glm::vec3(0.0f, 0.0f, 0.0f);
+    glm::vec3 lightColor = glm::vec3(0.0f, 0.0f, 0.0f);
+    auto lightView = SceneManager::Get().View<LightComponent, TransformComponent>();
+    auto lightEntity = lightView.begin();                                                    
+    if (lightEntity != lightView.end())                                                      
+    {                                                                          
+        const auto& [light, lightTransform] = lightView.get<LightComponent, TransformComponent>(*lightEntity);
+        lightPos = lightTransform.m_transform.m_position;
+        lightColor = light.m_lightColor;
+    }
     
     for (const auto& drawDesc : m_frontDrawList)
     {
@@ -32,9 +57,9 @@ void Renderer::render()
             
             shaderProgram->SetUniformMat4("projViewMat", viewProjMat);
             shaderProgram->SetUniformMat4("modelMat", modelMat);
-            shaderProgram->SetUniformFloat3("lightPos", m_lightPoint.getPosition());
-            shaderProgram->SetUniformFloat3("lightColor", m_lightPoint.getColor());
-            shaderProgram->SetUniformFloat3("viewPos", m_camera.getPosition());
+            shaderProgram->SetUniformFloat3("lightPos", lightPos);
+            shaderProgram->SetUniformFloat3("lightColor", lightColor);
+            shaderProgram->SetUniformFloat3("viewPos", cameraTransform.m_transform.m_position);
             
             mesh.draw();
             
@@ -43,6 +68,7 @@ void Renderer::render()
     }
 }
 
+/*
 Camera& Renderer::getCamera()
 {
     return m_camera;
@@ -52,6 +78,7 @@ LightPoint& Renderer::getLightPoint()
 {
     return m_lightPoint; 
 }
+*/
 
 void Renderer::initialize(const RendererDesc& desc)
 {

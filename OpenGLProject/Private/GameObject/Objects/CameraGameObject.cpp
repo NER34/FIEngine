@@ -55,7 +55,8 @@ void CameraGameObject::Update(float deltaTime)
 		return;
 	}
 	
-	Camera& camera = Renderer::get().getCamera();
+	//Camera& camera = Renderer::get().getCamera();
+	Camera camera;
 	
 	auto cameraForward =  camera.getTransform().GetForwardVector();
 	auto cameraRight = camera.getTransform().GetRightVector();
@@ -78,7 +79,7 @@ void CameraGameObject::Update(float deltaTime)
 	if (m_attachToLight)
 	{
 		Renderer& renderer = Renderer::get();
-		LightPoint& lightPoint = renderer.getLightPoint();
-		lightPoint.setPosition(cameraPos);
+		//LightPoint& lightPoint = renderer.getLightPoint();
+		//lightPoint.setPosition(cameraPos);
 	}
 }

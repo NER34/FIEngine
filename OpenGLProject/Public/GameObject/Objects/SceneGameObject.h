@@ -9,6 +9,8 @@ class SceneGameObject : public GameObject
 public:
     
     void BeginPlay() override;
+    void Update(float deltaTime) override;
+    void EndPlay() override;
     
 private:
     

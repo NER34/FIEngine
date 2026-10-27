@@ -4,6 +4,20 @@
 #include "GameObject/ComponentFactory.h"
 #include "Utilities/Logger.h"
 
+glm::mat4 CameraComponent::GetViewMatrix(const Transform& transform) const
+{
+    return glm::lookAt(
+        ToOGLCoordSys(transform.m_position),
+        ToOGLCoordSys(transform.m_position + transform.GetForwardVector()),
+        ToOGLCoordSys(m_up)
+        );
+}
+
+glm::mat4 CameraComponent::GetProjectionMatrix(float aspectRatio) const
+{
+    return glm::perspective(glm::radians(m_fov), aspectRatio, m_nearClipPlane, m_farClipPlane);
+}
+
 namespace
 {
     void DeserializeVector3(const nlohmann::json& data, const char* key, glm::vec3& outVector)

@@ -64,8 +64,10 @@ public:
     void addDraw(const GeometryDrawDesc& desc);
     void render();
     
+    /*
     Camera& getCamera();
     LightPoint& getLightPoint();
+    */
     
 private:
     
