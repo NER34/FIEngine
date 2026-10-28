@@ -6,9 +6,7 @@
 #include "MaterialParameters.h"
 #include "glad/glad.h"
 
-#include "Rendering/Material/ShaderProgram.h"
-#include "ResourceManager/Resources/TextureResource.h"
-#include "Utilities/Logger.h"
+#include "ResourceManager/Resources/ShaderProgramResource.h"
 
 
 class Material
@@ -25,8 +23,8 @@ public:
 
     ~Material();
     
-    void SetShaderProgram(ShaderProgram* shaderProgram);
-    ShaderProgram* GetShaderProgram() const;
+    void SetShaderProgram(const ResourceHandle<ShaderProgramResource>& shaderProgram);
+    const ResourceHandle<ShaderProgramResource>& GetShaderProgram() const;
     
     void Activate() const;
     void Deactivate() const;
@@ -65,7 +63,7 @@ protected:
     
 private:
     
-    ShaderProgram* m_shaderProgram = nullptr;
+    ResourceHandle<ShaderProgramResource> m_shaderProgram;
     MaterialParameters m_parameters;
     
 };

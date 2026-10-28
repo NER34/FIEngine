@@ -13,7 +13,7 @@ SceneManager::~SceneManager()
 
 void SceneManager::InstantiateScene(const ResourceHandle<SceneResource>& scene)
 {
-    scene.Get()->CopyToRegistry(m_registry);
+    scene->CopyToRegistry(m_registry);
 }
 
 void SceneManager::Free()

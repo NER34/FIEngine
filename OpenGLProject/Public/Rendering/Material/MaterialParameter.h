@@ -3,9 +3,10 @@
 #include <json.h>
 #include <typeindex>
 
+#include "ResourceManager/ResourceHandle.h"
 #include "Utilities/Logger.h"
 
-class ShaderProgram;
+class ShaderProgramResource;
 
 enum class MaterialParamType : unsigned char
 {
@@ -24,7 +25,7 @@ public:
     IMaterialParameter() = default;
     virtual ~IMaterialParameter() = default;
     
-    virtual void ApplyParameter(ShaderProgram* shaderProgram) const = 0;
+    virtual void ApplyParameter(const ResourceHandle<ShaderProgramResource>& shaderProgram) const = 0;
     
     virtual bool Deserialize(const nlohmann::json& data)
     {

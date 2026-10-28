@@ -5,12 +5,12 @@ Material::~Material()
     ClearMaterial();
 }
 
-void Material::SetShaderProgram(ShaderProgram* shaderProgram)
+void Material::SetShaderProgram(const ResourceHandle<ShaderProgramResource>& shaderProgram)
 {
     m_shaderProgram = shaderProgram;
 }
 
-ShaderProgram* Material::GetShaderProgram() const
+const ResourceHandle<ShaderProgramResource>& Material::GetShaderProgram() const
 {
     return m_shaderProgram;
 }
@@ -34,7 +34,7 @@ void Material::Activate() const
 
 void Material::Deactivate() const
 {
-    if (m_shaderProgram)
+    if (m_shaderProgram.IsValid())
     {
         m_shaderProgram->Deactivate();
     }
@@ -42,16 +42,16 @@ void Material::Deactivate() const
 
 GLuint Material::GetShaderProgramID() const
 {
-    return m_shaderProgram ? m_shaderProgram->GetShaderProgramID() : 0;
+    return m_shaderProgram.IsValid() ? m_shaderProgram->GetShaderProgramID() : 0;
 }
 
 bool Material::IsValid() const
 {
-    return m_shaderProgram != nullptr && m_shaderProgram->IsValid();
+    return m_shaderProgram.IsValid() && m_shaderProgram->IsValid();
 }
 
 void Material::ClearMaterial()
 {
-    m_shaderProgram = nullptr;
+    m_shaderProgram = ResourceHandle<ShaderProgramResource>();
     m_parameters.ClearParameters();
 }

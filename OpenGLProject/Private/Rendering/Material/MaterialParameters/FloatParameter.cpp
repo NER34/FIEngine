@@ -1,9 +1,9 @@
 ﻿#include "Rendering/Material/MaterialParameters/FloatParameter.h"
 
-#include "Rendering/Material/ShaderProgram.h"
+#include "ResourceManager/Resources/ShaderProgramResource.h"
 #include "Utilities/Logger.h"
 
-void FloatParameter::ApplyParameter(ShaderProgram* shaderProgram) const
+void FloatParameter::ApplyParameter(const ResourceHandle<ShaderProgramResource>& shaderProgram) const
 {
     shaderProgram->SetUniformFloat(m_name, m_value);
 }

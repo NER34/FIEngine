@@ -43,7 +43,7 @@ void PlainGameObject::BeginPlay()
     m_meshResourceHandle = ResourceManager::Get().CreateResource<MeshResource>("plane");
     if (m_meshResourceHandle.IsValid())
     {
-        m_meshResourceHandle.Get()->AddSubMesh(meshDesc);
+        m_meshResourceHandle->AddSubMesh(meshDesc);
     }
 
     m_transform.m_position = glm::vec3(2.0f, 0.0f, 0.0f);
@@ -63,8 +63,6 @@ void PlainGameObject::Update(float deltaTime)
     auto& position = m_transform.m_position;
     position.z = sin(m_globalVal) / 2.0f;
     
-	MaterialResource* materialResource = m_materialResourceHandle.Get();
-    MeshResource* meshResource = m_meshResourceHandle.Get();
 
     /*
     Renderer& renderer = Renderer::get();

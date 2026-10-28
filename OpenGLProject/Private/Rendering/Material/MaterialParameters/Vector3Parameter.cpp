@@ -1,8 +1,8 @@
 ﻿#include "Rendering/Material/MaterialParameters/Vector3Parameter.h"
 
-#include "Rendering/Material/ShaderProgram.h"
+#include "ResourceManager/Resources/ShaderProgramResource.h"
 
-void Vector3Parameter::ApplyParameter(ShaderProgram* shaderProgram) const
+void Vector3Parameter::ApplyParameter(const ResourceHandle<ShaderProgramResource>& shaderProgram) const
 {
     shaderProgram->SetUniformFloat3(m_name, m_vector);
 }

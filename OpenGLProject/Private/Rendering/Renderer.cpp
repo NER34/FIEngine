@@ -46,11 +46,11 @@ void Renderer::render()
     for (const auto& drawDesc : m_frontDrawList)
     {
         glm::mat4 modelMat = drawDesc.m_transform.GetModelMatrix();
-        const auto* mesh = drawDesc.m_mesh.Get();
+        const auto& mesh = drawDesc.m_mesh;
         for (size_t i = 0; i < mesh->GetSubMeshCount(); i++)
         {
-            auto* material = drawDesc.m_material.Get()->GetMaterial();
-            auto* shaderProgram = material->GetShaderProgram();
+            auto* material = drawDesc.m_material->GetMaterial();
+            const auto& shaderProgram = material->GetShaderProgram();
             
             material->Activate();
             

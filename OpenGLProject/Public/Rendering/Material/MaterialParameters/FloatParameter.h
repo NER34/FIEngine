@@ -4,13 +4,13 @@
 #include "glad/glad.h"
 #include "Rendering/Material/MaterialParameter.h"
 
-class ShaderProgram;
+class ShaderProgramResource;
 
 class FloatParameter : public MaterialParameterBase<FloatParameter>
 {
 public:
     
-    void ApplyParameter(ShaderProgram* shaderProgram) const override;
+    void ApplyParameter(const ResourceHandle<ShaderProgramResource>& shaderProgram) const override;
     bool Deserialize(const nlohmann::json& data) override;
     
 private:

@@ -26,7 +26,7 @@ public:
 
 private:
     
-    bool AddParameter(const ShaderProgram* shaderProgram, const nlohmann::json& json);
+    bool AddParameter(const ResourceHandle<ShaderProgramResource>& shaderProgram, const nlohmann::json& json);
     
     std::optional<Material> m_material;
     ResourceHandle<ShaderProgramResource> m_shaderProgramResource;

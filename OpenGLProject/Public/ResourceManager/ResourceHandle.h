@@ -27,12 +27,12 @@ public:
         return m_resourcePtr != nullptr;
     }
     
-    const TResource* Get() const
+    const TResource* operator->() const
     {
         return m_resourcePtr.get();
     }
     
-    TResource* Get()
+    TResource* operator->()
     {
         return m_resourcePtr.get();
     }

@@ -1,16 +1,15 @@
 ﻿#include "Rendering/Material/MaterialParameters/TextureParameter.h"
 
-#include "Rendering/Material/ShaderProgram.h"
+#include "ResourceManager/Resources/ShaderProgramResource.h"
 #include "ResourceManager/ResourceManager.h"
 
 
-void TextureParameter::ApplyParameter(ShaderProgram* shaderProgram) const
+void TextureParameter::ApplyParameter(const ResourceHandle<ShaderProgramResource>& shaderProgram) const
 {
-    const TextureResource* textureResource = m_textureHandle.Get();
-    if (textureResource->IsValid())
+    if (m_textureHandle->IsValid())
     {
         shaderProgram->SetUniformInt(m_name, m_textureSlot);
-        textureResource->Activate(GL_TEXTURE0 + m_textureSlot);
+        m_textureHandle->Activate(GL_TEXTURE0 + m_textureSlot);
     }
 }
 

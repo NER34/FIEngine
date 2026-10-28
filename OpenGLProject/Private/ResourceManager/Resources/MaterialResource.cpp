@@ -47,10 +47,7 @@ void MaterialResource::Reload()
     ResourceManager& resourceManager = ResourceManager::Get();
     m_shaderProgramResource = resourceManager.LoadResource<ShaderProgramResource>(materialAsset["shaderProgram"]);
 
-    ShaderProgramResource* shaderProgramResource = m_shaderProgramResource.Get();
-    ShaderProgram* shaderProgram = shaderProgramResource ? shaderProgramResource->GetShaderProgram() : nullptr;
-    
-    if (!m_shaderProgramResource.IsValid() || shaderProgram == nullptr || !shaderProgram->IsValid())
+    if (!m_shaderProgramResource.IsValid() || !m_shaderProgramResource->IsValid())
     {
         LOG_ERROR("Failed to load shader program for material: {}", fullPath);
         Free();
@@ -58,7 +55,7 @@ void MaterialResource::Reload()
     }
 
     m_material.emplace();
-    m_material->SetShaderProgram(shaderProgram);
+    m_material->SetShaderProgram(m_shaderProgramResource);
 
     if (materialAsset.contains("parameters") && !materialAsset["parameters"].is_array())
     {
@@ -67,14 +64,14 @@ void MaterialResource::Reload()
         return;
     }
 
-    shaderProgram->Activate();
+    m_shaderProgramResource->Activate();
     
     bool parametersValid = true;
     if (materialAsset.contains("parameters"))
     {
         for (const auto& parameter : materialAsset["parameters"])
         {
-            if (!AddParameter(shaderProgram, parameter))
+            if (!AddParameter(m_shaderProgramResource, parameter))
             {
                 parametersValid = false;
                 break;
@@ -82,7 +79,7 @@ void MaterialResource::Reload()
         }
     }
     
-    shaderProgram->Deactivate();
+    m_shaderProgramResource->Deactivate();
 
     if (!parametersValid)
     {
@@ -126,9 +123,9 @@ namespace
     };
 }
 
-bool MaterialResource::AddParameter(const ShaderProgram* shaderProgram, const nlohmann::json& json)
+bool MaterialResource::AddParameter(const ResourceHandle<ShaderProgramResource>& shaderProgram, const nlohmann::json& json)
 {
-    if (shaderProgram == nullptr || !shaderProgram->IsValid())
+    if (!shaderProgram.IsValid() || !shaderProgram->IsValid())
     {
         LOG_ERROR("Shader program is invalid");
         return false;
