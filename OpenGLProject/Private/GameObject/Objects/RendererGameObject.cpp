@@ -1,7 +1,7 @@
 ﻿#include "GameObject/Objects/RendererGameObject.h"
 
-#include "GameObject/Components/MeshComponent.h"
-#include "GameObject/Components/TransformComponent.h"
+#include "Components/MeshComponent.h"
+#include "Components/TransformComponent.h"
 #include "Rendering/Renderer.h"
 #include "Scene/SceneManager.h"
 

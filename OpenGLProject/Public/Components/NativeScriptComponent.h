@@ -1,14 +1,8 @@
 ﻿#pragma once
 
-#include <memory>
-
-#include "entt.h"
-#include "json.h"
-
-#include "GameObject/ComponentAllocator.h"
+#include "ComponentFactory/ComponentFactory.h"
 
 class IScriptFactory;
-
 class ScriptBase;
 
 class NativeScriptComponent
@@ -19,27 +13,21 @@ private:
     using TBeginPlayFunc = std::function<void(ScriptBase*)>;
     using TUpdateFunc = std::function<void(ScriptBase*, float deltaTime)>;
     using TEndPlayFunc = std::function<void(ScriptBase*)>;
-    using TDeserializeFunc = std::function<void(
-        ScriptBase*, const nlohmann::json&, const std::unordered_map<uint32_t, entt::entity>&
-        )>;
-    using TCopyFunc = std::function<void(
-        ScriptBase*, ScriptBase*, const std::unordered_map<entt::entity, entt::entity>&
-        )>;
     
 public:
-    
+
     NativeScriptComponent() = default;
 
-    NativeScriptComponent(const NativeScriptComponent& other);
-    NativeScriptComponent& operator=(const NativeScriptComponent& other);
-    
+    NativeScriptComponent(const NativeScriptComponent&) = delete;
+    NativeScriptComponent& operator=(const NativeScriptComponent&) = delete;
+
     NativeScriptComponent(NativeScriptComponent&& other) noexcept;
     NativeScriptComponent& operator=(NativeScriptComponent&& other) noexcept;
-    
+
     ~NativeScriptComponent();
 
     template <typename TScript>
-    void Bind()
+    TScript* Bind()
     {
         DestroyScript();
         m_scriptInst = new TScript();
@@ -55,14 +43,7 @@ public:
         {
             static_cast<TScript*>(script)->EndPlay();
         };
-        m_deserialize = [](ScriptBase* script, const nlohmann::json& data, const std::unordered_map<uint32_t, entt::entity>& entityIDMap)
-        {
-            static_cast<TScript*>(script)->Deserialize(data, entityIDMap);
-        };
-        m_copy = [](ScriptBase* script, ScriptBase* other, const std::unordered_map<entt::entity, entt::entity>& entityIDMap)
-        {
-            static_cast<TScript*>(script)->Copy(other, entityIDMap);
-        };
+        return static_cast<TScript*>(m_scriptInst);
     }
 
     void BeginPlay();
@@ -71,20 +52,16 @@ public:
 
     ScriptBase* GetScript() const;
     
-    static IMPLEMENT_COMPONENT_DESERIALIZE(Deserialize, NativeScriptComponent);
-    static IMPLEMENT_COMPONENT_COPY(Copy, NativeScriptComponent);
+    DECLARE_COMPONENT_DESERIALIZE_FUNC(Deserialize, NativeScriptComponent);
+    DECLARE_COMPONENT_COPY_FUNC(Copy, NativeScriptComponent);
     
 private:
-    
-    friend class ScriptRegistry;
 
     void DestroyScript();
 
     TBeginPlayFunc      m_beginPlay;
     TUpdateFunc         m_update;
     TEndPlayFunc        m_endPlay;
-    TDeserializeFunc    m_deserialize;
-    TCopyFunc           m_copy;
     
     ScriptBase*     m_scriptInst = nullptr;
     IScriptFactory* m_scriptFactory = nullptr;

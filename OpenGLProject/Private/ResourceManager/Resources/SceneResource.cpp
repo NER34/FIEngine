@@ -3,7 +3,7 @@
 #include <fstream>
 #include <json.h>
 
-#include "GameObject/ComponentAllocator.h"
+#include "ComponentFactory/ComponentFactory.h"
 #include "Utilities/Logger.h"
 
 SceneResource::~SceneResource()
@@ -49,7 +49,7 @@ void SceneResource::Reload()
         return;
     }
     
-    std::unordered_map<uint32_t, entt::entity> entityIDMap;
+    EntityIDMapping mapping;
     for (const auto& entity : sceneAsset["entities"])
     {
         if (!entity.is_number_unsigned())
@@ -60,18 +60,18 @@ void SceneResource::Reload()
             return;
         }
         uint32_t rawEntityID = entity;
-        if (entityIDMap.contains(rawEntityID))
+        if (mapping.Get(static_cast<entt::entity>(rawEntityID)) != entt::null)
         {
             LOG_ERROR("Invalid scene file {}: duplicated entity id", fullPath);
             assert(false);
             Free();
             return;
         }
-        
-        entityIDMap.insert({ entity, m_registry.create() });
+
+        mapping.Map(static_cast<entt::entity>(rawEntityID), m_registry.create());
     }
-    
-    auto& componentAllocator = ComponentAllocator::Get();
+
+    auto& componentRegistry = ComponentRegistry::Get();
     for (const auto& component : sceneAsset["components"])
     {
         if (!component.is_object())
@@ -89,7 +89,8 @@ void SceneResource::Reload()
             return;
         }
         std::string type = component["type"];
-        if (!componentAllocator.IsValidComponentName(type))
+        IComponentFactory* componentFactory = componentRegistry.GetObject(type);
+        if (!componentFactory)
         {
             LOG_ERROR("Invalid scene file {}: unknown component type {}", fullPath, type);
             assert(false);
@@ -111,17 +112,16 @@ void SceneResource::Reload()
             return;
         }
         uint32_t rawEntityID = component["entity"];
-        if (!entityIDMap.contains(rawEntityID))
+        entt::entity entity = mapping.Get(static_cast<entt::entity>(rawEntityID));
+        if (entity == entt::null)
         {
             LOG_ERROR("Invalid scene file {}: unknown entity id {}", fullPath, rawEntityID);
             assert(false);
             Free();
             return;
         }
-        
-        componentAllocator.AddComponentDeserialized(
-            type, m_registry, entityIDMap[rawEntityID], component["data"], entityIDMap
-            );
+
+        componentFactory->CreateFromAsset({ m_registry, entity }, component["data"], mapping);
     }
 }
 
@@ -132,10 +132,13 @@ void SceneResource::Free()
 
 void SceneResource::CopyToRegistry(entt::registry& other) const
 {
-    std::unordered_map<entt::entity, entt::entity> entityIDMap;
+    EntityIDMapping mapping;
     for (auto [entity] : m_registry.storage<entt::entity>()->each())
     {
-        entityIDMap.insert({ entity, other.create() });
+        mapping.Map(entity, other.create());
     }
-    ComponentAllocator::Get().CopyComponents(m_registry, other, entityIDMap);
+    ComponentRegistry::Get().ForEachObject([&](const std::string&, const IComponentFactory& factory)
+    {
+        factory.CloneAll(m_registry, other, mapping);
+    });
 }

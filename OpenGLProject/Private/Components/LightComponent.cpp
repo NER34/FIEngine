@@ -1,7 +1,6 @@
-﻿#include "GameObject/Components/LightComponent.h"
+﻿#include "Components/LightComponent.h"
 
-#include "GameObject/ComponentAllocator.h"
-#include "GameObject/ComponentFactory.h"
+#include "Utilities/Logger.h"
 
 namespace
 {
@@ -29,11 +28,16 @@ namespace
             outVector[index] = value[index];
         }
     }
-    
-    IMPLEMENT_COMPONENT_DESERIALIZE(Deserialize, LightComponent)
-    {
-        DeserializeVector3(data, "lightColor", component.m_lightColor);
-    }
 }
 
-REGISTER_COMPONENT_FACTORY(LightComponent, ::Deserialize, [](auto&...){})
+DEFINE_COMPONENT_DESERIALIZE_FUNC(Deserialize, LightComponent)
+{
+    ::DeserializeVector3(data, "lightColor", component.m_lightColor);
+}
+
+DEFINE_COMPONENT_COPY_FUNC(Copy, LightComponent)
+{
+    to.m_lightColor = from.m_lightColor;
+}
+
+REGISTER_COMPONENT_FACTORY(LightComponent, LightComponent::Deserialize, LightComponent::Copy)

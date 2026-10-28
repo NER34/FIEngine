@@ -1,57 +1,12 @@
-﻿#include "GameObject/Scripts/PlayerMovement.h"
+﻿#include "Scripts/PlayerMovement.h"
 
 #include <algorithm>
 
-#include "GameObject/ScriptRegistry.h"
-#include "GameObject/Components/TransformComponent.h"
+#include "Scripting/ScriptFactory.h"
+#include "Components/TransformComponent.h"
 #include "InputSystem/InputManager.h"
 #include "Scene/SceneManager.h"
 #include "Utilities/Logger.h"
-
-namespace
-{
-    void DeserializeEntity(
-        const nlohmann::json& data,
-        const char* key,
-        const std::unordered_map<uint32_t, entt::entity>& entityIDMap,
-        entt::entity& outEntity
-        )
-    {
-        if (!data.contains(key) || data[key].is_null())
-        {
-            outEntity = entt::null;
-            return;
-        }
-
-        if (!data[key].is_number_unsigned())
-        {
-            LOG_ERROR("PlayerMovement {} must be an unsigned integer or null", key);
-            outEntity = entt::null;
-            return;
-        }
-
-        uint32_t rawEntityID = data[key];
-        if (auto it = entityIDMap.find(rawEntityID); it != entityIDMap.end())
-        {
-            outEntity = it->second;
-        }
-        else
-        {
-            LOG_ERROR("PlayerMovement {} references unknown entity id {}", key, rawEntityID);
-            outEntity = entt::null;
-        }
-    }
-
-    void RemapEntity(
-        entt::entity from,
-        const std::unordered_map<entt::entity, entt::entity>& entityIDMap,
-        entt::entity& outEntity
-        )
-    {
-        auto it = entityIDMap.find(from);
-        outEntity = it != entityIDMap.end() ? it->second : entt::null;
-    }
-}
 
 void PlayerMovement::BeginPlay()
 {
@@ -156,15 +111,46 @@ void PlayerMovement::EndPlay()
     m_inputHandles.clear();
 }
 
-void PlayerMovement::Deserialize(const nlohmann::json& data, const std::unordered_map<uint32_t, entt::entity>& entityIDMap)
+namespace
 {
-    DeserializeEntity(data, "cameraEntity", entityIDMap, m_cameraEntity);
-    DeserializeEntity(data, "lightEntity", entityIDMap, m_lightEntity);
+    void DeserializeEntity(
+        const nlohmann::json& data,
+        const char* key,
+        const EntityIDMapping& mapping,
+        entt::entity& outEntity
+        )
+    {
+        if (!data.contains(key) || data[key].is_null())
+        {
+            outEntity = entt::null;
+            return;
+        }
+
+        if (!data[key].is_number_unsigned())
+        {
+            LOG_ERROR("PlayerMovement {} must be an unsigned integer or null", key);
+            outEntity = entt::null;
+            return;
+        }
+
+        uint32_t rawEntityID = data[key];
+        outEntity = mapping.Get(static_cast<entt::entity>(rawEntityID));
+        if (outEntity == entt::null)
+        {
+            LOG_ERROR("PlayerMovement {} references unknown entity id {}", key, rawEntityID);
+        }
+    }
+}
+
+DEFINE_SCRIPT_DESERIALIZE_FUNC(Deserialize, PlayerMovement)
+{
+    ::DeserializeEntity(data, "cameraEntity", mapping, script.m_cameraEntity);
+    ::DeserializeEntity(data, "lightEntity", mapping, script.m_lightEntity);
 
     if (data.contains("movementSpeed"))
     {
         if (data["movementSpeed"].is_number())
-            m_cameraMovSpeed = data["movementSpeed"];
+            script.m_cameraMovSpeed = data["movementSpeed"];
         else
             LOG_ERROR("PlayerMovement movementSpeed has an invalid value");
     }
@@ -172,20 +158,19 @@ void PlayerMovement::Deserialize(const nlohmann::json& data, const std::unordere
     if (data.contains("rotationSpeed"))
     {
         if (data["rotationSpeed"].is_number())
-            m_cameraRotSpeed = data["rotationSpeed"];
+            script.m_cameraRotSpeed = data["rotationSpeed"];
         else
             LOG_ERROR("PlayerMovement rotationSpeed has an invalid value");
     }
 }
 
-void PlayerMovement::Copy(const ScriptBase* other, const std::unordered_map<entt::entity, entt::entity>& entityIDMap)
+DEFINE_SCRIPT_COPY_FUNC(Copy, PlayerMovement)
 {
-    const PlayerMovement* otherMovement = static_cast<const PlayerMovement*>(other);
-    m_cameraMovSpeed = otherMovement->m_cameraMovSpeed;
-    m_cameraRotSpeed = otherMovement->m_cameraRotSpeed;
+    to.m_cameraMovSpeed = from.m_cameraMovSpeed;
+    to.m_cameraRotSpeed = from.m_cameraRotSpeed;
 
-    RemapEntity(otherMovement->m_cameraEntity, entityIDMap, m_cameraEntity);
-    RemapEntity(otherMovement->m_lightEntity, entityIDMap, m_lightEntity);
+    to.m_cameraEntity = mapping.Get(from.m_cameraEntity);
+    to.m_lightEntity = mapping.Get(from.m_lightEntity);
 }
 
-REGISTER_SCRIPT_FACTORY(PlayerMovement)
+REGISTER_SCRIPT_FACTORY(PlayerMovement, PlayerMovement::Deserialize, PlayerMovement::Copy)

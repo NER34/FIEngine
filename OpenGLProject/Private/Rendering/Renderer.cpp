@@ -1,8 +1,8 @@
 ﻿#include "Rendering/Renderer.h"
 
-#include "GameObject/Components/CameraComponent.h"
-#include "GameObject/Components/LightComponent.h"
-#include "GameObject/Components/TransformComponent.h"
+#include "Components/CameraComponent.h"
+#include "Components/LightComponent.h"
+#include "Components/TransformComponent.h"
 #include "Scene/SceneManager.h"
 
 Renderer& Renderer::get()

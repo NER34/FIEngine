@@ -3,7 +3,8 @@
 #include <utility>
 #include <vector>
 
-#include "GameObject/ScriptBase.h"
+#include "Scripting/ScriptBase.h"
+#include "Scripting/ScriptFactory.h"
 #include "InputSystem/InputContext.h"
 
 class PlayerMovement : public ScriptBase
@@ -13,8 +14,9 @@ public:
     void BeginPlay() override;
     void Update(float deltaTime) override;
     void EndPlay() override;
-    void Deserialize(const nlohmann::json& data, const std::unordered_map<uint32_t, entt::entity>& entityIDMap) override;
-    void Copy(const ScriptBase* other, const std::unordered_map<entt::entity, entt::entity>&) override;
+
+    DECLARE_SCRIPT_DESERIALIZE_FUNC(Deserialize, PlayerMovement);
+    DECLARE_SCRIPT_COPY_FUNC(Copy, PlayerMovement);
 
 private:
 

@@ -1,7 +1,5 @@
-﻿#include "GameObject/Components/CameraComponent.h"
+﻿#include "Components/CameraComponent.h"
 
-#include "GameObject/ComponentAllocator.h"
-#include "GameObject/ComponentFactory.h"
 #include "Utilities/Logger.h"
 
 glm::mat4 CameraComponent::GetViewMatrix(const Transform& transform) const
@@ -59,14 +57,22 @@ namespace
         }
         outValue = data[key];
     }
-
-    IMPLEMENT_COMPONENT_DESERIALIZE(Deserialize, CameraComponent)
-    {
-        DeserializeVector3(data, "up", component.m_up);
-        DeserializeFloat(data, "fov", component.m_fov);
-        DeserializeFloat(data, "nearClipPlane", component.m_nearClipPlane);
-        DeserializeFloat(data, "farClipPlane", component.m_farClipPlane);
-    }
 }
 
-REGISTER_COMPONENT_FACTORY(CameraComponent, ::Deserialize, [](auto&...){})
+DEFINE_COMPONENT_DESERIALIZE_FUNC(Deserialize, CameraComponent)
+{
+    ::DeserializeVector3(data, "up", component.m_up);
+    ::DeserializeFloat(data, "fov", component.m_fov);
+    ::DeserializeFloat(data, "nearClipPlane", component.m_nearClipPlane);
+    ::DeserializeFloat(data, "farClipPlane", component.m_farClipPlane);
+}
+
+DEFINE_COMPONENT_COPY_FUNC(Copy, CameraComponent)
+{
+    to.m_up = from.m_up;
+    to.m_fov = from.m_fov;
+    to.m_nearClipPlane = from.m_nearClipPlane;
+    to.m_farClipPlane = from.m_farClipPlane;
+}
+
+REGISTER_COMPONENT_FACTORY(CameraComponent, CameraComponent::Deserialize, CameraComponent::Copy)

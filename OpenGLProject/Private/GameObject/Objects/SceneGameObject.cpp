@@ -1,6 +1,6 @@
 ﻿#include "GameObject/Objects/SceneGameObject.h"
 
-#include "GameObject/Components/NativeScriptComponent.h"
+#include "Components/NativeScriptComponent.h"
 #include "ResourceManager/ResourceManager.h"
 #include "Scene/SceneManager.h"
 

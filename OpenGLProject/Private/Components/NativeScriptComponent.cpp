@@ -1,37 +1,15 @@
-﻿#include "GameObject/Components/NativeScriptComponent.h"
+﻿#include "Components/NativeScriptComponent.h"
 
 #include <utility>
 
-#include "GameObject/ComponentAllocator.h"
-#include "GameObject/ComponentFactory.h"
-#include "GameObject/ScriptRegistry.h"
-#include "GameObject/ScriptFactory.h"
+#include "Scripting/ScriptBase.h"
+#include "Scripting/ScriptFactory.h"
 #include "Utilities/Logger.h"
-
-NativeScriptComponent::NativeScriptComponent(const NativeScriptComponent& other)
-    : m_scriptFactory(other.m_scriptFactory)
-{}
-
-NativeScriptComponent& NativeScriptComponent::operator=(const NativeScriptComponent& other)
-{
-    if (this == &other)
-        return *this;
-    DestroyScript();
-    m_beginPlay = nullptr;
-    m_update = nullptr;
-    m_endPlay = nullptr;
-    m_deserialize = nullptr;
-    m_copy = nullptr;
-    m_scriptFactory = other.m_scriptFactory;
-    return *this;
-}
 
 NativeScriptComponent::NativeScriptComponent(NativeScriptComponent&& other) noexcept
     : m_beginPlay(std::move(other.m_beginPlay))
     , m_update(std::move(other.m_update))
     , m_endPlay(std::move(other.m_endPlay))
-    , m_deserialize(std::move(other.m_deserialize))
-    , m_copy(std::move(other.m_copy))
     , m_scriptInst(std::exchange(other.m_scriptInst, nullptr))
     , m_scriptFactory(std::exchange(other.m_scriptFactory, nullptr))
 {}
@@ -44,8 +22,6 @@ NativeScriptComponent& NativeScriptComponent::operator=(NativeScriptComponent&& 
     m_beginPlay = std::move(other.m_beginPlay);
     m_update = std::move(other.m_update);
     m_endPlay = std::move(other.m_endPlay);
-    m_deserialize = std::move(other.m_deserialize);
-    m_copy = std::move(other.m_copy);
     m_scriptInst = std::exchange(other.m_scriptInst, nullptr);
     m_scriptFactory = std::exchange(other.m_scriptFactory, nullptr);
     return *this;
@@ -85,20 +61,17 @@ ScriptBase* NativeScriptComponent::GetScript() const
     return m_scriptInst;
 }
 
-void NativeScriptComponent::Deserialize(
-    NativeScriptComponent& component, 
-    const nlohmann::json& data,
-    const std::unordered_map<uint32_t, entt::entity>& entityIDMap
-    )
+DEFINE_COMPONENT_DESERIALIZE_FUNC(Deserialize, NativeScriptComponent)
 {
     if (!data.contains("script") || !data["script"].is_string())
     {
         LOG_ERROR("Native script component must contain a script name");
         return;
     }
-
+    
     const std::string scriptName = data["script"];
-    if (!ScriptRegistry::Get().IsValidScriptName(scriptName))
+    IScriptFactory* scriptFactory = ScriptRegistry::Get().GetObject(scriptName);
+    if (!scriptFactory)
     {
         LOG_ERROR("Native script component references unknown script {}", scriptName);
         return;
@@ -110,22 +83,16 @@ void NativeScriptComponent::Deserialize(
         return;
     }
 
-    ScriptRegistry::Get().CreateScript(scriptName, component);
-    component.m_deserialize(component.m_scriptInst, data["data"], entityIDMap);
-    //component.Bind(scriptName, data.contains("data") ? data["data"] : nlohmann::json::object());
+    scriptFactory->CreateFromAsset(component, data["data"], mapping);
+    component.m_scriptFactory = scriptFactory;
 }
 
-void NativeScriptComponent::Copy(
-    const NativeScriptComponent& from, 
-    NativeScriptComponent& to,
-    const std::unordered_map<entt::entity, entt::entity>& entityIDMap
-    )
+DEFINE_COMPONENT_COPY_FUNC(Copy, NativeScriptComponent)
 {
     if (from.m_scriptFactory)
     {
-        from.m_scriptFactory->Create(to);
+        from.m_scriptFactory->CloneScript(from, to, mapping);
         to.m_scriptFactory = from.m_scriptFactory;
-        to.m_copy(to.m_scriptInst, from.GetScript(), entityIDMap);
     }
 }
 
