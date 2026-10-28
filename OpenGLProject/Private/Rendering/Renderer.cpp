@@ -49,7 +49,7 @@ void Renderer::render()
         const auto& mesh = drawDesc.m_mesh;
         for (size_t i = 0; i < mesh->GetSubMeshCount(); i++)
         {
-            auto* material = drawDesc.m_material->GetMaterial();
+            const auto& material = drawDesc.m_material;
             const auto& shaderProgram = material->GetShaderProgram();
             
             material->Activate();

@@ -37,4 +37,6 @@ void SceneGameObject::EndPlay()
         {
             component.EndPlay();
         });
+    
+    m_sceneHandle.Reset();
 }

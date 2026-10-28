@@ -37,6 +37,11 @@ public:
         return m_resourcePtr.get();
     }
     
+    void Reset()
+    {
+        m_resourcePtr.reset();
+    }
+    
 protected:
     
     template <typename T>

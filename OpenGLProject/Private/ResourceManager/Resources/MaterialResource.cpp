@@ -1,6 +1,7 @@
 #include "ResourceManager/Resources/MaterialResource.h"
 
 #include <fstream>
+#include <ranges>
 
 #include "json.h"
 #include "Rendering/Material/MaterialParameters/FloatParameter.h"
@@ -45,17 +46,14 @@ void MaterialResource::Reload()
         return;
     }
     ResourceManager& resourceManager = ResourceManager::Get();
-    m_shaderProgramResource = resourceManager.LoadResource<ShaderProgramResource>(materialAsset["shaderProgram"]);
+    m_shaderProgram = resourceManager.LoadResource<ShaderProgramResource>(materialAsset["shaderProgram"]);
 
-    if (!m_shaderProgramResource.IsValid() || !m_shaderProgramResource->IsValid())
+    if (!IsValid())
     {
         LOG_ERROR("Failed to load shader program for material: {}", fullPath);
         Free();
         return;
     }
-
-    m_material.emplace();
-    m_material->SetShaderProgram(m_shaderProgramResource);
 
     if (materialAsset.contains("parameters") && !materialAsset["parameters"].is_array())
     {
@@ -64,22 +62,22 @@ void MaterialResource::Reload()
         return;
     }
 
-    m_shaderProgramResource->Activate();
-    
+    m_shaderProgram->Activate();
+
     bool parametersValid = true;
     if (materialAsset.contains("parameters"))
     {
         for (const auto& parameter : materialAsset["parameters"])
         {
-            if (!AddParameter(m_shaderProgramResource, parameter))
+            if (!AddParameter(parameter))
             {
                 parametersValid = false;
                 break;
             }
         }
     }
-    
-    m_shaderProgramResource->Deactivate();
+
+    m_shaderProgram->Deactivate();
 
     if (!parametersValid)
     {
@@ -89,29 +87,54 @@ void MaterialResource::Reload()
 
 void MaterialResource::Free()
 {
-    m_material.reset();
-    m_shaderProgramResource = ResourceHandle<ShaderProgramResource>();
+    m_parameters.ClearParameters();
+    m_shaderProgram.Reset();
 }
 
-const Material* MaterialResource::GetMaterial() const
+void MaterialResource::Activate() const
 {
-    return m_material ? &m_material.value() : nullptr;
+    if (IsValid())
+    {
+        m_shaderProgram->Activate();
+
+        for (const auto& parameter : m_parameters.GetParameters() | std::views::values)
+        {
+            parameter->ApplyParameter(m_shaderProgram);
+        }
+    }
+    else
+    {
+        LOG_ERROR("Failed activate material: shader program is invalid");
+    }
 }
 
-Material* MaterialResource::GetMaterial()
+void MaterialResource::Deactivate() const
 {
-    return m_material ? &m_material.value() : nullptr;
+    if (m_shaderProgram.IsValid())
+    {
+        m_shaderProgram->Deactivate();
+    }
 }
 
 bool MaterialResource::IsValid() const
 {
-    return m_material && m_material->IsValid();
+    return m_shaderProgram.IsValid() && m_shaderProgram->IsValid();
 }
 
-namespace 
+const ResourceHandle<ShaderProgramResource>& MaterialResource::GetShaderProgram() const
+{
+    return m_shaderProgram;
+}
+
+GLuint MaterialResource::GetShaderProgramID() const
+{
+    return m_shaderProgram.IsValid() ? m_shaderProgram->GetShaderProgramID() : 0;
+}
+
+namespace
 {
     template<typename TParam>
-    bool PushParameter(Material& material, const nlohmann::json& json)
+    bool DeserializeParameter(MaterialResource& material, const nlohmann::json& json)
     {
         TParam parameter;
         if (!parameter.Deserialize(json))
@@ -123,9 +146,9 @@ namespace
     };
 }
 
-bool MaterialResource::AddParameter(const ResourceHandle<ShaderProgramResource>& shaderProgram, const nlohmann::json& json)
+bool MaterialResource::AddParameter(const nlohmann::json& json)
 {
-    if (!shaderProgram.IsValid() || !shaderProgram->IsValid())
+    if (!IsValid())
     {
         LOG_ERROR("Shader program is invalid");
         return false;
@@ -140,19 +163,19 @@ bool MaterialResource::AddParameter(const ResourceHandle<ShaderProgramResource>&
     const std::string type = json["type"];
     if (type == "FloatParameter")
     {
-        return PushParameter<FloatParameter>(m_material.value(), json);
+        return DeserializeParameter<FloatParameter>(*this, json);
     }
     if (type == "Vector3Parameter")
     {
-        return PushParameter<Vector3Parameter>(m_material.value(), json);
+        return DeserializeParameter<Vector3Parameter>(*this, json);
     }
     if (type == "Matrix4Parameter")
     {
-        return PushParameter<Matrix4Parameter>(m_material.value(), json);
+        return DeserializeParameter<Matrix4Parameter>(*this, json);
     }
     if (type == "TextureParameter")
     {
-        return PushParameter<TextureParameter>(m_material.value(), json);
+        return DeserializeParameter<TextureParameter>(*this, json);
     }
 
     LOG_ERROR("Unsupported material parameter type: {}", type);
