@@ -2,7 +2,6 @@
 
 #include "Camera.h"
 #include "LightPoint.h"
-#include "Rendering/Mesh.h"
 #include "Rendering/Material/Material.h"
 #include "ResourceManager/ResourceHandle.h"
 #include "ResourceManager/Resources/MaterialResource.h"

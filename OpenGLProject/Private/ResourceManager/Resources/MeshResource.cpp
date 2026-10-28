@@ -4,6 +4,9 @@
 #include "assimp/postprocess.h"
 #include "assimp/scene.h"
 
+#include "Rendering/Validation.h"
+#include "Utilities/Logger.h"
+
 MeshResource::~MeshResource()
 {
     MeshResource::Free();
@@ -19,6 +22,12 @@ void MeshResource::Reload()
         fullPath.c_str(),
         aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_JoinIdenticalVertices
     );
+    
+    if (!scene)
+    {
+        LOG_ERROR("Failed to load mesh: {} ({})", fullPath, importer.GetErrorString());
+        return;
+    }
 
     for (uint32_t i = 0; i < scene->mNumMeshes; i++)
     {
@@ -57,27 +66,99 @@ void MeshResource::Reload()
             meshDesc.m_indices.push_back(face.mIndices[1]);
             meshDesc.m_indices.push_back(face.mIndices[2]);
         }
-        m_meshes.emplace_back(meshDesc);
+        AddSubMesh(meshDesc);
     }
     importer.FreeScene();
 }
 
 void MeshResource::Free()
 {
-    m_meshes.clear();
+    for (auto& subMesh : m_subMeshes)
+    {
+        DestroySubMesh(subMesh);
+    }
+    m_subMeshes.clear();
 }
 
-void MeshResource::AddMesh(Mesh&& mesh)
+void MeshResource::AddSubMesh(const MeshDesc& desc)
 {
-    m_meshes.push_back(std::move(mesh));
+    m_subMeshes.push_back(CreateSubMesh(desc));
 }
 
-const std::vector<Mesh>& MeshResource::GetMeshes() const
+size_t MeshResource::GetSubMeshCount() const
 {
-    return m_meshes;
+    return m_subMeshes.size();
 }
 
-std::vector<Mesh>& MeshResource::GetMeshes()
+void MeshResource::DrawSubMesh(size_t index) const
 {
-    return m_meshes;
+    assert(index < m_subMeshes.size());
+    const auto& subMesh = m_subMeshes[index];
+    
+    CHECK_OGL_ERR(glBindVertexArray(subMesh.m_VAO))
+    
+    CHECK_OGL_ERR(glDrawElements(
+        GL_TRIANGLES, 
+        static_cast<GLsizei>(subMesh.m_numIndices), 
+        GL_UNSIGNED_INT, 
+        0
+        ))
+    
+    CHECK_OGL_ERR(glBindVertexArray(0))
+}
+
+void MeshResource::Draw() const
+{
+    for (size_t i = 0; i < m_subMeshes.size(); i++)
+    {
+        DrawSubMesh(i);
+    }
+}
+
+MeshResource::SubMesh MeshResource::CreateSubMesh(const MeshDesc& desc)
+{
+    SubMesh subMesh;
+    
+    CHECK_OGL_ERR(glGenVertexArrays(1, &subMesh.m_VAO))
+    CHECK_OGL_ERR(glGenBuffers(1, &subMesh.m_VBO_Pos))
+    CHECK_OGL_ERR(glGenBuffers(1, &subMesh.m_VBO_Norm))
+    CHECK_OGL_ERR(glGenBuffers(1, &subMesh.m_VBO_UV))
+    CHECK_OGL_ERR(glGenBuffers(1, &subMesh.m_EBO))
+
+    CHECK_OGL_ERR(glBindVertexArray(subMesh.m_VAO))
+    
+    auto setupVBO = [numVerts = desc.m_numVerts](GLenum location, GLsizei numFloats, GLuint vbo, const void* data)
+    {
+        GLsizei bufSize = numVerts * numFloats * sizeof(GLfloat);
+        CHECK_OGL_ERR(glBindBuffer(GL_ARRAY_BUFFER, vbo))
+        CHECK_OGL_ERR(glBufferData(GL_ARRAY_BUFFER, bufSize, data, GL_STATIC_DRAW))
+        CHECK_OGL_ERR(glEnableVertexAttribArray(location))
+        CHECK_OGL_ERR(glVertexAttribPointer(location, numFloats, GL_FLOAT, GL_FALSE, numFloats * sizeof(float), (void*)0))	
+    };
+    
+    setupVBO(POSITION_LOCATION, 3, subMesh.m_VBO_Pos, desc.m_vertices.data());
+    setupVBO(NORMAL_LOCATION, 3, subMesh.m_VBO_Norm, desc.m_normals.data());
+    setupVBO(TEX_UV_LOCATION, 2, subMesh.m_VBO_UV, desc.m_uvCoords.data());
+    
+    CHECK_OGL_ERR(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, subMesh.m_EBO))
+    GLsizei bufSize = desc.m_indices.size() * sizeof(GLuint);
+    CHECK_OGL_ERR(glBufferData(GL_ELEMENT_ARRAY_BUFFER, bufSize, desc.m_indices.data(), GL_STATIC_DRAW))
+    subMesh.m_numIndices = desc.m_indices.size();
+    
+    CHECK_OGL_ERR(glBindVertexArray(0))
+    CHECK_OGL_ERR(glBindBuffer(GL_ARRAY_BUFFER, 0))
+    CHECK_OGL_ERR(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0))
+    
+    return subMesh;
+}
+
+void MeshResource::DestroySubMesh(SubMesh& subMesh)
+{
+    CHECK_OGL_ERR(glDeleteVertexArrays(1, &subMesh.m_VAO))
+    CHECK_OGL_ERR(glDeleteBuffers(1, &subMesh.m_VBO_Pos))
+    CHECK_OGL_ERR(glDeleteBuffers(1, &subMesh.m_VBO_UV))
+    CHECK_OGL_ERR(glDeleteBuffers(1, &subMesh.m_VBO_Norm))
+    CHECK_OGL_ERR(glDeleteBuffers(1, &subMesh.m_EBO))
+    
+    subMesh = SubMesh();
 }

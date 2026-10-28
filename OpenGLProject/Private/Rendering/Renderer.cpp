@@ -46,10 +46,9 @@ void Renderer::render()
     for (const auto& drawDesc : m_frontDrawList)
     {
         glm::mat4 modelMat = drawDesc.m_transform.GetModelMatrix();
-        auto& meshes = drawDesc.m_mesh.Get()->GetMeshes();
-        for (size_t i = 0; i < meshes.size(); i++)
+        const auto* mesh = drawDesc.m_mesh.Get();
+        for (size_t i = 0; i < mesh->GetSubMeshCount(); i++)
         {
-            auto& mesh = meshes[i];
             auto* material = drawDesc.m_material.Get()->GetMaterial();
             auto* shaderProgram = material->GetShaderProgram();
             
@@ -61,7 +60,7 @@ void Renderer::render()
             shaderProgram->SetUniformFloat3("lightColor", lightColor);
             shaderProgram->SetUniformFloat3("viewPos", cameraTransform.m_transform.m_position);
             
-            mesh.draw();
+            mesh->DrawSubMesh(i);
             
             material->deactivate();
         }

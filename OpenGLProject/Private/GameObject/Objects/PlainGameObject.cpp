@@ -43,7 +43,7 @@ void PlainGameObject::BeginPlay()
     m_meshResourceHandle = ResourceManager::Get().CreateResource<MeshResource>("plane");
     if (m_meshResourceHandle.IsValid())
     {
-        m_meshResourceHandle.Get()->AddMesh(Mesh(meshDesc));
+        m_meshResourceHandle.Get()->AddSubMesh(meshDesc);
     }
 
     m_transform.m_position = glm::vec3(2.0f, 0.0f, 0.0f);
