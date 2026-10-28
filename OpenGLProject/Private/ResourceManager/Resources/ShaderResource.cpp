@@ -2,11 +2,21 @@
 
 #include <cassert>
 #include <fstream>
+#include <unordered_map>
 
 #include "json.h"
 
+#include "Rendering/Validation.h"
 #include "Utilities/Logger.h"
 #include "Utilities/Utilities.h"
+
+const std::unordered_map<ShaderType, GLenum> g_enumToGLenum = 
+{
+    { ShaderType::Vertex, GL_VERTEX_SHADER },
+    { ShaderType::Fragment, GL_FRAGMENT_SHADER },
+    { ShaderType::Geometry, GL_GEOMETRY_SHADER },
+    { ShaderType::Compute, GL_COMPUTE_SHADER }
+};
 
 ShaderResource::~ShaderResource()
 {
@@ -61,20 +71,56 @@ void ShaderResource::Reload()
     shaderDesc.m_shaderFilePath = shaderPath.string();
 #endif
 
-    m_shader.emplace(shaderDesc);
+    CreateShader(shaderDesc);
 }
 
 void ShaderResource::Free()
 {
-    m_shader.reset();
-}
-
-const Shader* ShaderResource::GetShader() const
-{
-    return m_shader ? &m_shader.value() : nullptr;
+    if (IsValid())
+    {
+        CHECK_OGL_ERR(glDeleteShader(m_shaderID))
+        m_shaderID = 0;
+    }
+    m_shaderType = ShaderType::Invalid;
 }
 
 bool ShaderResource::IsValid() const
 {
-    return m_shader && m_shader->IsValid();
+    return m_shaderID != 0;
+}
+
+ShaderType ShaderResource::GetShaderType() const
+{
+    return m_shaderType;
+}
+
+GLenum ShaderResource::GetGLShaderType() const
+{
+    return g_enumToGLenum.at(m_shaderType);
+}
+
+GLuint ShaderResource::GetShaderID() const
+{
+    return m_shaderID;
+}
+
+void ShaderResource::CreateShader(const ShaderDesc& desc)
+{
+    m_shaderType = desc.m_shaderType;
+    
+    CHECK_OGL_ERR(m_shaderID = glCreateShader(GetGLShaderType()))
+    CHECK_OGL_ERR(glShaderSource(m_shaderID, 1, &desc.m_shaderDataPtr, &desc.m_shaderDataSize))
+    CHECK_OGL_ERR(glCompileShader(m_shaderID))
+
+    GLint compileStatus = 0;
+    CHECK_OGL_ERR(glGetShaderiv(m_shaderID, GL_COMPILE_STATUS, &compileStatus))
+
+    if (compileStatus == GL_FALSE)
+    {
+        GLchar infoLog[1024] = {};
+        CHECK_OGL_ERR(glGetShaderInfoLog(m_shaderID, sizeof(infoLog), nullptr, infoLog))
+#if DEBUG_ENABLED
+        LOG_ERROR("Failed to compile shader {}: {}", desc.m_shaderFilePath, infoLog);
+#endif
+    }
 }

@@ -155,7 +155,7 @@ void ShaderProgram::CreateShaderProgram(const ShaderProgramDesc& desc)
 {
     CHECK_OGL_ERR(m_shaderProgramID = glCreateProgram())
     
-    for (const Shader* shader : desc.m_shaders)
+    for (const ShaderResource* shader : desc.m_shaders)
     {
         if (shader == nullptr || !shader->IsValid())
         {

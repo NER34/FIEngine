@@ -56,7 +56,7 @@ void ShaderProgramResource::Reload()
             LOG_ERROR("Failed to load shader for program {}: invalid shader resource", GetFilePath());
             continue;
         }
-        shaderProgramDesc.m_shaders.push_back(shaderResourceHandle.Get()->GetShader());
+        shaderProgramDesc.m_shaders.push_back(shaderResourceHandle.Get());
     }
     
     m_shaderProgram.emplace(shaderProgramDesc);

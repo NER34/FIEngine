@@ -6,11 +6,11 @@
 #include "glad/glad.h"
 #include "glm/fwd.hpp"
 
-#include "Rendering/Material/Shader.h"
+#include "ResourceManager/Resources/ShaderResource.h"
 
 struct ShaderProgramDesc
 {
-    std::vector<const Shader*> m_shaders;
+    std::vector<const ShaderResource*> m_shaders;
 };
 
 class ShaderProgram
