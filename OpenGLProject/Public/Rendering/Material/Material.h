@@ -7,20 +7,9 @@
 #include "glad/glad.h"
 
 #include "Rendering/Material/ShaderProgram.h"
-#include "Rendering/Texture.h"
+#include "ResourceManager/Resources/TextureResource.h"
 #include "Utilities/Logger.h"
 
-struct TextureSamplerDesc
-{
-    std::string m_name;
-    const Texture* m_texture = nullptr;
-};
-
-struct MaterialDesc
-{
-    const ShaderProgram* m_shaderProgram = nullptr;
-    std::vector<TextureSamplerDesc> m_texturesDesc;
-};
 
 class Material
 {
@@ -39,10 +28,10 @@ public:
     void SetShaderProgram(ShaderProgram* shaderProgram);
     ShaderProgram* GetShaderProgram() const;
     
-    void activate() const;
-    void deactivate() const;
+    void Activate() const;
+    void Deactivate() const;
     
-    GLuint getShaderProgramID() const;
+    GLuint GetShaderProgramID() const;
     
     template <typename TParam>
     TParam* PushParameter(const std::string& name, const TParam& param)
@@ -68,11 +57,11 @@ public:
         return m_parameters.GetParameter<TParam>(name);
     }
     
-    bool isValid() const;
+    bool IsValid() const;
     
 protected:
 
-    void clearMaterial();
+    void ClearMaterial();
     
 private:
     

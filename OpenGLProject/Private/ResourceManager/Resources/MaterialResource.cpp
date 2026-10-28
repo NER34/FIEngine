@@ -108,7 +108,7 @@ Material* MaterialResource::GetMaterial()
 
 bool MaterialResource::IsValid() const
 {
-    return m_material && m_material->isValid();
+    return m_material && m_material->IsValid();
 }
 
 namespace 

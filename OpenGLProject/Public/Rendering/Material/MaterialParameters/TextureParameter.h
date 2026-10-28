@@ -5,8 +5,6 @@
 #include "ResourceManager/ResourceHandle.h"
 #include "ResourceManager/Resources/TextureResource.h"
 
-class Texture;
-
 class TextureParameter : public MaterialParameterBase<TextureParameter>
 {
 public:

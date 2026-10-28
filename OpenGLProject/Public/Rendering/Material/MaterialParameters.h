@@ -27,159 +27,6 @@ public:
 
     ~MaterialParameters() = default;
 
-    class const_iterator;
-
-    class iterator
-    {
-        friend class MaterialParameters;
-        friend class const_iterator;
-
-    public:
-
-        iterator() = default;
-
-        using iterator_category = std::forward_iterator_tag;
-        using iterator_concept = std::forward_iterator_tag;
-        using value_type = IMaterialParameter;
-        using difference_type = std::ptrdiff_t;
-        using reference = IMaterialParameter&;
-        using pointer = IMaterialParameter*;
-
-        reference operator*() const
-        {
-            return *m_iterator->second;
-        }
-
-        pointer operator->() const
-        {
-            return m_iterator->second.get();
-        }
-
-        iterator& operator++()
-        {
-            ++m_iterator;
-            return *this;
-        }
-
-        iterator operator++(int)
-        {
-            iterator previous = *this;
-            ++(*this);
-            return previous;
-        }
-
-        bool operator==(const iterator& other) const
-        {
-            return m_iterator == other.m_iterator;
-        }
-
-        bool operator!=(const iterator& other) const
-        {
-            return !(*this == other);
-        }
-
-    private:
-
-        explicit iterator(Storage::iterator iterator)
-            : m_iterator(iterator)
-        {}
-
-        Storage::iterator m_iterator;
-    };
-
-    class const_iterator
-    {
-        friend class MaterialParameters;
-
-    public:
-
-        const_iterator() = default;
-
-        using iterator_category = std::forward_iterator_tag;
-        using iterator_concept = std::forward_iterator_tag;
-        using value_type = IMaterialParameter;
-        using difference_type = std::ptrdiff_t;
-        using reference = const IMaterialParameter&;
-        using pointer = const IMaterialParameter*;
-
-        const_iterator(const iterator& other)
-            : m_iterator(other.m_iterator)
-        {}
-
-        reference operator*() const
-        {
-            return *m_iterator->second;
-        }
-
-        pointer operator->() const
-        {
-            return m_iterator->second.get();
-        }
-
-        const_iterator& operator++()
-        {
-            ++m_iterator;
-            return *this;
-        }
-
-        const_iterator operator++(int)
-        {
-            const_iterator previous = *this;
-            ++(*this);
-            return previous;
-        }
-
-        bool operator==(const const_iterator& other) const
-        {
-            return m_iterator == other.m_iterator;
-        }
-
-        bool operator!=(const const_iterator& other) const
-        {
-            return !(*this == other);
-        }
-
-    private:
-
-        friend class iterator;
-
-        explicit const_iterator(Storage::const_iterator iterator)
-            : m_iterator(iterator)
-        {}
-
-        Storage::const_iterator m_iterator;
-    };
-
-    iterator begin() noexcept
-    {
-        return iterator(m_parameters.begin());
-    }
-
-    iterator end() noexcept
-    {
-        return iterator(m_parameters.end());
-    }
-
-    const_iterator begin() const noexcept
-    {
-        return const_iterator(m_parameters.begin());
-    }
-
-    const_iterator end() const noexcept
-    {
-        return const_iterator(m_parameters.end());
-    }
-
-    const_iterator cbegin() const noexcept
-    {
-        return begin();
-    }
-
-    const_iterator cend() const noexcept
-    {
-        return end();
-    }
-
     template <typename TParam, typename... Args>
     TParam* PushParameter(const std::string& name, Args&&... args)
     {
@@ -248,6 +95,16 @@ public:
             return it->second.get();
         }
         return nullptr;
+    }
+    
+    const auto& GetParameters() const noexcept
+    {
+        return m_parameters;
+    }
+    
+    auto& GetParameters() noexcept
+    {
+        return m_parameters;
     }
 
     void ClearParameters()

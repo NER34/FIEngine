@@ -2,7 +2,7 @@
 
 Material::~Material()
 {
-    clearMaterial();
+    ClearMaterial();
 }
 
 void Material::SetShaderProgram(ShaderProgram* shaderProgram)
@@ -15,15 +15,15 @@ ShaderProgram* Material::GetShaderProgram() const
     return m_shaderProgram;
 }
 
-void Material::activate() const
+void Material::Activate() const
 {
-    if (isValid())
+    if (IsValid())
     {
         m_shaderProgram->Activate();
         
-        for (const IMaterialParameter& parameter : m_parameters)
+        for (const auto& parameter : m_parameters.GetParameters() | std::views::values)
         {
-            parameter.ApplyParameter(m_shaderProgram);
+            parameter->ApplyParameter(m_shaderProgram);
         }
     }
     else
@@ -32,7 +32,7 @@ void Material::activate() const
     }
 }
 
-void Material::deactivate() const
+void Material::Deactivate() const
 {
     if (m_shaderProgram)
     {
@@ -40,17 +40,17 @@ void Material::deactivate() const
     }
 }
 
-GLuint Material::getShaderProgramID() const
+GLuint Material::GetShaderProgramID() const
 {
     return m_shaderProgram ? m_shaderProgram->GetShaderProgramID() : 0;
 }
 
-bool Material::isValid() const
+bool Material::IsValid() const
 {
     return m_shaderProgram != nullptr && m_shaderProgram->IsValid();
 }
 
-void Material::clearMaterial()
+void Material::ClearMaterial()
 {
     m_shaderProgram = nullptr;
     m_parameters.ClearParameters();

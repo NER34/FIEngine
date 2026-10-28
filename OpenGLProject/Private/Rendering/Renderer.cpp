@@ -52,7 +52,7 @@ void Renderer::render()
             auto* material = drawDesc.m_material.Get()->GetMaterial();
             auto* shaderProgram = material->GetShaderProgram();
             
-            material->activate();
+            material->Activate();
             
             shaderProgram->SetUniformMat4("projViewMat", viewProjMat);
             shaderProgram->SetUniformMat4("modelMat", modelMat);
@@ -62,7 +62,7 @@ void Renderer::render()
             
             mesh->DrawSubMesh(i);
             
-            material->deactivate();
+            material->Deactivate();
         }
     }
 }
