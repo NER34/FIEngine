@@ -4,7 +4,7 @@
 
 #include "glad/glad.h"
 #include "json.h"
-#include "Rendering/Material/MaterialParameters.h"
+#include "Rendering/Material/MaterialParamContainer.h"
 #include "ResourceManager/ResourceBase.h"
 #include "ResourceManager/ResourceHandle.h"
 #include "ResourceManager/Resources/ShaderProgramResource.h"
@@ -30,6 +30,7 @@ public:
     const ResourceHandle<ShaderProgramResource>& GetShaderProgram() const;
     GLuint GetShaderProgramID() const;
 
+    /*
     template <typename TParam>
     TParam* PushParameter(const std::string& name, const TParam& param)
     {
@@ -40,6 +41,13 @@ public:
     TParam* PushParameter(const std::string& name, TParam&& param)
     {
         return m_parameters.PushParameter<TParam>(name, std::move(param));
+    }
+    */
+
+    template <typename TParam, typename... TArgs>
+    TParam* PushParameter(const std::string& name, TArgs&&... args)
+    {
+        return m_parameters.PushParameter<TParam>(name, std::forward<TArgs>(args)...);
     }
 
     template <typename TParam>
@@ -59,6 +67,6 @@ private:
     bool AddParameter(const nlohmann::json& json);
 
     ResourceHandle<ShaderProgramResource> m_shaderProgram;
-    MaterialParameters m_parameters;
+    MaterialParamContainer m_parameters;
 
 };

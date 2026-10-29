@@ -7,16 +7,11 @@ void Matrix4Parameter::ApplyParameter(const ResourceHandle<ShaderProgramResource
     shaderProgram->SetUniformMat4(m_name, m_matrix);
 }
 
-bool Matrix4Parameter::Deserialize(const nlohmann::json& data)
+DEFINE_MATERIAL_PARAM_DESERIALIZE_FUNC(Deserialize, Matrix4Parameter)
 {
-    if (!IMaterialParameter::Deserialize(data))
-    {
-        return false;
-    }
-
     if (!data.contains("value") || !data["value"].is_array() || data["value"].size() != 16)
     {
-        LOG_ERROR("Matrix4 material parameter {} must contain sixteen values", GetName());
+        LOG_ERROR("Matrix4 material parameter {} must contain sixteen values", parameter.GetName());
         return false;
     }
 
@@ -24,11 +19,13 @@ bool Matrix4Parameter::Deserialize(const nlohmann::json& data)
     {
         if (!data["value"][index].is_number())
         {
-            LOG_ERROR("Matrix4 material parameter {} has an invalid value", GetName());
+            LOG_ERROR("Matrix4 material parameter {} has an invalid value", parameter.GetName());
             return false;
         }
-        m_matrix[index % 4][index / 4] = data["value"][index];
+        parameter.m_matrix[index % 4][index / 4] = data["value"][index];
     }
     
     return true;
 }
+
+REGISTER_MATERIAL_PARAM_FACTORY(Matrix4Parameter, Matrix4Parameter::Deserialize)

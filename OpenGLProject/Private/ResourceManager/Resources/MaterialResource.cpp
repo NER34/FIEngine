@@ -4,10 +4,7 @@
 #include <ranges>
 
 #include "json.h"
-#include "Rendering/Material/MaterialParameters/FloatParameter.h"
-#include "Rendering/Material/MaterialParameters/Matrix4Parameter.h"
-#include "Rendering/Material/MaterialParameters/TextureParameter.h"
-#include "Rendering/Material/MaterialParameters/Vector3Parameter.h"
+#include "Rendering/Material/MaterialParamFactory.h"
 #include "ResourceManager/ResourceManager.h"
 #include "Utilities/Logger.h"
 
@@ -131,21 +128,6 @@ GLuint MaterialResource::GetShaderProgramID() const
     return m_shaderProgram.IsValid() ? m_shaderProgram->GetShaderProgramID() : 0;
 }
 
-namespace
-{
-    template<typename TParam>
-    bool DeserializeParameter(MaterialResource& material, const nlohmann::json& json)
-    {
-        TParam parameter;
-        if (!parameter.Deserialize(json))
-        {
-            return false;
-        }
-        material.PushParameter(parameter.GetName(), std::move(parameter));
-        return true;
-    };
-}
-
 bool MaterialResource::AddParameter(const nlohmann::json& json)
 {
     if (!IsValid())
@@ -160,24 +142,19 @@ bool MaterialResource::AddParameter(const nlohmann::json& json)
         return false;
     }
 
-    const std::string type = json["type"];
-    if (type == "FloatParameter")
+    if (!json.contains("name") || !json["name"].is_string())
     {
-        return DeserializeParameter<FloatParameter>(*this, json);
-    }
-    if (type == "Vector3Parameter")
-    {
-        return DeserializeParameter<Vector3Parameter>(*this, json);
-    }
-    if (type == "Matrix4Parameter")
-    {
-        return DeserializeParameter<Matrix4Parameter>(*this, json);
-    }
-    if (type == "TextureParameter")
-    {
-        return DeserializeParameter<TextureParameter>(*this, json);
+        LOG_ERROR("Material parameter is missing its name");
+        return false;
     }
 
-    LOG_ERROR("Unsupported material parameter type: {}", type);
-    return false;
+    const std::string type = json["type"];
+    IMaterialParamFactory* paramFactory = MaterialParamRegistry::Get().GetObject(type);
+    if (!paramFactory)
+    {
+        LOG_ERROR("Unsupported material parameter type: {}", type);
+        return false;
+    }
+
+    return paramFactory->CreateFromAsset(*this, json["name"], json);
 }

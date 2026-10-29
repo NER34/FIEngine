@@ -26,18 +26,7 @@ public:
     virtual ~IMaterialParameter() = default;
     
     virtual void ApplyParameter(const ResourceHandle<ShaderProgramResource>& shaderProgram) const = 0;
-    
-    virtual bool Deserialize(const nlohmann::json& data)
-    {
-        if (!data.contains("name") || !data["name"].is_string())
-        {
-            LOG_ERROR("Material parameter is missing its name");
-            return false;
-        }
-        SetName(data["name"]);
-        return true;
-    }
-    
+
     void SetName(const std::string& name)
     {
         m_name = name;
@@ -50,7 +39,7 @@ public:
     
 private:
     
-    friend class MaterialParameters;
+    friend class MaterialParamContainer;
     
     virtual std::type_index GetParameterType() const = 0;
     

@@ -13,26 +13,23 @@ void TextureParameter::ApplyParameter(const ResourceHandle<ShaderProgramResource
     }
 }
 
-bool TextureParameter::Deserialize(const nlohmann::json& data)
+DEFINE_MATERIAL_PARAM_DESERIALIZE_FUNC(Deserialize, TextureParameter)
 {
-    if (!IMaterialParameter::Deserialize(data))
-    {
-        return false;
-    }
-
     if (!data.contains("slot") || !data["slot"].is_number())
     {
-        LOG_ERROR("Texture material parameter {} has an invalid slot", GetName());
+        LOG_ERROR("Texture material parameter {} has an invalid slot", parameter.GetName());
         return false;
     }
-    m_textureSlot = data["slot"];
+    parameter.m_textureSlot = data["slot"];
 
     if (!data.contains("path") || !data["path"].is_string())
     {
-        LOG_ERROR("Texture material parameter {} has invalid path", GetName());
+        LOG_ERROR("Texture material parameter {} has invalid path", parameter.GetName());
         return false;
     }
-    m_textureHandle = ResourceManager::Get().LoadResource<TextureResource>(data["path"]);
+    parameter.m_textureHandle = ResourceManager::Get().LoadResource<TextureResource>(data["path"]);
     
     return true;
 }
+
+REGISTER_MATERIAL_PARAM_FACTORY(TextureParameter, TextureParameter::Deserialize)

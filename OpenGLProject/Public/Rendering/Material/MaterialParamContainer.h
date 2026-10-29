@@ -10,22 +10,22 @@
 #include "MaterialParameter.h"
 #include "Utilities/Logger.h"
 
-class MaterialParameters
+class MaterialParamContainer
 {
     using ParameterPtr = std::unique_ptr<IMaterialParameter>;
     using Storage = std::unordered_map<std::string, ParameterPtr>;
 
 public:
 
-    MaterialParameters() noexcept = default;
+    MaterialParamContainer() noexcept = default;
 
-    MaterialParameters(const MaterialParameters& other) = delete;
-    MaterialParameters& operator=(const MaterialParameters& other) = delete;
+    MaterialParamContainer(const MaterialParamContainer& other) = delete;
+    MaterialParamContainer& operator=(const MaterialParamContainer& other) = delete;
 
-    MaterialParameters(MaterialParameters&& other) noexcept = delete;
-    MaterialParameters& operator=(MaterialParameters&& other) noexcept = delete;
+    MaterialParamContainer(MaterialParamContainer&& other) noexcept = delete;
+    MaterialParamContainer& operator=(MaterialParamContainer&& other) noexcept = delete;
 
-    ~MaterialParameters() = default;
+    ~MaterialParamContainer() = default;
 
     template <typename TParam, typename... Args>
     TParam* PushParameter(const std::string& name, Args&&... args)

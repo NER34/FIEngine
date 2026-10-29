@@ -7,16 +7,11 @@ void Vector3Parameter::ApplyParameter(const ResourceHandle<ShaderProgramResource
     shaderProgram->SetUniformFloat3(m_name, m_vector);
 }
 
-bool Vector3Parameter::Deserialize(const nlohmann::json& data)
+DEFINE_MATERIAL_PARAM_DESERIALIZE_FUNC(Deserialize, Vector3Parameter)
 {
-    if (!IMaterialParameter::Deserialize(data))
-    {
-        return false;
-    }
-    
     if (!data.contains("value") || !data["value"].is_array() || data["value"].size() != 3)
     {
-        LOG_ERROR("Vector3 material parameter {} must contain three values", GetName());
+        LOG_ERROR("Vector3 material parameter {} must contain three values", parameter.GetName());
         return false;
     }
 
@@ -24,10 +19,12 @@ bool Vector3Parameter::Deserialize(const nlohmann::json& data)
     {
         if (!data["value"][index].is_number())
         {
-            LOG_ERROR("Vector3 material parameter {} has an invalid value", GetName());
+            LOG_ERROR("Vector3 material parameter {} has an invalid value", parameter.GetName());
             return false;
         }
-        m_vector[index] = data["value"][index];
+        parameter.m_vector[index] = data["value"][index];
     }
     return true;
 }
+
+REGISTER_MATERIAL_PARAM_FACTORY(Vector3Parameter, Vector3Parameter::Deserialize)

@@ -12,7 +12,7 @@ public:
     
     ResourceManager() = default;
     ~ResourceManager();
-    
+
     static ResourceManager& Get();
     
     void FreeAllResources();
