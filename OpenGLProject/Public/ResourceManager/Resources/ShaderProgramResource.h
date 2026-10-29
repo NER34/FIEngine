@@ -7,6 +7,7 @@
 #include "glad/glad.h"
 #include "glm/fwd.hpp"
 
+#include "AssetManager/AssetFactory.h"
 #include "ResourceManager/ResourceBase.h"
 #include "ResourceManager/ResourceHandle.h"
 #include "ResourceManager/Resources/ShaderResource.h"
@@ -26,7 +27,6 @@ public:
     ShaderProgramResource(const ShaderProgramResource& other) = delete;
     ShaderProgramResource& operator=(const ShaderProgramResource& other) = delete;
 
-    void Reload() override;
     void Free() override;
 
     void Activate() const;
@@ -46,10 +46,13 @@ public:
     void SetUniformMat3(const std::string& name, const glm::mat3& value) const;
     void SetUniformMat4(const std::string& name, const glm::mat4& value) const;
 
+    bool CreateShaderProgram(const ShaderProgramDesc& desc);
+
+    DECLARE_ASSET_DESERIALIZE_FUNC(Deserialize, ShaderProgramResource);
+
 private:
 
     GLint GetUniformLocation(const std::string& name) const;
-    void CreateShaderProgram(const ShaderProgramDesc& desc);
     void DestroyShaderProgram();
 
     GLuint m_shaderProgramID = 0;

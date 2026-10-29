@@ -1,8 +1,5 @@
 #include "ResourceManager/Resources/ShaderProgramResource.h"
 
-#include <fstream>
-
-#include "json.h"
 #include "glm/gtc/type_ptr.hpp"
 
 #include "AssetManager/AssetManager.h"
@@ -16,75 +13,35 @@ ShaderProgramResource::~ShaderProgramResource()
     ShaderProgramResource::Free();
 }
 
-void ShaderProgramResource::Reload()
+DEFINE_ASSET_DESERIALIZE_FUNC(Deserialize, ShaderProgramResource)
 {
-    Free();
+    resource.Free();
 
-    const std::string fullPath = GetFullFilePath();
-    std::ifstream shaderProgramFile(fullPath);
-    if (!shaderProgramFile.is_open())
+    if (!data.contains("shaders") || !data["shaders"].is_array() || data["shaders"].empty())
     {
-        LOG_ERROR("Failed to open shader program file: {}", fullPath);
-        return;
-    }
-
-    nlohmann::json asset;
-    try
-    {
-        shaderProgramFile >> asset;
-    }
-    catch (const nlohmann::json::exception& exception)
-    {
-        LOG_ERROR("Failed to parse shader program file {}: {}", fullPath, exception.what());
-        return;
-    }
-
-    if (!asset.contains("type") || !asset["type"].is_string())
-    {
-        LOG_ERROR("Invalid asset file {}: type is missing", GetFilePath());
-        return;
-    }
-    if (asset["type"] != "ShaderProgramResource")
-    {
-        LOG_ERROR("Invalid asset file {}: expected type {}, got {}", GetFilePath(), "ShaderProgramResource", asset["type"].get<std::string>());
-        return;
-    }
-
-    if (!asset.contains("shaders") || !asset["shaders"].is_array())
-    {
-        LOG_ERROR("Invalid shader program asset file: {}", fullPath);
-        return;
-    }
-
-    for (const auto& shaderAssetPath : asset["shaders"])
-    {
-        if (!shaderAssetPath.is_string())
-        {
-            LOG_ERROR("Invalid shader asset path in shader program file: {}", fullPath);
-            continue;
-        }
-        ResourceHandle<ShaderResource> shaderHandle;
-        AssetManager::Get().Load<ShaderResource>(shaderAssetPath, shaderHandle);
-        m_shaderResources.push_back(shaderHandle);
-    }
-    if (m_shaderResources.empty())
-    {
-        LOG_ERROR("Failed to create shader program {}: no shaders declared", GetFilePath());
-        return;
+        LOG_ERROR("Invalid shader program asset file {}: shaders are missing", resource.GetFilePath());
+        return false;
     }
 
     ShaderProgramDesc shaderProgramDesc;
-    for (const ResourceHandle<ShaderResource>& shaderResourceHandle : m_shaderResources)
+    for (const auto& shaderAssetPath : data["shaders"])
     {
-        if (!shaderResourceHandle.IsValid() || !shaderResourceHandle->IsValid())
+        if (!shaderAssetPath.is_string())
         {
-            LOG_ERROR("Failed to load shader for program {}: invalid shader resource", GetFilePath());
+            LOG_ERROR("Invalid shader asset path in shader program file: {}", resource.GetFilePath());
             continue;
         }
-        shaderProgramDesc.m_shaders.push_back(shaderResourceHandle);
+        
+        ResourceHandle<ShaderResource> shaderHandle;
+        if (!AssetManager::Get().Load<ShaderResource>(shaderAssetPath, shaderHandle) || !shaderHandle->IsValid())
+        {
+            LOG_ERROR("Failed to load shader for program {}: invalid shader resource", resource.GetFilePath());
+            continue;
+        }
+        shaderProgramDesc.m_shaders.push_back(shaderHandle);
     }
 
-    CreateShaderProgram(shaderProgramDesc);
+    return resource.CreateShaderProgram(shaderProgramDesc);
 }
 
 void ShaderProgramResource::Free()
@@ -207,8 +164,16 @@ GLint ShaderProgramResource::GetUniformLocation(const std::string& name) const
     return location;
 }
 
-void ShaderProgramResource::CreateShaderProgram(const ShaderProgramDesc& desc)
+bool ShaderProgramResource::CreateShaderProgram(const ShaderProgramDesc& desc)
 {
+    Free();
+
+    if (desc.m_shaders.empty())
+    {
+        LOG_ERROR("Failed to create shader program {}: no shaders provided", GetFilePath());
+        return false;
+    }
+
     CHECK_OGL_ERR(m_shaderProgramID = glCreateProgram())
 
     for (const ResourceHandle<ShaderResource>& shader : desc.m_shaders)
@@ -220,6 +185,7 @@ void ShaderProgramResource::CreateShaderProgram(const ShaderProgramDesc& desc)
         }
 
         CHECK_OGL_ERR(glAttachShader(m_shaderProgramID, shader->GetShaderID()))
+        m_shaderResources.push_back(shader);
     }
 
     CHECK_OGL_ERR(glLinkProgram(m_shaderProgramID))
@@ -232,8 +198,10 @@ void ShaderProgramResource::CreateShaderProgram(const ShaderProgramDesc& desc)
         GLchar infoLog[1024] = {};
         CHECK_OGL_ERR(glGetProgramInfoLog(m_shaderProgramID, sizeof(infoLog), nullptr, infoLog))
         LOG_ERROR("Failed to link shader program: {}", infoLog);
-        DestroyShaderProgram();
+        Free();
+        return false;
     }
+    return true;
 }
 
 void ShaderProgramResource::DestroyShaderProgram()
@@ -244,3 +212,5 @@ void ShaderProgramResource::DestroyShaderProgram()
         m_shaderProgramID = 0;
     }
 }
+
+REGISTER_ASSET_FACTORY(ShaderProgramResource, ShaderProgramResource::Deserialize)

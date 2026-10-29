@@ -1,9 +1,9 @@
 #include "ResourceManager/Resources/MaterialResource.h"
 
-#include <fstream>
 #include <ranges>
 
 #include "json.h"
+#include "AssetManager/AssetManager.h"
 #include "Rendering/Material/MaterialParamFactory.h"
 #include "ResourceManager/ResourceManager.h"
 #include "Utilities/Logger.h"
@@ -14,70 +14,39 @@ MaterialResource::~MaterialResource()
     MaterialResource::Free();
 }
 
-void MaterialResource::Reload()
+DEFINE_ASSET_DESERIALIZE_FUNC(Deserialize, MaterialResource)
 {
-    Free();
+    resource.Free();
 
-    const std::string fullPath = GetFullFilePath();
-    std::ifstream materialFile(fullPath);
-    if (!materialFile.is_open())
+    if (!data.contains("shaderProgram") || !data["shaderProgram"].is_string())
     {
-        LOG_ERROR("Failed to open material file: {}", fullPath);
-        return;
+        LOG_ERROR("Invalid material file {}: shaderProgram is missing", resource.GetFilePath());
+        return false;
     }
+    AssetManager::Get().Load<ShaderProgramResource>(data["shaderProgram"], resource.m_shaderProgram);
 
-    nlohmann::json asset;
-    try
+    if (!resource.IsValid())
     {
-        materialFile >> asset;
-    }
-    catch (const nlohmann::json::exception& exception)
-    {
-        LOG_ERROR("Failed to parse material file {}: {}", fullPath, exception.what());
-        return;
+        LOG_ERROR("Failed to load shader program for material: {}", resource.GetFilePath());
+        resource.Free();
+        return false;
     }
 
-    if (!asset.contains("type") || !asset["type"].is_string())
+    if (data.contains("parameters") && !data["parameters"].is_array())
     {
-        LOG_ERROR("Invalid asset file {}: type is missing", GetFilePath());
-        return;
-    }
-    if (asset["type"] != "MaterialResource")
-    {
-        LOG_ERROR("Invalid asset file {}: expected type {}, got {}", GetFilePath(), "MaterialResource", asset["type"].get<std::string>());
-        return;
+        LOG_ERROR("Invalid material file {}: parameters must be an array", resource.GetFilePath());
+        resource.Free();
+        return false;
     }
 
-    if (!asset.contains("shaderProgram") || !asset["shaderProgram"].is_string())
-    {
-        LOG_ERROR("Invalid material file {}: shaderProgram is missing", fullPath);
-        return;
-    }
-    ResourceManager& resourceManager = ResourceManager::Get();
-    m_shaderProgram = resourceManager.LoadResource<ShaderProgramResource>(asset["shaderProgram"]);
-
-    if (!IsValid())
-    {
-        LOG_ERROR("Failed to load shader program for material: {}", fullPath);
-        Free();
-        return;
-    }
-
-    if (asset.contains("parameters") && !asset["parameters"].is_array())
-    {
-        LOG_ERROR("Invalid material file {}: parameters must be an array", fullPath);
-        Free();
-        return;
-    }
-
-    m_shaderProgram->Activate();
+    resource.m_shaderProgram->Activate();
 
     bool parametersValid = true;
-    if (asset.contains("parameters"))
+    if (data.contains("parameters"))
     {
-        for (const auto& parameter : asset["parameters"])
+        for (const auto& parameter : data["parameters"])
         {
-            if (!AddParameter(parameter))
+            if (!resource.AddParameter(parameter))
             {
                 parametersValid = false;
                 break;
@@ -85,12 +54,14 @@ void MaterialResource::Reload()
         }
     }
 
-    m_shaderProgram->Deactivate();
+    resource.m_shaderProgram->Deactivate();
 
     if (!parametersValid)
     {
-        Free();
+        resource.Free();
+        return false;
     }
+    return true;
 }
 
 void MaterialResource::Free()
@@ -127,6 +98,11 @@ void MaterialResource::Deactivate() const
 bool MaterialResource::IsValid() const
 {
     return m_shaderProgram.IsValid() && m_shaderProgram->IsValid();
+}
+
+void MaterialResource::SetShaderProgram(const ResourceHandle<ShaderProgramResource>& shaderProgram)
+{
+    m_shaderProgram = shaderProgram;
 }
 
 const ResourceHandle<ShaderProgramResource>& MaterialResource::GetShaderProgram() const
@@ -169,3 +145,5 @@ bool MaterialResource::AddParameter(const nlohmann::json& json)
 
     return paramFactory->CreateFromAsset(*this, json["name"], json);
 }
+
+REGISTER_ASSET_FACTORY(MaterialResource, MaterialResource::Deserialize)

@@ -6,8 +6,6 @@
 
 DEFINE_COMPONENT_DESERIALIZE_FUNC(Deserialize, MeshComponent)
 {
-    ResourceManager& resourceManager = ResourceManager::Get();
-
     if (!data.contains("mesh") || !data["mesh"].is_string())
     {
         LOG_ERROR("Mesh component must contain a mesh path");
@@ -37,7 +35,12 @@ DEFINE_COMPONENT_DESERIALIZE_FUNC(Deserialize, MeshComponent)
             LOG_ERROR("Mesh component has an invalid material path");
             continue;
         }
-        component.m_materialHandles.push_back(resourceManager.LoadResource<MaterialResource>(material));
+        ResourceHandle<MaterialResource> materialHandle;
+        if (!AssetManager::Get().Load<MaterialResource>(material, materialHandle))
+        {
+            LOG_ERROR("Mesh component failed to load material {}", material.get<std::string>());
+        }
+        component.m_materialHandles.push_back(materialHandle);
     }
 }
 

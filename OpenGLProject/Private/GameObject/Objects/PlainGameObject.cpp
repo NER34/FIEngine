@@ -1,5 +1,6 @@
 ﻿#include "GameObject/Objects/PlainGameObject.h"
 
+#include "AssetManager/AssetManager.h"
 #include "Rendering/Renderer.h"
 #include "ResourceManager/ResourceManager.h"
 
@@ -30,8 +31,7 @@ namespace
 
 void PlainGameObject::BeginPlay()
 {
-    ResourceManager& resourceManager = ResourceManager::Get();
-    m_materialResourceHandle = resourceManager.LoadResource<MaterialResource>(materialPath);
+    AssetManager::Get().Load<MaterialResource>(materialPath, m_materialResourceHandle);
 
     MeshDesc meshDesc;
     meshDesc.m_numVerts = sizeof(vertices) / (sizeof(GLfloat) * 3);
