@@ -1,6 +1,7 @@
 ﻿#include "ResourceManager/Resources/SceneResource.h"
 
-#include <fstream>
+#include <cassert>
+
 #include <json.h>
 
 #include "ComponentFactory/ComponentFactory.h"
@@ -11,135 +12,113 @@ SceneResource::~SceneResource()
     SceneResource::Free();
 }
 
-void SceneResource::Reload()
+DEFINE_ASSET_DESERIALIZE_FUNC(Deserialize, SceneResource)
 {
-    Free();
+    resource.Free();
 
-    const std::string fullPath = GetFullFilePath();
-    std::ifstream sceneFile(fullPath);
-    if (!sceneFile.is_open())
+    if (!data.contains("entities") || !data["entities"].is_array())
     {
-        LOG_ERROR("Failed to open scene file: {}", fullPath);
+        LOG_ERROR("Invalid scene file {}: array of entities is missing", resource.GetFilePath());
         assert(false);
-        return;
+        return false;
     }
-
-    nlohmann::json asset;
-    try
+    if (!data.contains("components") || !data["components"].is_array())
     {
-        sceneFile >> asset;
-    }
-    catch (const nlohmann::json::exception& exception)
-    {
-        LOG_ERROR("Failed to parse scene file {}: {}", fullPath, exception.what());
+        LOG_ERROR("Invalid scene file {}: array of components is missing", resource.GetFilePath());
         assert(false);
-        return;
-    }
-    
-    if (!asset.contains("type") || !asset["type"].is_string())
-    {
-        LOG_ERROR("Invalid asset file {}: type is missing", GetFilePath());
-        assert(false);
-        return;
-    }
-    if (asset["type"] != "SceneResource")
-    {
-        LOG_ERROR("Invalid asset file {}: expected type {}, got {}", GetFilePath(), "SceneResource", asset["type"].get<std::string>());
-        assert(false);
-        return;
-    }
-    if (!asset.contains("entities") || !asset["entities"].is_array())
-    {
-        LOG_ERROR("Invalid scene file {}: array of entities is missing", fullPath);
-        assert(false);
-        return;
-    }
-    if (!asset.contains("components") || !asset["components"].is_array())
-    {
-        LOG_ERROR("Invalid scene file {}: array of components is missing", fullPath);
-        assert(false);
-        return;
+        return false;
     }
     
     EntityIDMapping mapping;
-    for (const auto& entity : asset["entities"])
+    for (const auto& entity : data["entities"])
     {
         if (!entity.is_number_unsigned())
         {
-            LOG_ERROR("Invalid scene file {}: entity id is not an unsigned number", fullPath);
+            LOG_ERROR("Invalid scene file {}: entity id is not an unsigned number", resource.GetFilePath());
             assert(false);
-            Free();
-            return;
+            resource.Free();
+            return false;
         }
         uint32_t rawEntityID = entity;
         if (mapping.Get(static_cast<entt::entity>(rawEntityID)) != entt::null)
         {
-            LOG_ERROR("Invalid scene file {}: duplicated entity id", fullPath);
+            LOG_ERROR("Invalid scene file {}: duplicated entity id", resource.GetFilePath());
             assert(false);
-            Free();
-            return;
+            resource.Free();
+            return false;
         }
 
-        mapping.Map(static_cast<entt::entity>(rawEntityID), m_registry.create());
+        mapping.Map(static_cast<entt::entity>(rawEntityID), resource.m_registry.create());
     }
 
     auto& componentRegistry = ComponentRegistry::Get();
-    for (const auto& component : asset["components"])
+    for (const auto& component : data["components"])
     {
         if (!component.is_object())
         {
-            LOG_ERROR("Invalid scene file {}: invalid component", fullPath);
+            LOG_ERROR("Invalid scene file {}: invalid component", resource.GetFilePath());
             assert(false);
-            Free();
-            return;
+            resource.Free();
+            return false;
         }
         if (!component.contains("type") || !component["type"].is_string())
         {
-            LOG_ERROR("Invalid scene file {}: component type missing", fullPath);
+            LOG_ERROR("Invalid scene file {}: component type missing", resource.GetFilePath());
             assert(false);
-            Free();
-            return;
+            resource.Free();
+            return false;
         }
         std::string type = component["type"];
         IComponentFactory* componentFactory = componentRegistry.GetObject(type);
         if (!componentFactory)
         {
-            LOG_ERROR("Invalid scene file {}: unknown component type {}", fullPath, type);
+            LOG_ERROR("Invalid scene file {}: unknown component type {}", resource.GetFilePath(), type);
             assert(false);
-            Free();
-            return;
+            resource.Free();
+            return false;
         }
         if (!component.contains("entity") || !component["entity"].is_number_unsigned())
         {
-            LOG_ERROR("Invalid scene file {}: component entity missing", fullPath);
+            LOG_ERROR("Invalid scene file {}: component entity missing", resource.GetFilePath());
             assert(false);
-            Free();
-            return;
+            resource.Free();
+            return false;
         }
         if (!component.contains("data") || !component["data"].is_object())
         {
-            LOG_ERROR("Invalid scene file {}: component data missing", fullPath);
+            LOG_ERROR("Invalid scene file {}: component data missing", resource.GetFilePath());
             assert(false);
-            Free();
-            return;
+            resource.Free();
+            return false;
         }
         uint32_t rawEntityID = component["entity"];
         entt::entity entity = mapping.Get(static_cast<entt::entity>(rawEntityID));
         if (entity == entt::null)
         {
-            LOG_ERROR("Invalid scene file {}: unknown entity id {}", fullPath, rawEntityID);
+            LOG_ERROR("Invalid scene file {}: unknown entity id {}", resource.GetFilePath(), rawEntityID);
             assert(false);
-            Free();
-            return;
+            resource.Free();
+            return false;
         }
 
-        componentFactory->CreateFromAsset({ m_registry, entity }, component["data"], mapping);
+        componentFactory->CreateFromAsset({ resource.m_registry, entity }, component["data"], mapping);
     }
+    return true;
 }
 
 void SceneResource::Free()
 {
     m_registry.clear();
+}
+
+entt::registry& SceneResource::GetRegistry()
+{
+    return m_registry;
+}
+
+const entt::registry& SceneResource::GetRegistry() const
+{
+    return m_registry;
 }
 
 void SceneResource::CopyToRegistry(entt::registry& other) const
@@ -154,3 +133,5 @@ void SceneResource::CopyToRegistry(entt::registry& other) const
         factory.CloneAll(m_registry, other, mapping);
     });
 }
+
+REGISTER_ASSET_FACTORY(SceneResource, SceneResource::Deserialize)

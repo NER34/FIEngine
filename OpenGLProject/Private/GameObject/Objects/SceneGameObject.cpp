@@ -1,8 +1,10 @@
 ﻿#include "GameObject/Objects/SceneGameObject.h"
 
+#include "AssetManager/AssetManager.h"
 #include "Components/NativeScriptComponent.h"
 #include "ResourceManager/ResourceManager.h"
 #include "Scene/SceneManager.h"
+#include "Utilities/Logger.h"
 
 namespace
 {
@@ -11,7 +13,11 @@ namespace
 
 void SceneGameObject::BeginPlay()
 {
-    m_sceneHandle = ResourceManager::Get().LoadResource<SceneResource>(g_scenePath);
+    if (!AssetManager::Get().Load<SceneResource>(g_scenePath, m_sceneHandle))
+    {
+        LOG_ERROR("Failed to load scene {}", g_scenePath);
+        return;
+    }
     SceneManager::Get().InstantiateScene(m_sceneHandle);
     
     SceneManager::Get().View<NativeScriptComponent>().each(
