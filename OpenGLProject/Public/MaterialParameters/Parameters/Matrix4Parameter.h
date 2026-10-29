@@ -3,8 +3,8 @@
 
 #include "glad/glad.h"
 #include "glm/glm.hpp"
-#include "Rendering/Material/MaterialParameter.h"
-#include "Rendering/Material/MaterialParamFactory.h"
+#include "MaterialParameters/MaterialParameter.h"
+#include "MaterialParameters/MaterialParamFactory.h"
 
 class Matrix4Parameter : public MaterialParameterBase<Matrix4Parameter>
 {

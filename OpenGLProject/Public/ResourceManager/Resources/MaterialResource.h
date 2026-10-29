@@ -5,7 +5,7 @@
 #include "glad/glad.h"
 #include "json.h"
 #include "AssetManager/AssetFactory.h"
-#include "Rendering/Material/MaterialParamContainer.h"
+#include "MaterialParameters/MaterialParamContainer.h"
 #include "ResourceManager/ResourceBase.h"
 #include "ResourceManager/ResourceHandle.h"
 #include "ResourceManager/Resources/ShaderProgramResource.h"

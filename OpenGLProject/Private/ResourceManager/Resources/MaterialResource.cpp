@@ -4,7 +4,7 @@
 
 #include "json.h"
 #include "AssetManager/AssetManager.h"
-#include "Rendering/Material/MaterialParamFactory.h"
+#include "MaterialParameters/MaterialParamFactory.h"
 #include "ResourceManager/ResourceManager.h"
 #include "Utilities/Logger.h"
 

@@ -1,4 +1,4 @@
-﻿#include "Rendering/Material/MaterialParameters/TextureParameter.h"
+﻿#include "MaterialParameters/Parameters/TextureParameter.h"
 
 #include "AssetManager/AssetManager.h"
 #include "ResourceManager/Resources/ShaderProgramResource.h"

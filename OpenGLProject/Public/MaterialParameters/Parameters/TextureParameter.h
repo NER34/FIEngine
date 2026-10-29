@@ -1,8 +1,8 @@
 ﻿#pragma once
 
 #include "glad/glad.h"
-#include "Rendering/Material/MaterialParameter.h"
-#include "Rendering/Material/MaterialParamFactory.h"
+#include "MaterialParameters/MaterialParameter.h"
+#include "MaterialParameters/MaterialParamFactory.h"
 #include "ResourceManager/ResourceHandle.h"
 #include "ResourceManager/Resources/TextureResource.h"
 

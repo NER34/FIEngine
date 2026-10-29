@@ -2,8 +2,8 @@
 #include <string>
 
 #include "glm/glm.hpp"
-#include "Rendering/Material/MaterialParameter.h"
-#include "Rendering/Material/MaterialParamFactory.h"
+#include "MaterialParameters/MaterialParameter.h"
+#include "MaterialParameters/MaterialParamFactory.h"
 
 class Vector3Parameter : public MaterialParameterBase<Vector3Parameter>
 {

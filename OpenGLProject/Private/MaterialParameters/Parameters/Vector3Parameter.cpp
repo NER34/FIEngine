@@ -1,4 +1,4 @@
-﻿#include "Rendering/Material/MaterialParameters/Vector3Parameter.h"
+﻿#include "MaterialParameters/Parameters/Vector3Parameter.h"
 
 #include "ResourceManager/Resources/ShaderProgramResource.h"
 

@@ -1,9 +1,7 @@
 ﻿#pragma once
-#include <string>
 
-#include "glad/glad.h"
-#include "Rendering/Material/MaterialParameter.h"
-#include "Rendering/Material/MaterialParamFactory.h"
+#include "MaterialParameters/MaterialParameter.h"
+#include "MaterialParameters/MaterialParamFactory.h"
 
 class ShaderProgramResource;
 
