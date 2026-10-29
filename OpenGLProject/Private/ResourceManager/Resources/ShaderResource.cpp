@@ -36,12 +36,31 @@ void ShaderResource::Reload()
         return;
     }
     
-    nlohmann::json shaderAsset;
-    assetFile >> shaderAsset;
-    assetFile.close(); 
+    nlohmann::json asset;
+    try
+    {
+        assetFile >> asset;
+    }
+    catch (const nlohmann::json::exception& exception)
+    {
+        LOG_ERROR("Failed to parse shader asset file {}: {}", assetPath.string(), exception.what());
+        return;
+    }
+    assetFile.close();
     
-    ShaderType shaderType = shaderAsset.value("type", ShaderType::Invalid);
-    const std::string shaderFilePath = shaderAsset.value("path", "");
+    if (!asset.contains("type") || !asset["type"].is_string())
+    {
+        LOG_ERROR("Invalid asset file {}: type is missing", GetFilePath());
+        return;
+    }
+    if (asset["type"] != "ShaderResource")
+    {
+        LOG_ERROR("Invalid asset file {}: expected type {}, got {}", GetFilePath(), "ShaderResource", asset["type"].get<std::string>());
+        return;
+    }
+
+    ShaderType shaderType = asset.value("shaderType", ShaderType::Invalid);
+    const std::string shaderFilePath = asset.value("path", "");
     
     if (shaderType == ShaderType::Invalid || shaderFilePath.empty())
     {

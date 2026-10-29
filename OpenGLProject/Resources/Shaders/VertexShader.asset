@@ -1,4 +1,5 @@
 {
-  "type": 0,
+  "type": "ShaderResource",
+  "shaderType": 0,
   "path": "Shaders/VertexShader.vert"
 }

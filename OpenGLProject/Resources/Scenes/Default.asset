@@ -1,4 +1,5 @@
 {
+  "type": "SceneResource",
   "entities": [
     0,
     1,
@@ -93,7 +94,7 @@
       "type": "MeshComponent",
       "entity": 3,
       "data": {
-        "mesh": "Meshes/Sting-Sword-lowpoly.obj",
+        "mesh": "Meshes/Sting-Sword-lowpoly.asset",
         "materials": [
           "Materials/Phong.asset"
         ]

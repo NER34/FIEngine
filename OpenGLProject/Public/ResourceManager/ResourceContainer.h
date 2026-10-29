@@ -70,6 +70,17 @@ public:
         m_resources.clear();
     }
     
+    bool GetResource(const std::string& name, ResourceHandle<TResource>& outHandle)
+    {
+        if (auto it = m_resources.find(name); it != m_resources.end())
+        {
+            outHandle.Reset();
+            outHandle.m_resourcePtr = it->second;
+            return true;
+        }
+        return false;
+    }
+    
 protected:
     
     std::unordered_map<std::string, std::shared_ptr<TResource>> m_resources;

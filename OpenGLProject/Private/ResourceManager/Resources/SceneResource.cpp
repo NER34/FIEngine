@@ -24,10 +24,10 @@ void SceneResource::Reload()
         return;
     }
 
-    nlohmann::json sceneAsset;
+    nlohmann::json asset;
     try
     {
-        sceneFile >> sceneAsset;
+        sceneFile >> asset;
     }
     catch (const nlohmann::json::exception& exception)
     {
@@ -36,13 +36,25 @@ void SceneResource::Reload()
         return;
     }
     
-    if (!sceneAsset.contains("entities") || !sceneAsset["entities"].is_array())
+    if (!asset.contains("type") || !asset["type"].is_string())
+    {
+        LOG_ERROR("Invalid asset file {}: type is missing", GetFilePath());
+        assert(false);
+        return;
+    }
+    if (asset["type"] != "SceneResource")
+    {
+        LOG_ERROR("Invalid asset file {}: expected type {}, got {}", GetFilePath(), "SceneResource", asset["type"].get<std::string>());
+        assert(false);
+        return;
+    }
+    if (!asset.contains("entities") || !asset["entities"].is_array())
     {
         LOG_ERROR("Invalid scene file {}: array of entities is missing", fullPath);
         assert(false);
         return;
     }
-    if (!sceneAsset.contains("components") || !sceneAsset["components"].is_array())
+    if (!asset.contains("components") || !asset["components"].is_array())
     {
         LOG_ERROR("Invalid scene file {}: array of components is missing", fullPath);
         assert(false);
@@ -50,7 +62,7 @@ void SceneResource::Reload()
     }
     
     EntityIDMapping mapping;
-    for (const auto& entity : sceneAsset["entities"])
+    for (const auto& entity : asset["entities"])
     {
         if (!entity.is_number_unsigned())
         {
@@ -72,7 +84,7 @@ void SceneResource::Reload()
     }
 
     auto& componentRegistry = ComponentRegistry::Get();
-    for (const auto& component : sceneAsset["components"])
+    for (const auto& component : asset["components"])
     {
         if (!component.is_object())
         {

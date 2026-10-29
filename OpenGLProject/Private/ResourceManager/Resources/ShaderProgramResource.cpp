@@ -27,15 +27,35 @@ void ShaderProgramResource::Reload()
         return;
     }
 
-    nlohmann::json shaderProgramAsset;
-    shaderProgramFile >> shaderProgramAsset;
-    if (!shaderProgramAsset.contains("shaders") || !shaderProgramAsset["shaders"].is_array())
+    nlohmann::json asset;
+    try
+    {
+        shaderProgramFile >> asset;
+    }
+    catch (const nlohmann::json::exception& exception)
+    {
+        LOG_ERROR("Failed to parse shader program file {}: {}", fullPath, exception.what());
+        return;
+    }
+
+    if (!asset.contains("type") || !asset["type"].is_string())
+    {
+        LOG_ERROR("Invalid asset file {}: type is missing", GetFilePath());
+        return;
+    }
+    if (asset["type"] != "ShaderProgramResource")
+    {
+        LOG_ERROR("Invalid asset file {}: expected type {}, got {}", GetFilePath(), "ShaderProgramResource", asset["type"].get<std::string>());
+        return;
+    }
+
+    if (!asset.contains("shaders") || !asset["shaders"].is_array())
     {
         LOG_ERROR("Invalid shader program asset file: {}", fullPath);
         return;
     }
 
-    for (const auto& shaderAssetPath : shaderProgramAsset["shaders"])
+    for (const auto& shaderAssetPath : asset["shaders"])
     {
         if (!shaderAssetPath.is_string())
         {

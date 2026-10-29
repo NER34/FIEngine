@@ -1,5 +1,8 @@
 #include "ResourceManager/Resources/TextureResource.h"
 
+#include <fstream>
+
+#include "json.h"
 #include "stb_image.h"
 #include "Rendering/Validation.h"
 #include "Utilities/Logger.h"
@@ -13,8 +16,49 @@ TextureResource::~TextureResource()
 void TextureResource::Reload()
 {
     Free();
+
+    const std::string assetPath = GetFullFilePath();
+    std::ifstream assetFile(assetPath);
+    if (!assetFile.is_open())
+    {
+        LOG_ERROR("Failed to open texture asset file: {}", assetPath);
+        assert(false);
+        return;
+    }
+
+    nlohmann::json asset;
+    try
+    {
+        assetFile >> asset;
+    }
+    catch (const nlohmann::json::exception& exception)
+    {
+        LOG_ERROR("Failed to parse texture asset file {}: {}", assetPath, exception.what());
+        assert(false);
+        return;
+    }
+
+    if (!asset.contains("type") || !asset["type"].is_string())
+    {
+        LOG_ERROR("Invalid asset file {}: type is missing", GetFilePath());
+        assert(false);
+        return;
+    }
+    if (asset["type"] != "TextureResource")
+    {
+        LOG_ERROR("Invalid asset file {}: expected type {}, got {}", GetFilePath(), "TextureResource", asset["type"].get<std::string>());
+        assert(false);
+        return;
+    }
+
+    if (!asset.contains("path") || !asset["path"].is_string())
+    {
+        LOG_ERROR("Invalid texture asset file {}: path is missing", assetPath);
+        assert(false);
+        return;
+    }
     
-    std::string texturePath = (GetResourcesPath() / GetFilePath()).string();
+    std::string texturePath = (GetResourcesPath() / asset["path"].get<std::string>()).string();
     TextureDesc textureDesc;
     textureDesc.data = stbi_load(
         texturePath.c_str(), 

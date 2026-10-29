@@ -1,4 +1,5 @@
 {
-  "type": 1,
+  "type": "ShaderResource",
+  "shaderType": 1,
   "path": "Shaders/PhongShader.frag"
 }

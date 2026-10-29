@@ -26,10 +26,10 @@ void MaterialResource::Reload()
         return;
     }
 
-    nlohmann::json materialAsset;
+    nlohmann::json asset;
     try
     {
-        materialFile >> materialAsset;
+        materialFile >> asset;
     }
     catch (const nlohmann::json::exception& exception)
     {
@@ -37,13 +37,24 @@ void MaterialResource::Reload()
         return;
     }
 
-    if (!materialAsset.contains("shaderProgram") || !materialAsset["shaderProgram"].is_string())
+    if (!asset.contains("type") || !asset["type"].is_string())
+    {
+        LOG_ERROR("Invalid asset file {}: type is missing", GetFilePath());
+        return;
+    }
+    if (asset["type"] != "MaterialResource")
+    {
+        LOG_ERROR("Invalid asset file {}: expected type {}, got {}", GetFilePath(), "MaterialResource", asset["type"].get<std::string>());
+        return;
+    }
+
+    if (!asset.contains("shaderProgram") || !asset["shaderProgram"].is_string())
     {
         LOG_ERROR("Invalid material file {}: shaderProgram is missing", fullPath);
         return;
     }
     ResourceManager& resourceManager = ResourceManager::Get();
-    m_shaderProgram = resourceManager.LoadResource<ShaderProgramResource>(materialAsset["shaderProgram"]);
+    m_shaderProgram = resourceManager.LoadResource<ShaderProgramResource>(asset["shaderProgram"]);
 
     if (!IsValid())
     {
@@ -52,7 +63,7 @@ void MaterialResource::Reload()
         return;
     }
 
-    if (materialAsset.contains("parameters") && !materialAsset["parameters"].is_array())
+    if (asset.contains("parameters") && !asset["parameters"].is_array())
     {
         LOG_ERROR("Invalid material file {}: parameters must be an array", fullPath);
         Free();
@@ -62,9 +73,9 @@ void MaterialResource::Reload()
     m_shaderProgram->Activate();
 
     bool parametersValid = true;
-    if (materialAsset.contains("parameters"))
+    if (asset.contains("parameters"))
     {
-        for (const auto& parameter : materialAsset["parameters"])
+        for (const auto& parameter : asset["parameters"])
         {
             if (!AddParameter(parameter))
             {

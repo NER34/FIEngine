@@ -51,6 +51,17 @@ public:
         }
     }
     
+    template<typename TResource>
+    bool GetResource(ResourceHandle<TResource>& outHandle)
+    {
+        if (const auto it = m_registeredContainers.find(typeid(TResource)); it != m_registeredContainers.end())
+        {
+            auto* container = static_cast<ResourceContainer<TResource>*>(it->second.get());
+            return container->GetResource(outHandle);
+        }
+        return false;
+    }
+    
 private:
     
     template <typename TResourceContainer, typename TResource>

@@ -1,4 +1,5 @@
 {
+  "type": "ShaderProgramResource",
   "shaders": [
     "Shaders/VertexShader.asset",
     "Shaders/PhongShader.asset"

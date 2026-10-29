@@ -1,10 +1,11 @@
 {
+  "type": "MaterialResource",
   "shaderProgram": "Shaders/PhongShaderProgram.asset",
   "parameters": [
     {
       "type": "TextureParameter",
       "name": "SolidColor",
-      "path": "Textures/Sting/Sting_Base_Color.png",
+      "path": "Textures/Sting/Sting_Base_Color.asset",
       "slot": 0
     }
   ]
