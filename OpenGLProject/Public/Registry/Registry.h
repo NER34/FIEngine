@@ -11,7 +11,7 @@ class Registry
 public:
     
     template <typename TDerivedObject, typename... TArgs>
-    bool FindObject(const TKey& key, TArgs&&... args)
+    bool RegisterObject(const TKey& key, TArgs&&... args)
     {
         if (!m_registry.contains(key))
         {

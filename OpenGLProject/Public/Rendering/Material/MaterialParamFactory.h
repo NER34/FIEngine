@@ -68,7 +68,7 @@ private:
 
 
 #define MATERIAL_PARAM_FACTORY_REGISTER_VAR(TMaterialParam) template<> bool MaterialParamFactory<TMaterialParam>::s_registered
-#define MATERIAL_PARAM_FACTORY_REGISTER_FUNC(TMaterialParam) MaterialParamRegistry::Get().FindObject<MaterialParamFactory<TMaterialParam>>
+#define MATERIAL_PARAM_FACTORY_REGISTER_FUNC(TMaterialParam) MaterialParamRegistry::Get().RegisterObject<MaterialParamFactory<TMaterialParam>>
 
 #define REGISTER_MATERIAL_PARAM_FACTORY(TMaterialParam, DeserializeFunc) \
     MATERIAL_PARAM_FACTORY_REGISTER_VAR(TMaterialParam) = MATERIAL_PARAM_FACTORY_REGISTER_FUNC(TMaterialParam) \

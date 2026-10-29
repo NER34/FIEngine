@@ -101,7 +101,7 @@ private:
 
 
 #define SCRIPT_FACTORY_REGISTER_VAR(TScript) template<> bool ScriptFactory<TScript>::s_registered
-#define SCRIPT_FACTORY_REGISTER_FUNC(TScript) ScriptRegistry::Get().FindObject<ScriptFactory<TScript>>
+#define SCRIPT_FACTORY_REGISTER_FUNC(TScript) ScriptRegistry::Get().RegisterObject<ScriptFactory<TScript>>
 
 #define REGISTER_SCRIPT_FACTORY(TScript, DeserializeFunc, CopyFunc) \
     SCRIPT_FACTORY_REGISTER_VAR(TScript) = SCRIPT_FACTORY_REGISTER_FUNC(TScript) \

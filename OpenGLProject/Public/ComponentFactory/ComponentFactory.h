@@ -91,7 +91,7 @@ private:
 
 
 #define COMPONENT_FACTORY_REGISTER_VAR(TComponent) template<> bool ComponentFactory<TComponent>::s_registered
-#define COMPONENT_FACTORY_REGISTER_FUNC(TComponent) ComponentRegistry::Get().FindObject<ComponentFactory<TComponent>>
+#define COMPONENT_FACTORY_REGISTER_FUNC(TComponent) ComponentRegistry::Get().RegisterObject<ComponentFactory<TComponent>>
 
 #define REGISTER_COMPONENT_FACTORY(TComponent, DeserializeFunc, CopyFunc) \
     COMPONENT_FACTORY_REGISTER_VAR(TComponent) = COMPONENT_FACTORY_REGISTER_FUNC(TComponent) \
