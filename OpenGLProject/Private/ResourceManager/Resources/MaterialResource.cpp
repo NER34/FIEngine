@@ -20,21 +20,21 @@ DEFINE_ASSET_DESERIALIZE_FUNC(Deserialize, MaterialResource)
 
     if (!data.contains("shaderProgram") || !data["shaderProgram"].is_string())
     {
-        LOG_ERROR("Invalid material file {}: shaderProgram is missing", resource.GetFilePath());
+        LOG_ERROR("Invalid material file: shaderProgram is missing");
         return false;
     }
     AssetManager::Get().Load<ShaderProgramResource>(data["shaderProgram"], resource.m_shaderProgram);
 
     if (!resource.IsValid())
     {
-        LOG_ERROR("Failed to load shader program for material: {}", resource.GetFilePath());
+        LOG_ERROR("Failed to load shader program for material");
         resource.Free();
         return false;
     }
 
     if (data.contains("parameters") && !data["parameters"].is_array())
     {
-        LOG_ERROR("Invalid material file {}: parameters must be an array", resource.GetFilePath());
+        LOG_ERROR("Invalid material file: parameters must be an array");
         resource.Free();
         return false;
     }

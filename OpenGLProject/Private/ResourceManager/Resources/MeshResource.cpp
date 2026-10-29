@@ -20,7 +20,7 @@ DEFINE_ASSET_DESERIALIZE_FUNC(Deserialize, MeshResource)
 
     if (!data.contains("path") || !data["path"].is_string())
     {
-        LOG_ERROR("Invalid mesh asset file {}: path is missing", resource.GetFilePath());
+        LOG_ERROR("Invalid mesh asset file: path is missing");
         return false;
     }
     

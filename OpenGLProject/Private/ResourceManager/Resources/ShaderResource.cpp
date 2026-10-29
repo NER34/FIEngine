@@ -27,19 +27,19 @@ DEFINE_ASSET_DESERIALIZE_FUNC(Deserialize, ShaderResource)
 
     if (!data.contains("shaderType") || !data["shaderType"].is_number_integer())
     {
-        LOG_ERROR("Invalid shader asset file {}: shaderType is missing", resource.GetFilePath());
+        LOG_ERROR("Invalid shader asset file: shaderType is missing");
         return false;
     }
     const ShaderType shaderType = data["shaderType"].get<ShaderType>();
     if (!g_enumToGLenum.contains(shaderType))
     {
-        LOG_ERROR("Invalid shader asset file {}: unknown shaderType {}", resource.GetFilePath(), data["shaderType"].get<int>());
+        LOG_ERROR("Invalid shader asset file: unknown shaderType {}", data["shaderType"].get<int>());
         return false;
     }
 
     if (!data.contains("path") || !data["path"].is_string())
     {
-        LOG_ERROR("Invalid shader asset file {}: path is missing", resource.GetFilePath());
+        LOG_ERROR("Invalid shader asset file: path is missing");
         return false;
     }
     

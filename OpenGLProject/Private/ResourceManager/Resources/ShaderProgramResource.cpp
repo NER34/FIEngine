@@ -19,7 +19,7 @@ DEFINE_ASSET_DESERIALIZE_FUNC(Deserialize, ShaderProgramResource)
 
     if (!data.contains("shaders") || !data["shaders"].is_array() || data["shaders"].empty())
     {
-        LOG_ERROR("Invalid shader program asset file {}: shaders are missing", resource.GetFilePath());
+        LOG_ERROR("Invalid shader program asset file: shaders are missing");
         return false;
     }
 
@@ -28,14 +28,14 @@ DEFINE_ASSET_DESERIALIZE_FUNC(Deserialize, ShaderProgramResource)
     {
         if (!shaderAssetPath.is_string())
         {
-            LOG_ERROR("Invalid shader asset path in shader program file: {}", resource.GetFilePath());
+            LOG_ERROR("Invalid shader asset path");
             continue;
         }
         
         ResourceHandle<ShaderResource> shaderHandle;
         if (!AssetManager::Get().Load<ShaderResource>(shaderAssetPath, shaderHandle) || !shaderHandle->IsValid())
         {
-            LOG_ERROR("Failed to load shader for program {}: invalid shader resource", resource.GetFilePath());
+            LOG_ERROR("Failed to load shader for program: invalid shader resource");
             continue;
         }
         shaderProgramDesc.m_shaders.push_back(shaderHandle);
@@ -170,7 +170,7 @@ bool ShaderProgramResource::CreateShaderProgram(const ShaderProgramDesc& desc)
 
     if (desc.m_shaders.empty())
     {
-        LOG_ERROR("Failed to create shader program {}: no shaders provided", GetFilePath());
+        LOG_ERROR("Failed to create shader program: no shaders provided");
         return false;
     }
 

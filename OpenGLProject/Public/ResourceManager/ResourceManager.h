@@ -30,18 +30,6 @@ public:
     }
     
     template<typename TResource>
-    ResourceHandle<TResource> LoadResource(const std::string& filePath)
-    {
-        if (!m_registeredContainers.contains(typeid(TResource)))
-        {
-            RegisterResourceType<ResourceContainer<TResource>, TResource>();
-        }
-        auto it = m_registeredContainers.find(typeid(TResource));
-        auto* container = static_cast<ResourceContainer<TResource>*>(it->second.get());
-        return container->LoadResource(filePath);
-    }
-    
-    template<typename TResource>
     void FreeResource(const std::string& filePath)
     {
         if (auto it = m_registeredContainers.find(typeid(TResource)); it != m_registeredContainers.end())

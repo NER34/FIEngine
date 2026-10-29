@@ -18,7 +18,7 @@ DEFINE_ASSET_DESERIALIZE_FUNC(Deserialize, TextureResource)
 
     if (!data.contains("path") || !data["path"].is_string())
     {
-        LOG_ERROR("Invalid texture asset file {}: path is missing", resource.GetFilePath());
+        LOG_ERROR("Invalid texture asset file: path is missing");
         assert(false);
         return false;
     }

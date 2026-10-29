@@ -30,23 +30,6 @@ public:
     ResourceHandle<TResource> CreateResource(const std::string& name, TArgs&&... args)
     {
         auto [it, inserted] = m_resources.try_emplace(name, std::make_shared<TResource>());
-        if (inserted)
-        {
-            it->second->m_filePath = name;
-        }
-        ResourceHandle<TResource> handle;
-        handle.m_resourcePtr = it->second;
-        return handle;
-    }
-    
-    ResourceHandle<TResource> LoadResource(const std::string& filePath)
-    {
-        auto [it, inserted] = m_resources.try_emplace(filePath, std::make_shared<TResource>());
-        if (inserted)
-        {
-            it->second->m_filePath = filePath;
-            it->second->Reload();
-        }
         ResourceHandle<TResource> handle;
         handle.m_resourcePtr = it->second;
         return handle;
