@@ -5,6 +5,7 @@
 #include "json.h"
 #include "glm/gtc/type_ptr.hpp"
 
+#include "AssetManager/AssetManager.h"
 #include "Rendering/Validation.h"
 #include "ResourceManager/ResourceManager.h"
 #include "Utilities/Logger.h"
@@ -62,7 +63,9 @@ void ShaderProgramResource::Reload()
             LOG_ERROR("Invalid shader asset path in shader program file: {}", fullPath);
             continue;
         }
-        m_shaderResources.push_back(ResourceManager::Get().LoadResource<ShaderResource>(shaderAssetPath));
+        ResourceHandle<ShaderResource> shaderHandle;
+        AssetManager::Get().Load<ShaderResource>(shaderAssetPath, shaderHandle);
+        m_shaderResources.push_back(shaderHandle);
     }
     if (m_shaderResources.empty())
     {

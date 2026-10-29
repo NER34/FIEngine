@@ -4,6 +4,7 @@
 
 #include "glad/glad.h"
 
+#include "AssetManager/AssetFactory.h"
 #include "ResourceManager/ResourceBase.h"
 
 enum class ShaderType : char
@@ -37,7 +38,6 @@ public:
     ShaderResource(const ShaderResource& other) = delete;
     ShaderResource& operator=(const ShaderResource& other) = delete;
     
-    void Reload() override;
     void Free() override;
     
     bool IsValid() const;
@@ -46,9 +46,11 @@ public:
     GLenum GetGLShaderType() const;
     GLuint GetShaderID() const;
     
-private:
+    bool CreateShader(const ShaderDesc& desc);
     
-    void CreateShader(const ShaderDesc& desc);
+    DECLARE_ASSET_DESERIALIZE_FUNC(Deserialize, ShaderResource);
+    
+private:
     
     ShaderType m_shaderType = ShaderType::Invalid; 
     GLuint m_shaderID = 0;

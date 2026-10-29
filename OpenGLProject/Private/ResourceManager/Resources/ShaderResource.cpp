@@ -4,8 +4,6 @@
 #include <fstream>
 #include <unordered_map>
 
-#include "json.h"
-
 #include "Rendering/Validation.h"
 #include "Utilities/Logger.h"
 #include "Utilities/Utilities.h"
@@ -23,58 +21,35 @@ ShaderResource::~ShaderResource()
     ShaderResource::Free();
 }
 
-void ShaderResource::Reload()
+DEFINE_ASSET_DESERIALIZE_FUNC(Deserialize, ShaderResource)
 {
-    Free();
-    
-    const auto assetPath = GetResourcesPath() / GetFilePath();
-    std::ifstream assetFile(assetPath);
+    resource.Free();
 
-    if (!assetFile.is_open())
+    if (!data.contains("shaderType") || !data["shaderType"].is_number_integer())
     {
-        LOG_ERROR("Failed to open shader asset file: {}", assetPath.string());
-        return;
+        LOG_ERROR("Invalid shader asset file {}: shaderType is missing", resource.GetFilePath());
+        return false;
     }
-    
-    nlohmann::json asset;
-    try
+    const ShaderType shaderType = data["shaderType"].get<ShaderType>();
+    if (!g_enumToGLenum.contains(shaderType))
     {
-        assetFile >> asset;
-    }
-    catch (const nlohmann::json::exception& exception)
-    {
-        LOG_ERROR("Failed to parse shader asset file {}: {}", assetPath.string(), exception.what());
-        return;
-    }
-    assetFile.close();
-    
-    if (!asset.contains("type") || !asset["type"].is_string())
-    {
-        LOG_ERROR("Invalid asset file {}: type is missing", GetFilePath());
-        return;
-    }
-    if (asset["type"] != "ShaderResource")
-    {
-        LOG_ERROR("Invalid asset file {}: expected type {}, got {}", GetFilePath(), "ShaderResource", asset["type"].get<std::string>());
-        return;
+        LOG_ERROR("Invalid shader asset file {}: unknown shaderType {}", resource.GetFilePath(), data["shaderType"].get<int>());
+        return false;
     }
 
-    ShaderType shaderType = asset.value("shaderType", ShaderType::Invalid);
-    const std::string shaderFilePath = asset.value("path", "");
-    
-    if (shaderType == ShaderType::Invalid || shaderFilePath.empty())
+    if (!data.contains("path") || !data["path"].is_string())
     {
-        LOG_ERROR("Invalid shader asset file: {}", assetPath.string());
-        return;
+        LOG_ERROR("Invalid shader asset file {}: path is missing", resource.GetFilePath());
+        return false;
     }
     
-    const std::filesystem::path shaderPath = GetResourcesPath() / shaderFilePath;
+    const std::filesystem::path shaderPath = GetResourcesPath() / data["path"].get<std::string>();
     std::ifstream shaderFile(shaderPath);
 
     if (!shaderFile.is_open())
     {
         LOG_ERROR("Failed to open shader file: {}", shaderPath.string());
-        return;
+        return false;
     }
 
     std::string shaderData = std::string(
@@ -90,7 +65,7 @@ void ShaderResource::Reload()
     shaderDesc.m_shaderFilePath = shaderPath.string();
 #endif
 
-    CreateShader(shaderDesc);
+    return resource.CreateShader(shaderDesc);
 }
 
 void ShaderResource::Free()
@@ -123,8 +98,10 @@ GLuint ShaderResource::GetShaderID() const
     return m_shaderID;
 }
 
-void ShaderResource::CreateShader(const ShaderDesc& desc)
+bool ShaderResource::CreateShader(const ShaderDesc& desc)
 {
+    Free();
+    
     m_shaderType = desc.m_shaderType;
     
     CHECK_OGL_ERR(m_shaderID = glCreateShader(GetGLShaderType()))
@@ -141,5 +118,10 @@ void ShaderResource::CreateShader(const ShaderDesc& desc)
 #if DEBUG_ENABLED
         LOG_ERROR("Failed to compile shader {}: {}", desc.m_shaderFilePath, infoLog);
 #endif
+        Free();
+        return false;
     }
+    return true;
 }
+
+REGISTER_ASSET_FACTORY(ShaderResource, ShaderResource::Deserialize)
