@@ -1,5 +1,6 @@
 ﻿#include "Components/MeshComponent.h"
 
+#include "AssetManager/AssetManager.h"
 #include "ResourceManager/ResourceManager.h"
 #include "Utilities/Logger.h"
 
@@ -13,7 +14,10 @@ DEFINE_COMPONENT_DESERIALIZE_FUNC(Deserialize, MeshComponent)
     }
     else
     {
-        component.m_meshHandle = resourceManager.LoadResource<MeshResource>(data["mesh"]);
+        if (!AssetManager::Get().Load<MeshResource>(data["mesh"], component.m_meshHandle))
+        {
+            LOG_ERROR("Mesh component failed to load mesh {}", data["mesh"].get<std::string>());
+        }
     }
 
     if (!data.contains("materials"))

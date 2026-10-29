@@ -1,11 +1,10 @@
 ﻿#include "ResourceManager/Resources/MeshResource.h"
 
-#include <fstream>
+#include <cassert>
 
 #include "assimp/Importer.hpp"
 #include "assimp/postprocess.h"
 #include "assimp/scene.h"
-#include "json.h"
 
 #include "Rendering/Validation.h"
 #include "Utilities/Logger.h"
@@ -15,48 +14,18 @@ MeshResource::~MeshResource()
     MeshResource::Free();
 }
 
-void MeshResource::Reload()
+DEFINE_ASSET_DESERIALIZE_FUNC(Deserialize, MeshResource)
 {
-    Free();
+    resource.Free();
 
-    const std::string assetPath = GetFullFilePath();
-    std::ifstream assetFile(assetPath);
-    if (!assetFile.is_open())
+    if (!data.contains("path") || !data["path"].is_string())
     {
-        LOG_ERROR("Failed to open mesh asset file: {}", assetPath);
-        return;
-    }
-
-    nlohmann::json asset;
-    try
-    {
-        assetFile >> asset;
-    }
-    catch (const nlohmann::json::exception& exception)
-    {
-        LOG_ERROR("Failed to parse mesh asset file {}: {}", assetPath, exception.what());
-        return;
-    }
-
-    if (!asset.contains("type") || !asset["type"].is_string())
-    {
-        LOG_ERROR("Invalid asset file {}: type is missing", GetFilePath());
-        return;
-    }
-    if (asset["type"] != "MeshResource")
-    {
-        LOG_ERROR("Invalid asset file {}: expected type {}, got {}", GetFilePath(), "MeshResource", asset["type"].get<std::string>());
-        return;
-    }
-
-    if (!asset.contains("path") || !asset["path"].is_string())
-    {
-        LOG_ERROR("Invalid mesh asset file {}: path is missing", assetPath);
-        return;
+        LOG_ERROR("Invalid mesh asset file {}: path is missing", resource.GetFilePath());
+        return false;
     }
     
     Assimp::Importer importer;
-    std::string fullPath = (GetResourcesPath() / asset["path"].get<std::string>()).string();
+    std::string fullPath = (GetResourcesPath() / data["path"].get<std::string>()).string();
     auto* scene = importer.ReadFile(
         fullPath.c_str(),
         aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_JoinIdenticalVertices
@@ -65,7 +34,7 @@ void MeshResource::Reload()
     if (!scene)
     {
         LOG_ERROR("Failed to load mesh: {} ({})", fullPath, importer.GetErrorString());
-        return;
+        return false;
     }
 
     for (uint32_t i = 0; i < scene->mNumMeshes; i++)
@@ -105,9 +74,10 @@ void MeshResource::Reload()
             meshDesc.m_indices.push_back(face.mIndices[1]);
             meshDesc.m_indices.push_back(face.mIndices[2]);
         }
-        AddSubMesh(meshDesc);
+        resource.AddSubMesh(meshDesc);
     }
     importer.FreeScene();
+    return true;
 }
 
 void MeshResource::Free()
@@ -201,3 +171,5 @@ void MeshResource::DestroySubMesh(SubMesh& subMesh)
     
     subMesh = SubMesh();
 }
+
+REGISTER_ASSET_FACTORY(MeshResource, MeshResource::Deserialize)

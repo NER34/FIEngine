@@ -2,6 +2,7 @@
 
 #include "glad/glad.h"
 
+#include "AssetManager/AssetFactory.h"
 #include "ResourceManager/ResourceBase.h"
 #include "Utilities/Utilities.h"
 
@@ -28,7 +29,6 @@ public:
     MeshResource(const MeshResource& other) = delete;
     MeshResource& operator=(const MeshResource& other) = delete;
     
-    void Reload() override;
     void Free() override;
     
     void AddSubMesh(const MeshDesc& desc);
@@ -36,6 +36,8 @@ public:
     size_t GetSubMeshCount() const;
     void DrawSubMesh(size_t index) const;
     void Draw() const;
+    
+    DECLARE_ASSET_DESERIALIZE_FUNC(Deserialize, MeshResource);
     
 private:
     
