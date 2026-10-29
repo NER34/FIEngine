@@ -2,6 +2,7 @@
 
 #include "glad/glad.h"
 
+#include "AssetManager/AssetFactory.h"
 #include "ResourceManager/ResourceBase.h"
 
 struct TextureDesc
@@ -21,7 +22,6 @@ public:
     TextureResource(const TextureResource& other) = delete;
     TextureResource& operator=(const TextureResource& other) = delete;
     
-    void Reload() override;
     void Free() override;
     
     void Activate(GLenum textureUnit = GL_TEXTURE0) const;
@@ -29,9 +29,11 @@ public:
     bool IsValid() const;
     GLuint GetTextureID() const;
     
-private:
-    
     void CreateTexture(const TextureDesc& desc);
+    
+    DECLARE_ASSET_DESERIALIZE_FUNC(Deserialize, TextureResource);
+    
+private:
     
     GLuint m_textureID = 0;
     

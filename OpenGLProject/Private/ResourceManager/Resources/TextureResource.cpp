@@ -1,8 +1,7 @@
 #include "ResourceManager/Resources/TextureResource.h"
 
-#include <fstream>
+#include <cassert>
 
-#include "json.h"
 #include "stb_image.h"
 #include "Rendering/Validation.h"
 #include "Utilities/Logger.h"
@@ -13,52 +12,18 @@ TextureResource::~TextureResource()
     TextureResource::Free();
 }
 
-void TextureResource::Reload()
+DEFINE_ASSET_DESERIALIZE_FUNC(Deserialize, TextureResource)
 {
-    Free();
+    resource.Free();
 
-    const std::string assetPath = GetFullFilePath();
-    std::ifstream assetFile(assetPath);
-    if (!assetFile.is_open())
+    if (!data.contains("path") || !data["path"].is_string())
     {
-        LOG_ERROR("Failed to open texture asset file: {}", assetPath);
+        LOG_ERROR("Invalid texture asset file {}: path is missing", resource.GetFilePath());
         assert(false);
-        return;
-    }
-
-    nlohmann::json asset;
-    try
-    {
-        assetFile >> asset;
-    }
-    catch (const nlohmann::json::exception& exception)
-    {
-        LOG_ERROR("Failed to parse texture asset file {}: {}", assetPath, exception.what());
-        assert(false);
-        return;
-    }
-
-    if (!asset.contains("type") || !asset["type"].is_string())
-    {
-        LOG_ERROR("Invalid asset file {}: type is missing", GetFilePath());
-        assert(false);
-        return;
-    }
-    if (asset["type"] != "TextureResource")
-    {
-        LOG_ERROR("Invalid asset file {}: expected type {}, got {}", GetFilePath(), "TextureResource", asset["type"].get<std::string>());
-        assert(false);
-        return;
-    }
-
-    if (!asset.contains("path") || !asset["path"].is_string())
-    {
-        LOG_ERROR("Invalid texture asset file {}: path is missing", assetPath);
-        assert(false);
-        return;
+        return false;
     }
     
-    std::string texturePath = (GetResourcesPath() / asset["path"].get<std::string>()).string();
+    std::string texturePath = (GetResourcesPath() / data["path"].get<std::string>()).string();
     TextureDesc textureDesc;
     textureDesc.data = stbi_load(
         texturePath.c_str(), 
@@ -66,16 +31,16 @@ void TextureResource::Reload()
         &textureDesc.numChannels, 0
         );
     
-    if (textureDesc.data)
-    {
-        CreateTexture(textureDesc);
-        stbi_image_free(textureDesc.data);
-    }
-    else
+    if (!textureDesc.data)
     {
         LOG_ERROR("Failed to load texture: {}", texturePath);
         assert(false);
+        return false;
     }
+    
+    resource.CreateTexture(textureDesc);
+    stbi_image_free(textureDesc.data);
+    return true;
 }
 
 void TextureResource::Free()
@@ -112,6 +77,8 @@ GLuint TextureResource::GetTextureID() const
 
 void TextureResource::CreateTexture(const TextureDesc& desc)
 {
+    Free();
+    
     CHECK_OGL_ERR(glGenTextures(1, &m_textureID))
     CHECK_OGL_ERR(glBindTexture(GL_TEXTURE_2D, m_textureID))
     
@@ -139,3 +106,5 @@ void TextureResource::CreateTexture(const TextureDesc& desc)
 
     CHECK_OGL_ERR(glBindTexture(GL_TEXTURE_2D, 0))
 }
+
+REGISTER_ASSET_FACTORY(TextureResource, TextureResource::Deserialize)

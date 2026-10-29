@@ -34,10 +34,10 @@ public:
 template <typename TResource>
 class AssetFactory : public IAssetFactory
 {
-    using TDeserializeFunc = std::function<bool(TResource&, const nlohmann::json&)>;
+    using DeserializeFunc = std::function<bool(TResource&, const nlohmann::json&)>;
 public:
     
-    AssetFactory(TDeserializeFunc deserialize)
+    AssetFactory(DeserializeFunc deserialize)
         : m_deserialize(deserialize)
     {}
     
@@ -59,7 +59,7 @@ public:
     
 private:
     
-    TDeserializeFunc m_deserialize;
+    DeserializeFunc m_deserialize;
     static bool      s_registered;
     
 };

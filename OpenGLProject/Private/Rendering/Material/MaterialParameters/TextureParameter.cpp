@@ -1,7 +1,7 @@
 ﻿#include "Rendering/Material/MaterialParameters/TextureParameter.h"
 
+#include "AssetManager/AssetManager.h"
 #include "ResourceManager/Resources/ShaderProgramResource.h"
-#include "ResourceManager/ResourceManager.h"
 
 
 void TextureParameter::ApplyParameter(const ResourceHandle<ShaderProgramResource>& shaderProgram) const
@@ -27,7 +27,11 @@ DEFINE_MATERIAL_PARAM_DESERIALIZE_FUNC(Deserialize, TextureParameter)
         LOG_ERROR("Texture material parameter {} has invalid path", parameter.GetName());
         return false;
     }
-    parameter.m_textureHandle = ResourceManager::Get().LoadResource<TextureResource>(data["path"]);
+    if (!AssetManager::Get().Load<TextureResource>(data["path"], parameter.m_textureHandle))
+    {
+        LOG_ERROR("Texture material parameter {} failed to load texture", parameter.GetName());
+        return false;
+    }
     
     return true;
 }
