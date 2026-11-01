@@ -6,9 +6,9 @@
     2,
     3
   ],
-  "components": [      
+  "components": [
     {
-      "type": "EntityHierarchyComponent",
+      "type": "TransformComponent",
       "entity": 0,
       "data": {
         "parent": null,
@@ -17,21 +17,15 @@
       }
     },
     {
-      "type": "EntityHierarchyComponent",
-      "entity": 1,
-      "data": {
-        "parent": 0,
-        "child": null,
-        "neighbor": 2
-      }
-    },
-    {
       "type": "TransformComponent",
       "entity": 1,
       "data": {
         "position": [ 0.0, 0.0, 0.0 ],
         "rotation": [ 0.0, 0.0, 0.0 ],
-        "scale": [ 1.0, 1.0, 1.0 ]
+        "scale": [ 1.0, 1.0, 1.0 ],
+        "parent": 0,
+        "child": null,
+        "neighbor": 2
       }
     },
     {
@@ -58,21 +52,15 @@
       }
     },
     {
-      "type": "EntityHierarchyComponent",
-      "entity": 2,
-      "data": {
-        "parent": 0,
-        "child": null,
-        "neighbor": 3
-      }
-    },
-    {
       "type": "TransformComponent",
       "entity": 2,
       "data": {
         "position": [ 0.0, 0.0, 5.0 ],
         "rotation": [ 0.0, 0.0, 0.0 ],
-        "scale": [ 1.0, 1.0, 1.0 ]
+        "scale": [ 1.0, 1.0, 1.0 ],
+        "parent": 0,
+        "child": null,
+        "neighbor": 3
       }
     },
     {
@@ -83,21 +71,15 @@
       }
     },
     {
-      "type": "EntityHierarchyComponent",
-      "entity": 3,
-      "data": {
-        "parent": 0,
-        "child": null,
-        "neighbor": null
-      }
-    },
-    {
       "type": "TransformComponent",
       "entity": 3,
       "data": {
         "position": [ 2.0, 2.0, 0.0 ],
         "rotation": [ 0.0, 0.0, 180.0 ],
-        "scale": [ 1.0, 1.0, 1.0 ]
+        "scale": [ 1.0, 1.0, 1.0 ],
+        "parent": 0,
+        "child": null,
+        "neighbor": null
       }
     },
     {
