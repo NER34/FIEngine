@@ -17,6 +17,16 @@
       }
     },
     {
+      "type": "NativeScriptComponent",
+      "entity": 0,
+      "data": {
+        "script": "SpawnScene",
+        "data": {
+          "scene": "Scenes/SolarSystem.asset"
+        }
+      }
+    },
+    {
       "type": "TransformComponent",
       "entity": 1,
       "data": {

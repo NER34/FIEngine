@@ -50,6 +50,7 @@ public:
     void Update(float deltaTime);
     void EndPlay();
 
+    bool HasBegunPlay() const;
     ScriptBase* GetScript() const;
     
     DECLARE_COMPONENT_DESERIALIZE_FUNC(Deserialize, NativeScriptComponent);
@@ -65,5 +66,7 @@ private:
     
     ScriptBase*     m_scriptInst = nullptr;
     IScriptFactory* m_scriptFactory = nullptr;
+
+    bool m_bBegunPlay = false;
 
 };

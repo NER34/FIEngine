@@ -1,7 +1,6 @@
 ﻿#include "GameObject/Objects/SceneGameObject.h"
 
 #include "AssetManager/AssetManager.h"
-#include "Components/NativeScriptComponent.h"
 #include "ResourceManager/ResourceManager.h"
 #include "Scene/SceneManager.h"
 #include "Utilities/Logger.h"
@@ -18,31 +17,10 @@ void SceneGameObject::BeginPlay()
         LOG_ERROR("Failed to load scene {}", g_scenePath);
         return;
     }
-    SceneManager::Get().InstantiateScene(m_sceneHandle);
-    
-    SceneManager::Get().View<NativeScriptComponent>().each(
-        [&](auto entity, NativeScriptComponent& component)
-        {
-            component.BeginPlay();
-        });
-}
-
-void SceneGameObject::Update(float deltaTime)
-{
-    SceneManager::Get().View<NativeScriptComponent>().each(
-        [&](auto entity, NativeScriptComponent& component)
-        {
-            component.Update(deltaTime);
-        });
+    SceneManager::Get().SpawnScene(m_sceneHandle);
 }
 
 void SceneGameObject::EndPlay()
 {
-    SceneManager::Get().View<NativeScriptComponent>().each(
-        [&](auto entity, NativeScriptComponent& component)
-        {
-            component.EndPlay();
-        });
-    
     m_sceneHandle.Reset();
 }

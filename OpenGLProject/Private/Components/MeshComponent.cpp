@@ -6,6 +6,8 @@
 
 DEFINE_COMPONENT_DESERIALIZE_FUNC(Deserialize, MeshComponent)
 {
+    auto& component = handle.m_registry.get<MeshComponent>(handle.m_entity);
+    
     if (!data.contains("mesh") || !data["mesh"].is_string())
     {
         LOG_ERROR("Mesh component must contain a mesh path");
@@ -46,6 +48,9 @@ DEFINE_COMPONENT_DESERIALIZE_FUNC(Deserialize, MeshComponent)
 
 DEFINE_COMPONENT_COPY_FUNC(Copy, MeshComponent)
 {
+    auto& to = handle_to.m_registry.get<MeshComponent>(handle_to.m_entity);
+    const auto& from = handle_from.m_registry.get<MeshComponent>(handle_from.m_entity);
+    
     to.m_meshHandle = from.m_meshHandle;
     to.m_materialHandles = from.m_materialHandles;
 }

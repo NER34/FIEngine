@@ -1,0 +1,17 @@
+﻿#pragma once
+
+#include "Scripting/ScriptBase.h"
+#include "Scripting/ScriptFactory.h"
+
+class Script : public ScriptBase
+{
+public:
+
+    void BeginPlay() override;
+    void Update(float deltaTime) override;
+    void EndPlay() override;
+
+    DECLARE_SCRIPT_DESERIALIZE_FUNC(Deserialize, Script);
+    DECLARE_SCRIPT_COPY_FUNC(Copy, Script);
+
+};

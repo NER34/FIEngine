@@ -121,9 +121,11 @@ const entt::registry& SceneResource::GetRegistry() const
     return m_registry;
 }
 
-void SceneResource::CopyToRegistry(entt::registry& other) const
+/*
+void SceneResource::CopyToRegistry(entt::registry& other, entt::entity parent) const
 {
     EntityIDMapping mapping;
+    mapping.Map(entt::null, parent);
     for (auto [entity] : m_registry.storage<entt::entity>()->each())
     {
         mapping.Map(entity, other.create());
@@ -133,5 +135,6 @@ void SceneResource::CopyToRegistry(entt::registry& other) const
         factory.CloneAll(m_registry, other, mapping);
     });
 }
+*/
 
 REGISTER_ASSET_FACTORY(SceneResource, SceneResource::Deserialize)

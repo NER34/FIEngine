@@ -11,7 +11,7 @@ Renderer& Renderer::get()
     return instance;
 }
 
-void Renderer::render()
+void Renderer::Render()
 {
     std::swap(m_frontDrawList, m_backDrawList);
     m_backDrawList.clear();
@@ -28,7 +28,7 @@ void Renderer::render()
     }   
     const auto& [camera, cameraTransform] = cameraView.get<CameraComponent, TransformComponent>(*cameraEntity);
     glm::mat4 projMat = camera.GetProjectionMatrix(m_camera.getCameraDesc().m_aspectRatio);
-    glm::mat4 viewMat = camera.GetViewMatrix(cameraTransform.m_transform);
+    glm::mat4 viewMat = camera.GetViewMatrix(cameraTransform.GetTransform());
     glm::mat4 viewProjMat = projMat * viewMat * toLeftHandTransformMat;
     
     // Light
@@ -39,13 +39,13 @@ void Renderer::render()
     if (lightEntity != lightView.end())                                                      
     {                                                                          
         const auto& [light, lightTransform] = lightView.get<LightComponent, TransformComponent>(*lightEntity);
-        lightPos = lightTransform.m_transform.m_position;
+        lightPos = lightTransform.GetTransform().m_position;
         lightColor = light.m_lightColor;
     }
     
     for (const auto& drawDesc : m_frontDrawList)
     {
-        glm::mat4 modelMat = drawDesc.m_transform.GetModelMatrix();
+        const glm::mat4& modelMat = drawDesc.m_transform;
         const auto& mesh = drawDesc.m_mesh;
         for (size_t i = 0; i < mesh->GetSubMeshCount(); i++)
         {
@@ -58,7 +58,7 @@ void Renderer::render()
             shaderProgram->SetUniformMat4("modelMat", modelMat);
             shaderProgram->SetUniformFloat3("lightPos", lightPos);
             shaderProgram->SetUniformFloat3("lightColor", lightColor);
-            shaderProgram->SetUniformFloat3("viewPos", cameraTransform.m_transform.m_position);
+            shaderProgram->SetUniformFloat3("viewPos", cameraTransform.GetTransform().m_position);
             
             mesh->DrawSubMesh(i);
             
@@ -67,19 +67,7 @@ void Renderer::render()
     }
 }
 
-/*
-Camera& Renderer::getCamera()
-{
-    return m_camera;
-}
-
-LightPoint& Renderer::getLightPoint()
-{
-    return m_lightPoint; 
-}
-*/
-
-void Renderer::initialize(const RendererDesc& desc)
+void Renderer::Initialize(const RendererDesc& desc)
 {
 	gladLoadGL();
     
@@ -97,7 +85,7 @@ void Renderer::initialize(const RendererDesc& desc)
     m_camera = Camera(desc.m_cameraDesc);
 }
 
-void Renderer::addDraw(const GeometryDrawDesc& desc)
+void Renderer::AddDraw(const GeometryDrawDesc& desc)
 {
     m_backDrawList.push_back(desc);
 }

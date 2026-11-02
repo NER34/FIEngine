@@ -19,8 +19,8 @@ void RendererGameObject::Update(float deltaTime)
             GeometryDrawDesc desc = {
                 meshComponent.m_meshHandle,
                 meshComponent.m_materialHandles[0],
-                transform.m_transform
+                transform.GetGlobalTransform()
             };
-            renderer.addDraw(desc);
+            renderer.AddDraw(desc);
         });
 }

@@ -74,30 +74,30 @@ void PlayerMovement::Update(float deltaTime)
 	}
 
 	TransformComponent& cameraTransformComp = transformView.get<TransformComponent>(m_cameraEntity);
-	Transform& cameraTransform = cameraTransformComp.m_transform;
+	const Transform& cameraTransform = cameraTransformComp.GetTransform();
 
 	auto cameraForward = cameraTransform.GetForwardVector();
 	auto cameraRight = cameraTransform.GetRightVector();
 
-	auto& cameraPos = cameraTransform.m_position;
+	auto cameraPos = cameraTransform.m_position;
 	cameraPos += cameraForward * m_cameraMovSpeed * deltaTime * (float)m_cameraMovDir.m_forwardMult;
 	cameraPos += cameraRight * m_cameraMovSpeed * deltaTime * (float)m_cameraMovDir.m_rightMult;
 	cameraPos += glm::vec3(0.0f, 0.0f, 1.0f) * m_cameraMovSpeed * deltaTime * (float)m_cameraMovDir.m_upMult;
-
+	cameraTransformComp.SetPosition(cameraPos);
+	
 	float deltaPitch = m_cameraRot.m_pitch * deltaTime * m_cameraRotSpeed;
 	float deltaYaw = m_cameraRot.m_yaw * deltaTime * m_cameraRotSpeed;
 	m_cameraRot.zero();
 
-	auto& cameraRot = cameraTransform.m_rotation;
+	auto cameraRot = cameraTransform.m_rotation;
 	cameraRot += glm::vec3{ 0.0f, deltaPitch, deltaYaw };
 	cameraRot.y = std::clamp(cameraRot.y, -89.0f, 89.0f);
-	cameraTransformComp.m_bModified = true;
+	cameraTransformComp.SetRotation(cameraRot);
 
 	if (m_attachToLight && transformView.contains(m_lightEntity))
 	{
 		TransformComponent& lightTransformComp = transformView.get<TransformComponent>(m_lightEntity);
-		lightTransformComp.m_transform.m_position = cameraPos;
-		lightTransformComp.m_bModified = true;
+		lightTransformComp.SetPosition(cameraPos);
 	}
 }
 

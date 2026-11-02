@@ -29,14 +29,14 @@ public:
     virtual void CreateFromAsset(ComponentHandle handle, const nlohmann::json& data, const EntityIDMapping& mapping) const = 0;
     virtual void CloneComponent(ConstComponentHandle from, ComponentHandle to, const EntityIDMapping& mapping) const = 0;
     virtual void CloneAll(const entt::registry& from, entt::registry& to, const EntityIDMapping& mapping) const = 0;
-    
+
 };
 
 template <typename TComponent>
 class ComponentFactory : public IComponentFactory
 {
-    using DeserializeFunc = std::function<void(TComponent&, const nlohmann::json&, const EntityIDMapping&)>;
-    using CopyFunc = std::function<void(const TComponent&, TComponent&, const EntityIDMapping&)>;
+    using DeserializeFunc = std::function<void(ComponentHandle, const nlohmann::json&, const EntityIDMapping&)>;
+    using CopyFunc = std::function<void(ConstComponentHandle, ComponentHandle, const EntityIDMapping&)>;
 
 public:
     
@@ -47,15 +47,14 @@ public:
     
     void CreateFromAsset(ComponentHandle handle, const nlohmann::json& data, const EntityIDMapping& mapping) const final
     {
-        TComponent& component = handle.m_registry.emplace_or_replace<TComponent>(handle.m_entity);
-        m_deserialize(component, data, mapping);
+        handle.m_registry.emplace_or_replace<TComponent>(handle.m_entity);
+        m_deserialize(handle, data, mapping);
     }
     
     void CloneComponent(ConstComponentHandle from, ComponentHandle to, const EntityIDMapping& mapping) const final
     {
-        const TComponent& component_from = from.m_registry.get<TComponent>(from.m_entity);
-        TComponent& component_to = to.m_registry.emplace<TComponent>(to.m_entity);
-        m_copy(component_from, component_to, mapping);
+        to.m_registry.emplace<TComponent>(to.m_entity);
+        m_copy(from, to, mapping);
     }
     
     void CloneAll(const entt::registry& from, entt::registry& to, const EntityIDMapping& mapping) const final
@@ -78,16 +77,16 @@ private:
 
 
 #define DECLARE_COMPONENT_DESERIALIZE_FUNC(FuncName, TComponent) \
-    static void FuncName(TComponent& component, const nlohmann::json& data, const EntityIDMapping& mapping)
+    static void FuncName(ComponentHandle handle, const nlohmann::json& data, const EntityIDMapping& mapping)
 
 #define DEFINE_COMPONENT_DESERIALIZE_FUNC(FuncName, TComponent) \
-    void TComponent::FuncName(TComponent& component, const nlohmann::json& data, const EntityIDMapping& mapping)
+    void TComponent::FuncName(ComponentHandle handle, const nlohmann::json& data, const EntityIDMapping& mapping)
 
 #define DECLARE_COMPONENT_COPY_FUNC(FuncName, TComponent) \
-    static void FuncName(const TComponent& from, TComponent& to, const EntityIDMapping& mapping)
+    static void FuncName(ConstComponentHandle handle_from, ComponentHandle handle_to, const EntityIDMapping& mapping)
     
 #define DEFINE_COMPONENT_COPY_FUNC(FuncName, TComponent) \
-    void TComponent::FuncName(const TComponent& from, TComponent& to, const EntityIDMapping& mapping)
+    void TComponent::FuncName(ConstComponentHandle handle_from, ComponentHandle handle_to, const EntityIDMapping& mapping)
 
 
 #define COMPONENT_FACTORY_REGISTER_VAR(TComponent) template<> bool ComponentFactory<TComponent>::s_registered

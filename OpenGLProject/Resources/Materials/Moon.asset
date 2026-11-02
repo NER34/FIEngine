@@ -1,0 +1,12 @@
+{
+  "type": "MaterialResource",
+  "shaderProgram": "Shaders/DefaultShaderProgram.asset",
+  "parameters": [
+    {
+      "type": "TextureParameter",
+      "name": "SolidColor",
+      "path": "Textures/MoonDiffuse.asset",
+      "slot": 0
+    }
+  ]
+}

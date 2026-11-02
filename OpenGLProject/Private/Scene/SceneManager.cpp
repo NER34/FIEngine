@@ -1,22 +1,73 @@
 ﻿#include "Scene/SceneManager.h"
 
+#include "ComponentFactory/ComponentFactory.h"
+#include "ComponentFactory/ComponentFactoryStructs.h"
+#include "Components/TransformComponent.h"
+
 SceneManager& SceneManager::Get()
 {
     static SceneManager instance;
     return instance;
 }
 
-SceneManager::~SceneManager()
+void SceneManager::Initialize()
 {
-    Free();
+    m_sceneRoot = m_registry.create();
+    m_registry.emplace<TransformComponent>(m_sceneRoot);
 }
 
-void SceneManager::InstantiateScene(const ResourceHandle<SceneResource>& scene)
+void SceneManager::Update()
 {
-    scene->CopyToRegistry(m_registry);
+    if (m_sceneGraphModified)
+    {
+        m_sceneGraphModified = false;
+        auto& transforms = m_registry.storage<TransformComponent>();
+        std::vector<entt::entity> order;
+        order.reserve(transforms.size());
+        
+        std::vector<entt::entity> stack;
+        stack.push_back(m_sceneRoot);
+        while (!stack.empty())
+        {
+            entt::entity entity = stack.back();
+            stack.pop_back();
+            order.push_back(entity);
+            
+            for (auto child = transforms.get(entity).m_child; child != entt::null; child = transforms.get(child).m_neighbor)
+            {
+                stack.push_back(child);
+            }
+        }
+        
+        transforms.sort_as(order.begin(), order.end());
+    }
+    
+    m_registry.view<TransformComponent>().each(
+        [&](entt::entity entity, TransformComponent& transform)
+        {
+            transform.UpdateGlobalTransform(m_registry);
+        });
 }
 
-void SceneManager::Free()
+void SceneManager::Deinitialize()
 {
     m_registry.clear();
+    m_sceneRoot = entt::null;
+}
+
+void SceneManager::SpawnScene(const ResourceHandle<SceneResource>& scene)
+{
+    m_sceneGraphModified = true;
+    
+    EntityIDMapping mapping;
+    mapping.Map(entt::null, m_sceneRoot);
+    for (auto [entity] : scene->m_registry.storage<entt::entity>()->each())
+    {
+        mapping.Map(entity, m_registry.create());
+    }
+    
+    ComponentRegistry::Get().ForEachObject([&](const std::string&, const IComponentFactory& factory)
+    {
+        factory.CloneAll(scene->m_registry, m_registry, mapping);
+    });
 }

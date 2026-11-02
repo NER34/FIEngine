@@ -61,6 +61,8 @@ namespace
 
 DEFINE_COMPONENT_DESERIALIZE_FUNC(Deserialize, CameraComponent)
 {
+    auto& component = handle.m_registry.get<CameraComponent>(handle.m_entity);
+    
     ::DeserializeVector3(data, "up", component.m_up);
     ::DeserializeFloat(data, "fov", component.m_fov);
     ::DeserializeFloat(data, "nearClipPlane", component.m_nearClipPlane);
@@ -69,6 +71,9 @@ DEFINE_COMPONENT_DESERIALIZE_FUNC(Deserialize, CameraComponent)
 
 DEFINE_COMPONENT_COPY_FUNC(Copy, CameraComponent)
 {
+    auto& to = handle_to.m_registry.get<CameraComponent>(handle_to.m_entity);
+    const auto& from = handle_from.m_registry.get<CameraComponent>(handle_from.m_entity);
+    
     to.m_up = from.m_up;
     to.m_fov = from.m_fov;
     to.m_nearClipPlane = from.m_nearClipPlane;

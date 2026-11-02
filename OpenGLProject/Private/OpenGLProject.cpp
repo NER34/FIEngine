@@ -16,6 +16,7 @@
 #include "Rendering/Renderer.h"
 #include "ResourceManager/ResourceManager.h"
 #include "Scene/SceneManager.h"
+#include "Scripting/ScriptManager.h"
 #include "Utilities/Logger.h"
 #include "Window/GLFW/WindowGLFW.h"
 
@@ -47,12 +48,16 @@ int main()
 	rendererDesc.m_cameraDesc = cameraDesc;
 	
 	Renderer& renderer = Renderer::get();
-	renderer.initialize(rendererDesc);
+	renderer.Initialize(rendererDesc);
+	
+	SceneManager::Get().Initialize();
 	
 	GameObjectManager& gameObjectManager = GameObjectManager::get();
 	gameObjectManager.createGameObject<SceneGameObject>();
 	gameObjectManager.createGameObject<RendererGameObject>();
-	
+
+	ScriptManager::Get().Initialize();
+
 	auto prevTime = std::chrono::high_resolution_clock::now(); 
 	while (!window.isWindowShouldClose())
 	{
@@ -61,14 +66,17 @@ int main()
 		prevTime = currTime;
 		
 		inputManager.update();
+		ScriptManager::Get().Update(deltaTime);
+		SceneManager::Get().Update();
 		gameObjectManager.Update(deltaTime);
-		renderer.render();
+		renderer.Render();
 		window.update();
 	}
 	
 	//inputManager.setInputContext(nullptr);
+	ScriptManager::Get().Deinitialize();
 	gameObjectManager.destroyAllGameObjects();
-	SceneManager::Get().Free();
+	SceneManager::Get().Deinitialize();
 	ResourceManager::Get().FreeAllResources();
 	
 	return 0;

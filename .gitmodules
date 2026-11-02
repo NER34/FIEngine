@@ -17,3 +17,6 @@
 [submodule "ThirdParty/stduuid"]
 	path = ThirdParty/stduuid
 	url = https://github.com/mariusbancila/stduuid.git
+[submodule "ThirdParty/easy_profiler"]
+	path = ThirdParty/easy_profiler
+	url = https://github.com/yse/easy_profiler.git

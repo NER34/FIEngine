@@ -23,7 +23,7 @@ public:
 private:
     
     friend class SceneManager;
-    void CopyToRegistry(entt::registry& other) const;
+    //void CopyToRegistry(entt::registry& other, entt::entity parent) const;
     
     entt::registry m_registry;
     

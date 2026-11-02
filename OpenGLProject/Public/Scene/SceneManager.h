@@ -11,9 +11,11 @@ public:
     
     static SceneManager& Get();
     
-    ~SceneManager();
+    void Initialize();
+    void Update();
+    void Deinitialize();
     
-    void InstantiateScene(const ResourceHandle<SceneResource>& scene);
+    void SpawnScene(const ResourceHandle<SceneResource>& scene);
     
     template <typename ... TComp>
     auto View() const
@@ -27,10 +29,18 @@ public:
         return m_registry.view<TComp...>();
     }
     
-    void Free();
+    template <typename TComp>
+    auto* GetComponent(entt::entity entity)
+    {
+        return m_registry.valid(entity)
+            ? &m_registry.get<TComp>(entity)
+            : nullptr;
+    }
     
 private:
     
     entt::registry m_registry;
+    entt::entity m_sceneRoot = entt::null;
+    bool m_sceneGraphModified = false;
     
 };

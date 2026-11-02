@@ -9,14 +9,30 @@ class TransformComponent
 {
 public:
 
-    Transform m_transform;
-    bool m_bModified = false;
+    void UpdateGlobalTransform(const entt::registry& registry);
+    
+    void SetPosition(const glm::vec3& position);
+    void SetRotation(const glm::vec3& rotation);
+    void SetScale(const glm::vec3& scale);
+    
+    const glm::mat4& GetGlobalTransform() const;
+    const Transform& GetTransform() const;
+
+    DECLARE_COMPONENT_DESERIALIZE_FUNC(Deserialize, TransformComponent);
+    DECLARE_COMPONENT_COPY_FUNC(Copy, TransformComponent);
+    
+private:
+    
+    friend class SceneManager;
+    
+    Transform m_localTransform;
+    glm::mat4 m_globalTransform = glm::mat4(1.0f);
+    
+    bool m_bTransformModified = true;
+    bool m_bTransformUpdated = false;
 
     entt::entity m_parent   = entt::null;
     entt::entity m_child    = entt::null;
     entt::entity m_neighbor = entt::null;
-
-    DECLARE_COMPONENT_DESERIALIZE_FUNC(Deserialize, TransformComponent);
-    DECLARE_COMPONENT_COPY_FUNC(Copy, TransformComponent);
     
 };

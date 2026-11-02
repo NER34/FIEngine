@@ -21,7 +21,7 @@ struct GeometryDrawDesc
     GeometryDrawDesc(
         const ResourceHandle<MeshResource>& mesh, 
         const ResourceHandle<MaterialResource>& material, 
-        const Transform& transform
+        const glm::mat4& transform
         ) 
         : m_mesh(mesh)
         , m_material(material)
@@ -30,7 +30,7 @@ struct GeometryDrawDesc
     
     ResourceHandle<MeshResource> m_mesh;
     ResourceHandle<MaterialResource> m_material;
-    Transform m_transform;
+    glm::mat4 m_transform;
 };
 
 struct ViewportDesc
@@ -58,14 +58,9 @@ public:
         , m_backDrawList(m_drawList_2)
     {}
     
-    void initialize(const RendererDesc& desc);
-    void addDraw(const GeometryDrawDesc& desc);
-    void render();
-    
-    /*
-    Camera& getCamera();
-    LightPoint& getLightPoint();
-    */
+    void Initialize(const RendererDesc& desc);
+    void AddDraw(const GeometryDrawDesc& desc);
+    void Render();
     
 private:
     
@@ -76,6 +71,5 @@ private:
     std::vector<GeometryDrawDesc> m_drawList_2;
     
     Camera m_camera;
-    LightPoint m_lightPoint;
     
 };

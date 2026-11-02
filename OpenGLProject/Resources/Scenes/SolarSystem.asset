@@ -1,0 +1,129 @@
+{
+  "type": "SceneResource",
+  "entities": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "components": [
+    {
+      "type": "TransformComponent",
+      "entity": 0,
+      "data": {
+        "position": [ 25.0, -25.0, 0.0 ],
+        "rotation": [ 45.0, 45.0, 0.0 ],
+        "scale": [ 1.0, 1.0, 1.0 ],
+        "parent": null,
+        "child": 1,
+        "neighbor": null
+      }
+    },
+    {
+      "type": "TransformComponent",
+      "entity": 1,
+      "data": {
+        "position": [ 0.0, 0.0, 0.0 ],
+        "rotation": [ 0.0, 0.0, 0.0 ],
+        "scale": [ 1.5, 1.5, 1.5 ],
+        "parent": 0,
+        "child": null,
+        "neighbor": 2
+      }
+    },
+    {
+      "type": "TransformComponent",
+      "entity": 2,
+      "data": {
+        "position": [ 0.0, 0.0, 0.0 ],
+        "rotation": [ 0.0, 0.0, 0.0 ],
+        "scale": [ 1.0, 1.0, 1.0 ],
+        "parent": 0,
+        "child": 3,
+        "neighbor": null
+      }
+    },
+    {
+      "type": "TransformComponent",
+      "entity": 3,
+      "data": {
+        "position": [ 20.0, 2.0, 0.0 ],
+        "rotation": [ 0.0, 0.0, 0.0 ],
+        "scale": [ 1.0, 1.0, 1.0 ],
+        "parent": 2,
+        "child": null,
+        "neighbor": 4
+      }
+    },
+    {
+      "type": "TransformComponent",
+      "entity": 4,
+      "data": {
+        "position": [ 20.0, 2.0, 0.0 ],
+        "rotation": [ 0.0, 0.0, 0.0 ],
+        "scale": [ 1.0, 1.0, 1.0 ],
+        "parent": 2,
+        "child": 5,
+        "neighbor": null
+      }
+    },
+    {
+      "type": "TransformComponent",
+      "entity": 5,
+      "data": {
+        "position": [ 7.0, 0.0, 0.0 ],
+        "rotation": [ 0.0, 0.0, 0.0 ],
+        "scale": [ 0.5, 0.5, 0.5 ],
+        "parent": 4,
+        "child": null,
+        "neighbor": null
+      }
+    },
+    {
+      "type": "MeshComponent",
+      "entity": 1,
+      "data": {
+        "mesh": "Meshes/Earth_2K.asset",
+        "materials": [
+          "Materials/Sun.asset"
+        ]
+      }
+    },
+    {
+      "type": "MeshComponent",
+      "entity": 3,
+      "data": {
+        "mesh": "Meshes/Earth_2K.asset",
+        "materials": [
+          "Materials/Earth.asset"
+        ]
+      }
+    },
+    {
+      "type": "MeshComponent",
+      "entity": 5,
+      "data": {
+        "mesh": "Meshes/Moon_2K.asset",
+        "materials": [
+          "Materials/Moon.asset"
+        ]
+      }
+    },
+    {
+      "type": "NativeScriptComponent",
+      "entity": 0,
+      "data": {
+        "script": "SolarSystem",
+        "data": {
+          "sun": 1,
+          "sun_proxy": 2,
+          "earth": 3,
+          "earth_proxy": 4,
+          "moon": 5
+        }
+      }
+    }
+  ]
+}
