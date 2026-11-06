@@ -87,6 +87,8 @@
       "data": {
         "mesh": "Meshes/Earth_2K.asset",
         "materials": [
+          "Materials/Sun.asset",
+          "Materials/Sun.asset",
           "Materials/Sun.asset"
         ]
       }
@@ -97,6 +99,8 @@
       "data": {
         "mesh": "Meshes/Earth_2K.asset",
         "materials": [
+          "Materials/Earth.asset",
+          "Materials/Earth.asset",
           "Materials/Earth.asset"
         ]
       }

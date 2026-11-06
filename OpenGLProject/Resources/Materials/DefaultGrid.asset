@@ -1,0 +1,5 @@
+{
+  "type": "MaterialResource",
+  "shaderProgram": "Shaders/GridShaderProgram.asset",
+  "parameters": []
+}

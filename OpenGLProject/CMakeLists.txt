@@ -34,12 +34,13 @@ target_link_libraries(OpenGLProject
 		entt
 )
 
-add_custom_command(
-	TARGET OpenGLProject POST_BUILD
-	COMMAND ${CMAKE_COMMAND} -E copy_directory
-		"${CMAKE_CURRENT_SOURCE_DIR}/Resources"
-		"$<TARGET_FILE_DIR:OpenGLProject>/Resources"
-)
+#add_custom_command(
+#	TARGET OpenGLProject POST_BUILD
+#	COMMAND ${CMAKE_COMMAND} -E copy_directory
+#		"${CMAKE_CURRENT_SOURCE_DIR}/Resources"
+#		"$<TARGET_FILE_DIR:OpenGLProject>/Resources"
+#)
 
 # Debug enable/disable variable
 add_compile_definitions(DEBUG_ENABLED=1)
+add_compile_definitions(RESOURCES_FOLDER_PATH="${CMAKE_CURRENT_SOURCE_DIR}/Resources")

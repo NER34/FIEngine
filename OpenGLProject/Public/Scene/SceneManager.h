@@ -42,5 +42,5 @@ private:
     entt::registry m_registry;
     entt::entity m_sceneRoot = entt::null;
     bool m_sceneGraphModified = false;
-    
+    ResourceHandle<SceneResource> m_sceneHandle;
 };

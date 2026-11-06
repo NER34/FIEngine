@@ -13,7 +13,11 @@ static  std::filesystem::path GetWorkingDirectoryPath()
 
 static  std::filesystem::path GetResourcesPath()
 {
+#ifdef RESOURCES_FOLDER_PATH
+    return RESOURCES_FOLDER_PATH;
+#else
     return GetWorkingDirectoryPath() / "Resources";
+#endif
 }
 
 inline glm::vec3 RotateVector(glm::vec3 vector, glm::vec3 eulerRot)

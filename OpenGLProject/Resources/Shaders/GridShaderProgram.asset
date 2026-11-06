@@ -1,0 +1,7 @@
+{
+  "type": "ShaderProgramResource",
+  "shaders": [
+    "Shaders/VertexShader.asset",
+    "Shaders/GridShader.asset"
+  ]
+}

@@ -1,7 +1,9 @@
 ﻿#include "Rendering/Renderer.h"
 
+#include "AssetManager/AssetManager.h"
 #include "Components/CameraComponent.h"
 #include "Components/LightComponent.h"
+#include "Components/MeshComponent.h"
 #include "Components/TransformComponent.h"
 #include "Scene/SceneManager.h"
 
@@ -13,6 +15,8 @@ Renderer& Renderer::get()
 
 void Renderer::Render()
 {
+    CollectMeshesForDrawing();
+    
     std::swap(m_frontDrawList, m_backDrawList);
     m_backDrawList.clear();
     
@@ -47,24 +51,59 @@ void Renderer::Render()
     {
         const glm::mat4& modelMat = drawDesc.m_transform;
         const auto& mesh = drawDesc.m_mesh;
-        for (size_t i = 0; i < mesh->GetSubMeshCount(); i++)
-        {
+        //for (size_t i = 0; i < mesh->GetSubMeshCount(); i++)
+        //{
             const auto& material = drawDesc.m_material;
-            const auto& shaderProgram = material->GetShaderProgram();
+            if (!material.IsValid())
+            {
+                continue;
+            }
             
             material->Activate();
             
+            const auto& shaderProgram = material->GetShaderProgram();
             shaderProgram->SetUniformMat4("projViewMat", viewProjMat);
             shaderProgram->SetUniformMat4("modelMat", modelMat);
             shaderProgram->SetUniformFloat3("lightPos", lightPos);
             shaderProgram->SetUniformFloat3("lightColor", lightColor);
             shaderProgram->SetUniformFloat3("viewPos", cameraTransform.GetTransform().m_position);
             
-            mesh->DrawSubMesh(i);
+            mesh->DrawSubMesh(drawDesc.m_subMeshIndex);
             
             material->Deactivate();
-        }
+        //}
     }
+}
+
+void Renderer::CollectMeshesForDrawing()
+{    
+    SceneManager::Get().View<TransformComponent, MeshComponent>().each(
+        [&](entt::entity entity, const TransformComponent& transform, const MeshComponent& meshComponent)
+        {
+            if (!meshComponent.m_meshHandle.IsValid())
+            {
+                return;
+            }
+            
+            for (size_t i = 0; i < meshComponent.m_meshHandle->GetSubMeshCount(); i++)
+            {
+                const ResourceHandle<MaterialResource>* material = &m_defaultMaterial;
+                if (i < meshComponent.m_materialHandles.size() && meshComponent.m_materialHandles[i].IsValid())
+                {
+                    material = &meshComponent.m_materialHandles[i];
+                }
+                    
+                GeometryDrawDesc desc = {
+                    meshComponent.m_meshHandle,
+                    *material,
+                    transform.GetGlobalTransform(),
+                    i
+                };
+                
+                AddDraw(desc);
+            }
+            
+        });
 }
 
 void Renderer::Initialize(const RendererDesc& desc)
@@ -83,6 +122,12 @@ void Renderer::Initialize(const RendererDesc& desc)
         );
     
     m_camera = Camera(desc.m_cameraDesc);
+    
+#define DEFAULT_MATERIAL_PATH "Materials/DefaultGrid.asset"
+    if (!AssetManager::Get().Load<MaterialResource>(DEFAULT_MATERIAL_PATH, m_defaultMaterial))
+    {
+        LOG_ERROR("Renderer: Failed to load {} material", DEFAULT_MATERIAL_PATH);
+    }
 }
 
 void Renderer::AddDraw(const GeometryDrawDesc& desc)

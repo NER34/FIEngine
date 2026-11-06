@@ -1,5 +1,6 @@
 ﻿#include "Scene/SceneManager.h"
 
+#include "AssetManager/AssetManager.h"
 #include "ComponentFactory/ComponentFactory.h"
 #include "ComponentFactory/ComponentFactoryStructs.h"
 #include "Components/TransformComponent.h"
@@ -10,10 +11,22 @@ SceneManager& SceneManager::Get()
     return instance;
 }
 
+namespace
+{
+    const std::string g_scenePath = "Scenes/Default_NoPlane_C&L.asset";
+}
+
 void SceneManager::Initialize()
 {
     m_sceneRoot = m_registry.create();
     m_registry.emplace<TransformComponent>(m_sceneRoot);
+    
+    if (!AssetManager::Get().Load<SceneResource>(g_scenePath, m_sceneHandle))
+    {
+        LOG_ERROR("Failed to load scene {}", g_scenePath);
+        return;
+    }
+    SpawnScene(m_sceneHandle);
 }
 
 void SceneManager::Update()

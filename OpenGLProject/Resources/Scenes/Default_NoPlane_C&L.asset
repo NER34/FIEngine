@@ -4,7 +4,8 @@
     0,
     1,
     2,
-    3
+    3,
+    4
   ],
   "components": [
     {
@@ -14,16 +15,6 @@
         "parent": null,
         "child": 1,
         "neighbor": null
-      }
-    },
-    {
-      "type": "NativeScriptComponent",
-      "entity": 0,
-      "data": {
-        "script": "SpawnScene",
-        "data": {
-          "scene": "Scenes/SolarSystem.asset"
-        }
       }
     },
     {
@@ -39,13 +30,72 @@
       }
     },
     {
-      "type": "CameraComponent",
-      "entity": 1,
+      "type": "TransformComponent",
+      "entity": 2,
       "data": {
-        "up": [ 0.0, 0.0, 1.0 ],
-        "fov": 90.0,
-        "nearClipPlane": 0.1,
-        "farClipPlane": 100.0
+        "position": [ 0.0, 0.0, 5.0 ],
+        "rotation": [ 0.0, 0.0, 0.0 ],
+        "scale": [ 1.0, 1.0, 1.0 ],
+        "parent": 0,
+        "child": null,
+        "neighbor": 3
+      }
+    },
+    {
+      "type": "TransformComponent",
+      "entity": 3,
+      "data": {
+        "position": [ 2.0, 2.0, 0.0 ],
+        "rotation": [ 0.0, 0.0, 180.0 ],
+        "scale": [ 1.0, 1.0, 1.0 ],
+        "parent": 0,
+        "child": null,
+        "neighbor": 4
+      }
+    },
+    {
+      "type": "TransformComponent",
+      "entity": 4,
+      "data": {
+        "position": [ 2.0, 0.0, 0.0 ],
+        "rotation": [ 0.0, 0.0, 0.0 ],
+        "scale": [ 1.0, 1.0, 1.0 ],
+        "parent": 0,
+        "child": null,
+        "neighbor": null
+      }
+    },
+    {
+      "type": "MeshComponent",
+      "entity": 3,
+      "data": {
+        "mesh": "Meshes/Sting-Sword-lowpoly.asset",
+        "materials": [
+          "Materials/Phong.asset",
+          "Materials/Phong.asset",
+          "Materials/Phong.asset",
+          "Materials/Phong.asset"
+        ]
+      }
+    },
+    {
+      "type": "MeshComponent",
+      "entity": 4,
+      "data": {
+        "mesh": "",
+        "materials": [
+          "Materials/Default.asset"
+        ]
+      }
+    },
+    {
+      "type": "NativeScriptComponent",
+      "entity": 0,
+      "data": {
+        "script": "SpawnScene",
+        "data": {
+          "scene": "Scenes/SolarSystem.asset"
+        }
       }
     },
     {
@@ -62,15 +112,23 @@
       }
     },
     {
-      "type": "TransformComponent",
-      "entity": 2,
+      "type": "NativeScriptComponent",
+      "entity": 4,
       "data": {
-        "position": [ 0.0, 0.0, 5.0 ],
-        "rotation": [ 0.0, 0.0, 0.0 ],
-        "scale": [ 1.0, 1.0, 1.0 ],
-        "parent": 0,
-        "child": null,
-        "neighbor": 3
+        "script": "TestPlane",
+        "data": {
+          "planeEntity": 4
+        }
+      }
+    },
+    {
+      "type": "CameraComponent",
+      "entity": 1,
+      "data": {
+        "up": [ 0.0, 0.0, 1.0 ],
+        "fov": 90.0,
+        "nearClipPlane": 0.1,
+        "farClipPlane": 100.0
       }
     },
     {
@@ -78,28 +136,6 @@
       "entity": 2,
       "data": {
         "lightColor": [ 1.0, 1.0, 1.0 ]
-      }
-    },
-    {
-      "type": "TransformComponent",
-      "entity": 3,
-      "data": {
-        "position": [ 2.0, 2.0, 0.0 ],
-        "rotation": [ 0.0, 0.0, 180.0 ],
-        "scale": [ 1.0, 1.0, 1.0 ],
-        "parent": 0,
-        "child": null,
-        "neighbor": null
-      }
-    },
-    {
-      "type": "MeshComponent",
-      "entity": 3,
-      "data": {
-        "mesh": "Meshes/Sting-Sword-lowpoly.asset",
-        "materials": [
-          "Materials/Phong.asset"
-        ]
       }
     }
   ]

@@ -1,0 +1,5 @@
+{
+  "type": "ShaderResource",
+  "shaderType": 1,
+  "path": "Shaders/GridShader.frag"
+}

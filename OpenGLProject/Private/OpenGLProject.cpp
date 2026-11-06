@@ -5,9 +5,6 @@
 
 #include <filesystem>
 
-#include "GameObject/GameObjectManager.h"
-#include "GameObject/Objects/RendererGameObject.h"
-#include "GameObject/Objects/SceneGameObject.h"
 #include "glad/glad.h"
 
 #include "InputSystem/InputContext.h"
@@ -51,10 +48,6 @@ int main()
 	renderer.Initialize(rendererDesc);
 	
 	SceneManager::Get().Initialize();
-	
-	GameObjectManager& gameObjectManager = GameObjectManager::get();
-	gameObjectManager.createGameObject<SceneGameObject>();
-	gameObjectManager.createGameObject<RendererGameObject>();
 
 	ScriptManager::Get().Initialize();
 
@@ -68,14 +61,12 @@ int main()
 		inputManager.update();
 		ScriptManager::Get().Update(deltaTime);
 		SceneManager::Get().Update();
-		gameObjectManager.Update(deltaTime);
 		renderer.Render();
 		window.update();
 	}
 	
 	//inputManager.setInputContext(nullptr);
 	ScriptManager::Get().Deinitialize();
-	gameObjectManager.destroyAllGameObjects();
 	SceneManager::Get().Deinitialize();
 	ResourceManager::Get().FreeAllResources();
 	
