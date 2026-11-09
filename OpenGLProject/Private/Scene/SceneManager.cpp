@@ -19,7 +19,8 @@ namespace
 void SceneManager::Initialize()
 {
     m_sceneRoot = m_registry.create();
-    m_registry.emplace<TransformComponent>(m_sceneRoot);
+    TransformComponent& transform = m_registry.emplace<TransformComponent>(m_sceneRoot);
+    transform.m_current = m_sceneRoot;
     
     if (!AssetManager::Get().Load<SceneResource>(g_scenePath, m_sceneHandle))
     {
@@ -46,7 +47,7 @@ void SceneManager::Update()
             stack.pop_back();
             order.push_back(entity);
             
-            for (auto child = transforms.get(entity).m_child; child != entt::null; child = transforms.get(child).m_neighbor)
+            for (auto child = transforms.get(entity).m_child; child != entt::null; child = transforms.get(child).m_neighbor_r)
             {
                 stack.push_back(child);
             }
@@ -68,19 +69,46 @@ void SceneManager::Deinitialize()
     m_sceneRoot = entt::null;
 }
 
-void SceneManager::SpawnScene(const ResourceHandle<SceneResource>& scene)
+entt::entity SceneManager::GetRootEntity() const
+{
+    return m_sceneRoot;
+}
+
+void SceneManager::MarkSceneGraphModified()
 {
     m_sceneGraphModified = true;
+}
+
+entt::entity SceneManager::SpawnScene(const ResourceHandle<SceneResource>& scene, entt::entity parent)
+{
+    MarkSceneGraphModified();
     
     EntityIDMapping mapping;
-    mapping.Map(entt::null, m_sceneRoot);
+    //mapping.Map(entt::null, m_sceneRoot);
     for (auto [entity] : scene->m_registry.storage<entt::entity>()->each())
     {
         mapping.Map(entity, m_registry.create());
     }
-    
     ComponentRegistry::Get().ForEachObject([&](const std::string&, const IComponentFactory& factory)
     {
         factory.CloneAll(scene->m_registry, m_registry, mapping);
     });
+    
+    entt::entity rootEntity = mapping.Get(scene->m_rootEntity);
+    if (parent == entt::null)
+    {
+        parent = m_sceneRoot;
+    }
+    TransformComponent& sceneTransform = m_registry.get<TransformComponent>(rootEntity);
+    TransformComponent& parentTransform = m_registry.get<TransformComponent>(parent);
+    sceneTransform.AttachTo(parentTransform);
+    
+    for (const auto& [subSceneParent, subSceneTransform, subSceneHandle] : scene->m_subScenes)
+    {
+        auto subSceneRoot = SpawnScene(subSceneHandle, mapping.Get(subSceneParent));
+        TransformComponent& subSceneTransformComp = m_registry.get<TransformComponent>(subSceneRoot);
+        subSceneTransformComp.SetTransform(subSceneTransform);
+    }
+    
+    return rootEntity;
 }

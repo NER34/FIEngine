@@ -2,6 +2,7 @@
 
 #include "AssetManager/AssetManager.h"
 #include "Scene/SceneManager.h"
+#include "Utilities/ParsingHelpers.h"
 
 void SpawnScene::BeginPlay()
 {
@@ -13,7 +14,7 @@ void SpawnScene::BeginPlay()
 
 DEFINE_SCRIPT_DESERIALIZE_FUNC(Deserialize, SpawnScene)
 {
-    if (!data.contains("scene") || !data["scene"].is_string())
+    if (!HasStringField(data, "scene"))
     {
         LOG_ERROR("Spawn Scene script must contain a scene path");
     }

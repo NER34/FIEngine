@@ -5,6 +5,7 @@
 #include "ResourceManager/ResourceHandle.h"
 #include "ResourceManager/ResourceManager.h"
 #include "Utilities/Logger.h"
+#include "Utilities/ParsingHelpers.h"
 
 class AssetManager
 {
@@ -30,7 +31,7 @@ public:
             return false;
         }
 
-        if (!asset.contains("type") || !asset["type"].is_string())
+        if (!HasStringField(asset, "type"))
         {
             LOG_ERROR("Invalid asset file {}: type is missing", path);
             return false;

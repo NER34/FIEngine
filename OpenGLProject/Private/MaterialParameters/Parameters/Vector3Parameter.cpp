@@ -1,6 +1,7 @@
 ﻿#include "MaterialParameters/Parameters/Vector3Parameter.h"
 
 #include "ResourceManager/Resources/ShaderProgramResource.h"
+#include "Utilities/ParsingHelpers.h"
 
 void Vector3Parameter::ApplyParameter(const ResourceHandle<ShaderProgramResource>& shaderProgram) const
 {
@@ -9,7 +10,7 @@ void Vector3Parameter::ApplyParameter(const ResourceHandle<ShaderProgramResource
 
 DEFINE_MATERIAL_PARAM_DESERIALIZE_FUNC(Deserialize, Vector3Parameter)
 {
-    if (!data.contains("value") || !data["value"].is_array() || data["value"].size() != 3)
+    if (!HasArrayField(data, "value") || data["value"].size() != 3)
     {
         LOG_ERROR("Vector3 material parameter {} must contain three values", parameter.GetName());
         return false;

@@ -1,11 +1,23 @@
 {
   "type": "SceneResource",
+  "root": 0,
   "entities": [
     0,
     1,
     2,
     3,
     4
+  ],
+  "scenes": [
+    {
+      "parent": 0,
+      "transform": {
+        "position": [ 25.0, -25.0, 0.0 ],
+        "rotation": [ 45.0, 45.0, 0.0 ],
+        "scale": [ 1.0, 1.0, 1.0 ]
+      },
+      "path": "Scenes/SolarSystem.asset"
+    }
   ],
   "components": [
     {
@@ -14,7 +26,8 @@
       "data": {
         "parent": null,
         "child": 1,
-        "neighbor": null
+        "neighbor_r": null,
+        "neighbor_l": null
       }
     },
     {
@@ -26,7 +39,8 @@
         "scale": [ 1.0, 1.0, 1.0 ],
         "parent": 0,
         "child": null,
-        "neighbor": 2
+        "neighbor_r": 2,
+        "neighbor_l": null
       }
     },
     {
@@ -38,7 +52,8 @@
         "scale": [ 1.0, 1.0, 1.0 ],
         "parent": 0,
         "child": null,
-        "neighbor": 3
+        "neighbor_r": 3,
+        "neighbor_l": 1
       }
     },
     {
@@ -50,7 +65,8 @@
         "scale": [ 1.0, 1.0, 1.0 ],
         "parent": 0,
         "child": null,
-        "neighbor": 4
+        "neighbor_r": 4,
+        "neighbor_l": 2
       }
     },
     {
@@ -62,7 +78,8 @@
         "scale": [ 1.0, 1.0, 1.0 ],
         "parent": 0,
         "child": null,
-        "neighbor": null
+        "neighbor_r": null,
+        "neighbor_l": 3
       }
     },
     {
@@ -86,16 +103,6 @@
         "materials": [
           "Materials/Default.asset"
         ]
-      }
-    },
-    {
-      "type": "NativeScriptComponent",
-      "entity": 0,
-      "data": {
-        "script": "SpawnScene",
-        "data": {
-          "scene": "Scenes/SolarSystem.asset"
-        }
       }
     },
     {

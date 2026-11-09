@@ -1,6 +1,7 @@
 ﻿#include "MaterialParameters/Parameters/Matrix4Parameter.h"
 
 #include "ResourceManager/Resources/ShaderProgramResource.h"
+#include "Utilities/ParsingHelpers.h"
 
 void Matrix4Parameter::ApplyParameter(const ResourceHandle<ShaderProgramResource>& shaderProgram) const
 {
@@ -9,7 +10,7 @@ void Matrix4Parameter::ApplyParameter(const ResourceHandle<ShaderProgramResource
 
 DEFINE_MATERIAL_PARAM_DESERIALIZE_FUNC(Deserialize, Matrix4Parameter)
 {
-    if (!data.contains("value") || !data["value"].is_array() || data["value"].size() != 16)
+    if (!HasArrayField(data, "value") || data["value"].size() != 16)
     {
         LOG_ERROR("Matrix4 material parameter {} must contain sixteen values", parameter.GetName());
         return false;

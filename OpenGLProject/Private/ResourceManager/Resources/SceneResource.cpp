@@ -4,8 +4,10 @@
 
 #include <json.h>
 
+#include "AssetManager/AssetManager.h"
 #include "ComponentFactory/ComponentFactory.h"
 #include "Utilities/Logger.h"
+#include "Utilities/ParsingHelpers.h"
 
 SceneResource::~SceneResource()
 {
@@ -16,27 +18,88 @@ DEFINE_ASSET_DESERIALIZE_FUNC(Deserialize, SceneResource)
 {
     resource.Free();
 
-    if (!data.contains("entities") || !data["entities"].is_array())
+    if (!HasArrayField(data, "entities"))
     {
         LOG_ERROR("Invalid scene file: array of entities is missing");
         assert(false);
         return false;
     }
-    if (!data.contains("components") || !data["components"].is_array())
+    if (!HasArrayField(data, "components"))
     {
         LOG_ERROR("Invalid scene file: array of components is missing");
         assert(false);
         return false;
     }
+    if (!IsOptionalArrayField(data, "scenes"))
+    {
+        LOG_ERROR("Invalid scene file: scenes is not an array");
+        assert(false);
+        return false;
+    }
     
     EntityIDMapping mapping;
+    
+    if (!ParseEntities(resource, data, mapping))
+    {
+        LOG_ERROR("Invalid scene file: failed to parse entities");
+        assert(false);
+        resource.Free();
+        return false;
+    }
+    
+    if (!ParseComponents(resource, data, mapping))
+    {
+        LOG_ERROR("Invalid scene file: failed to parse components");
+        assert(false);
+        resource.Free();
+        return false;
+    }
+    
+    if (!ParseSubScenes(resource, data, mapping))
+    {
+        LOG_ERROR("Invalid scene file: failed to parse sub scenes");
+        assert(false);
+        resource.Free();
+        return false;
+    }
+    
+    return true;
+}
+
+void SceneResource::Free()
+{
+    m_registry.clear();
+    m_subScenes.clear();
+}
+
+/*
+entt::registry& SceneResource::GetRegistry()
+{
+    return m_registry;
+}
+*/
+
+/*
+const entt::registry& SceneResource::GetRegistry() const
+{
+    return m_registry;
+}
+*/
+
+bool SceneResource::ParseEntities(SceneResource& resource, const nlohmann::json& data, EntityIDMapping& mapping)
+{
+    if (!HasUnsignedField(data, "root"))
+    {
+        LOG_ERROR("Invalid scene file: root entity missing");
+        assert(false);
+        return false;
+    }
     for (const auto& entity : data["entities"])
     {
         if (!entity.is_number_unsigned())
         {
             LOG_ERROR("Invalid scene file: entity id is not an unsigned number");
             assert(false);
-            resource.Free();
             return false;
         }
         uint32_t rawEntityID = entity;
@@ -44,13 +107,23 @@ DEFINE_ASSET_DESERIALIZE_FUNC(Deserialize, SceneResource)
         {
             LOG_ERROR("Invalid scene file: duplicated entity id");
             assert(false);
-            resource.Free();
             return false;
         }
 
         mapping.Map(static_cast<entt::entity>(rawEntityID), resource.m_registry.create());
     }
+    resource.m_rootEntity = mapping.Get(data["root"]);
+    if (resource.m_rootEntity == entt::null)
+    {
+        LOG_ERROR("Invalid scene file: invalid root entity");
+        assert(false);
+        return false;
+    }
+    return true;
+}
 
+bool SceneResource::ParseComponents(SceneResource& resource, const nlohmann::json& data, EntityIDMapping& mapping)
+{
     auto& componentRegistry = ComponentRegistry::Get();
     for (const auto& component : data["components"])
     {
@@ -58,14 +131,12 @@ DEFINE_ASSET_DESERIALIZE_FUNC(Deserialize, SceneResource)
         {
             LOG_ERROR("Invalid scene file: invalid component");
             assert(false);
-            resource.Free();
             return false;
         }
-        if (!component.contains("type") || !component["type"].is_string())
+        if (!HasStringField(component, "type"))
         {
             LOG_ERROR("Invalid scene file: component type missing");
             assert(false);
-            resource.Free();
             return false;
         }
         std::string type = component["type"];
@@ -74,21 +145,18 @@ DEFINE_ASSET_DESERIALIZE_FUNC(Deserialize, SceneResource)
         {
             LOG_ERROR("Invalid scene file: unknown component type {}", type);
             assert(false);
-            resource.Free();
             return false;
         }
-        if (!component.contains("entity") || !component["entity"].is_number_unsigned())
+        if (!HasUnsignedField(component, "entity"))
         {
             LOG_ERROR("Invalid scene file: component entity missing");
             assert(false);
-            resource.Free();
             return false;
         }
-        if (!component.contains("data") || !component["data"].is_object())
+        if (!HasObjectField(component, "data"))
         {
             LOG_ERROR("Invalid scene file: component data missing");
             assert(false);
-            resource.Free();
             return false;
         }
         uint32_t rawEntityID = component["entity"];
@@ -97,7 +165,6 @@ DEFINE_ASSET_DESERIALIZE_FUNC(Deserialize, SceneResource)
         {
             LOG_ERROR("Invalid scene file: unknown entity id {}", rawEntityID);
             assert(false);
-            resource.Free();
             return false;
         }
 
@@ -106,35 +173,67 @@ DEFINE_ASSET_DESERIALIZE_FUNC(Deserialize, SceneResource)
     return true;
 }
 
-void SceneResource::Free()
+bool SceneResource::ParseSubScenes(SceneResource& resource, const nlohmann::json& data, EntityIDMapping& mapping)
 {
-    m_registry.clear();
-}
-
-entt::registry& SceneResource::GetRegistry()
-{
-    return m_registry;
-}
-
-const entt::registry& SceneResource::GetRegistry() const
-{
-    return m_registry;
-}
-
-/*
-void SceneResource::CopyToRegistry(entt::registry& other, entt::entity parent) const
-{
-    EntityIDMapping mapping;
-    mapping.Map(entt::null, parent);
-    for (auto [entity] : m_registry.storage<entt::entity>()->each())
+    if (!data.contains("scenes"))
     {
-        mapping.Map(entity, other.create());
+        return true;
     }
-    ComponentRegistry::Get().ForEachObject([&](const std::string&, const IComponentFactory& factory)
+    
+    auto& assetManager = AssetManager::Get();
+    for (const auto& scene : data["scenes"])
     {
-        factory.CloneAll(m_registry, other, mapping);
-    });
+        if (!scene.is_object())
+        {
+            LOG_ERROR("Invalid scene file: invalid sub scene");
+            assert(false);
+            return false;
+        }
+        SubSceneDesc desc;
+        if (!HasUnsignedField(scene, "parent"))
+        {
+            LOG_ERROR("Invalid scene file: sub scene parent missing");
+            assert(false);
+            return false;
+        }
+        if (!HasObjectField(scene, "transform"))
+        {
+            LOG_ERROR("Invalid scene file: sub scene transform missing");
+            assert(false);
+            return false;
+        }
+        if (!HasStringField(scene, "path"))
+        {
+            LOG_ERROR("Invalid scene file: sub scene path missing");
+            assert(false);
+            return false;
+        }
+        
+        const auto& transformData = scene["transform"];
+        DeserializeEntity(scene, "parent", mapping, desc.m_parent);
+        if (desc.m_parent == entt::null)
+        {
+            LOG_ERROR("Invalid scene file: invalid sub scene parent");
+            assert(false);
+            return false;
+        }
+        
+        DeserializeVector3(transformData, "position", desc.m_transform.m_position);
+        DeserializeVector3(transformData, "rotation", desc.m_transform.m_rotation);
+        DeserializeVector3(transformData, "scale", desc.m_transform.m_scale);
+        
+        // TODO: This code can lead to circular dependency of scene assets
+        // I won't fix it for now, but it's good to keep it in mind 
+        if (!assetManager.Load(scene["path"], desc.m_scene))
+        {
+            LOG_ERROR("Invalid scene file: failed to load sub scene");
+            assert(false);
+            return false;
+        }
+        
+        resource.m_subScenes.push_back(desc);
+    }
+    return true;
 }
-*/
 
 REGISTER_ASSET_FACTORY(SceneResource, SceneResource::Deserialize)

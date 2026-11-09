@@ -8,11 +8,12 @@
 template <typename TResource>
 class ResourceHandle
 { 
-    static_assert(std::is_base_of_v<ResourceBase, TResource>, "TResource must derive from ResourceBase");
-
 public:
     
-    ResourceHandle() = default;
+    ResourceHandle()
+    {
+        static_assert(std::is_base_of_v<ResourceBase, TResource>, "TResource must derive from ResourceBase");
+    }
     
     ResourceHandle(const ResourceHandle& other) = default;
     ResourceHandle& operator=(const ResourceHandle& other) = default;

@@ -2,6 +2,7 @@
 
 #include "ResourceManager/Resources/ShaderProgramResource.h"
 #include "Utilities/Logger.h"
+#include "Utilities/ParsingHelpers.h"
 
 void FloatParameter::ApplyParameter(const ResourceHandle<ShaderProgramResource>& shaderProgram) const
 {
@@ -10,7 +11,7 @@ void FloatParameter::ApplyParameter(const ResourceHandle<ShaderProgramResource>&
 
 DEFINE_MATERIAL_PARAM_DESERIALIZE_FUNC(Deserialize, FloatParameter)
 {
-    if (!data.contains("value") || !data["value"].is_number())
+    if (!HasNumberField(data, "value"))
     {
         LOG_ERROR("Float material parameter {} has an invalid value", parameter.GetName());
         return false;

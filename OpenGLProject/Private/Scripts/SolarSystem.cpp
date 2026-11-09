@@ -4,6 +4,7 @@
 
 #include "Components/TransformComponent.h"
 #include "Scene/SceneManager.h"
+#include "Utilities/ParsingHelpers.h"
 
 namespace
 {
@@ -35,37 +36,6 @@ void SolarSystem::Update(float deltaTime)
     // Orbits: rotating a proxy carries its children around the proxy's origin
     RotateAroundUp(*sunPTransform, g_earthOrbitSpeed, deltaTime);
     RotateAroundUp(*earthPTransform, g_moonOrbitSpeed, deltaTime);
-}
-
-namespace
-{
-    void DeserializeEntity(
-        const nlohmann::json& data,
-        const char* key,
-        const EntityIDMapping& mapping,
-        entt::entity& outEntity
-        )
-    {
-        if (!data.contains(key) || data[key].is_null())
-        {
-            outEntity = entt::null;
-            return;
-        }
-
-        if (!data[key].is_number_unsigned())
-        {
-            LOG_ERROR("SolarSystem {} must be an unsigned integer or null", key);
-            outEntity = entt::null;
-            return;
-        }
-
-        uint32_t rawEntityID = data[key];
-        outEntity = mapping.Get(static_cast<entt::entity>(rawEntityID));
-        if (outEntity == entt::null)
-        {
-            LOG_ERROR("SolarSystem {} references unknown entity id {}", key, rawEntityID);
-        }
-    }
 }
 
 DEFINE_SCRIPT_DESERIALIZE_FUNC(Deserialize, SolarSystem)

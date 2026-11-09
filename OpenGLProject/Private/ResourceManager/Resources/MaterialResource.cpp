@@ -7,6 +7,7 @@
 #include "MaterialParameters/MaterialParamFactory.h"
 #include "ResourceManager/ResourceManager.h"
 #include "Utilities/Logger.h"
+#include "Utilities/ParsingHelpers.h"
 
 
 MaterialResource::~MaterialResource()
@@ -18,7 +19,7 @@ DEFINE_ASSET_DESERIALIZE_FUNC(Deserialize, MaterialResource)
 {
     resource.Free();
 
-    if (!data.contains("shaderProgram") || !data["shaderProgram"].is_string())
+    if (!HasStringField(data, "shaderProgram"))
     {
         LOG_ERROR("Invalid material file: shaderProgram is missing");
         return false;
@@ -32,7 +33,7 @@ DEFINE_ASSET_DESERIALIZE_FUNC(Deserialize, MaterialResource)
         return false;
     }
 
-    if (data.contains("parameters") && !data["parameters"].is_array())
+    if (!IsOptionalArrayField(data, "parameters"))
     {
         LOG_ERROR("Invalid material file: parameters must be an array");
         resource.Free();
@@ -123,13 +124,13 @@ bool MaterialResource::AddParameter(const nlohmann::json& json)
         return false;
     }
 
-    if (!json.is_object() || !json.contains("type") || !json["type"].is_string())
+    if (!json.is_object() || !HasStringField(json, "type"))
     {
         LOG_ERROR("Invalid material parameter definition");
         return false;
     }
 
-    if (!json.contains("name") || !json["name"].is_string())
+    if (!HasStringField(json, "name"))
     {
         LOG_ERROR("Material parameter is missing its name");
         return false;

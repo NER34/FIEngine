@@ -6,6 +6,7 @@
 
 #include "Rendering/Validation.h"
 #include "Utilities/Logger.h"
+#include "Utilities/ParsingHelpers.h"
 #include "Utilities/Utilities.h"
 
 const std::unordered_map<ShaderType, GLenum> g_enumToGLenum = 
@@ -25,7 +26,7 @@ DEFINE_ASSET_DESERIALIZE_FUNC(Deserialize, ShaderResource)
 {
     resource.Free();
 
-    if (!data.contains("shaderType") || !data["shaderType"].is_number_integer())
+    if (!HasIntegerField(data, "shaderType"))
     {
         LOG_ERROR("Invalid shader asset file: shaderType is missing");
         return false;
@@ -37,7 +38,7 @@ DEFINE_ASSET_DESERIALIZE_FUNC(Deserialize, ShaderResource)
         return false;
     }
 
-    if (!data.contains("path") || !data["path"].is_string())
+    if (!HasStringField(data, "path"))
     {
         LOG_ERROR("Invalid shader asset file: path is missing");
         return false;

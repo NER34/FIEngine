@@ -5,6 +5,7 @@
 #include "stb_image.h"
 #include "Rendering/Validation.h"
 #include "Utilities/Logger.h"
+#include "Utilities/ParsingHelpers.h"
 #include "Utilities/Utilities.h"
 
 TextureResource::~TextureResource()
@@ -16,7 +17,7 @@ DEFINE_ASSET_DESERIALIZE_FUNC(Deserialize, TextureResource)
 {
     resource.Free();
 
-    if (!data.contains("path") || !data["path"].is_string())
+    if (!HasStringField(data, "path"))
     {
         LOG_ERROR("Invalid texture asset file: path is missing");
         assert(false);

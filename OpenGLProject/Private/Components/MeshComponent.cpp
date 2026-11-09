@@ -3,12 +3,13 @@
 #include "AssetManager/AssetManager.h"
 #include "ResourceManager/ResourceManager.h"
 #include "Utilities/Logger.h"
+#include "Utilities/ParsingHelpers.h"
 
 DEFINE_COMPONENT_DESERIALIZE_FUNC(Deserialize, MeshComponent)
 {
     auto& component = handle.m_registry.get<MeshComponent>(handle.m_entity);
     
-    if (!data.contains("mesh") || !data["mesh"].is_string())
+    if (!HasStringField(data, "mesh"))
     {
         LOG_ERROR("Mesh component must contain a mesh path");
     }

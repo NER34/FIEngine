@@ -8,6 +8,7 @@
 
 #include "Rendering/Validation.h"
 #include "Utilities/Logger.h"
+#include "Utilities/ParsingHelpers.h"
 
 MeshResource::~MeshResource()
 {
@@ -18,7 +19,7 @@ DEFINE_ASSET_DESERIALIZE_FUNC(Deserialize, MeshResource)
 {
     resource.Free();
 
-    if (!data.contains("path") || !data["path"].is_string())
+    if (!HasStringField(data, "path"))
     {
         LOG_ERROR("Invalid mesh asset file: path is missing");
         return false;

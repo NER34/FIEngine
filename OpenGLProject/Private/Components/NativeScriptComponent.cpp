@@ -5,6 +5,7 @@
 #include "Scripting/ScriptBase.h"
 #include "Scripting/ScriptFactory.h"
 #include "Utilities/Logger.h"
+#include "Utilities/ParsingHelpers.h"
 
 NativeScriptComponent::NativeScriptComponent(NativeScriptComponent&& other) noexcept
     : m_beginPlay(std::move(other.m_beginPlay))
@@ -78,7 +79,7 @@ DEFINE_COMPONENT_DESERIALIZE_FUNC(Deserialize, NativeScriptComponent)
 {
     auto& component = handle.m_registry.get<NativeScriptComponent>(handle.m_entity);
     
-    if (!data.contains("script") || !data["script"].is_string())
+    if (!HasStringField(data, "script"))
     {
         LOG_ERROR("Native script component must contain a script name");
         return;
@@ -92,7 +93,7 @@ DEFINE_COMPONENT_DESERIALIZE_FUNC(Deserialize, NativeScriptComponent)
         return;
     }
 
-    if (!data.contains("data") || !data["data"].is_object())
+    if (!HasObjectField(data, "data"))
     {
         LOG_ERROR("Native script component data is invalid: {}", scriptName);
         return;

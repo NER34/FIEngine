@@ -1,5 +1,6 @@
 {
   "type": "SceneResource",
+  "root": 0,
   "entities": [
     0,
     1,
@@ -18,7 +19,8 @@
         "scale": [ 1.0, 1.0, 1.0 ],
         "parent": null,
         "child": 1,
-        "neighbor": null
+        "neighbor_r": null,
+        "neighbor_l": null
       }
     },
     {
@@ -30,7 +32,8 @@
         "scale": [ 1.5, 1.5, 1.5 ],
         "parent": 0,
         "child": null,
-        "neighbor": 2
+        "neighbor_r": 2,
+        "neighbor_l": null
       }
     },
     {
@@ -42,7 +45,8 @@
         "scale": [ 1.0, 1.0, 1.0 ],
         "parent": 0,
         "child": 3,
-        "neighbor": null
+        "neighbor_r": null,
+        "neighbor_l": 1
       }
     },
     {
@@ -54,7 +58,8 @@
         "scale": [ 1.0, 1.0, 1.0 ],
         "parent": 2,
         "child": null,
-        "neighbor": 4
+        "neighbor_r": 4,
+        "neighbor_l": null
       }
     },
     {
@@ -66,7 +71,8 @@
         "scale": [ 1.0, 1.0, 1.0 ],
         "parent": 2,
         "child": 5,
-        "neighbor": null
+        "neighbor_r": null,
+        "neighbor_l": 3
       }
     },
     {
@@ -78,7 +84,8 @@
         "scale": [ 0.5, 0.5, 0.5 ],
         "parent": 4,
         "child": null,
-        "neighbor": null
+        "neighbor_r": null,
+        "neighbor_l": null
       }
     },
     {

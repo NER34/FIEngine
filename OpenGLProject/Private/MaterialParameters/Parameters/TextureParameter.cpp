@@ -2,6 +2,7 @@
 
 #include "AssetManager/AssetManager.h"
 #include "ResourceManager/Resources/ShaderProgramResource.h"
+#include "Utilities/ParsingHelpers.h"
 
 
 void TextureParameter::ApplyParameter(const ResourceHandle<ShaderProgramResource>& shaderProgram) const
@@ -15,14 +16,14 @@ void TextureParameter::ApplyParameter(const ResourceHandle<ShaderProgramResource
 
 DEFINE_MATERIAL_PARAM_DESERIALIZE_FUNC(Deserialize, TextureParameter)
 {
-    if (!data.contains("slot") || !data["slot"].is_number())
+    if (!HasNumberField(data, "slot"))
     {
         LOG_ERROR("Texture material parameter {} has an invalid slot", parameter.GetName());
         return false;
     }
     parameter.m_textureSlot = data["slot"];
 
-    if (!data.contains("path") || !data["path"].is_string())
+    if (!HasStringField(data, "path"))
     {
         LOG_ERROR("Texture material parameter {} has invalid path", parameter.GetName());
         return false;

@@ -6,6 +6,7 @@
 #include "Rendering/Validation.h"
 #include "ResourceManager/ResourceManager.h"
 #include "Utilities/Logger.h"
+#include "Utilities/ParsingHelpers.h"
 #include "Utilities/Utilities.h"
 
 ShaderProgramResource::~ShaderProgramResource()
@@ -17,7 +18,7 @@ DEFINE_ASSET_DESERIALIZE_FUNC(Deserialize, ShaderProgramResource)
 {
     resource.Free();
 
-    if (!data.contains("shaders") || !data["shaders"].is_array() || data["shaders"].empty())
+    if (!HasArrayField(data, "shaders") || data["shaders"].empty())
     {
         LOG_ERROR("Invalid shader program asset file: shaders are missing");
         return false;

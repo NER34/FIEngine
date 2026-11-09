@@ -14,8 +14,10 @@ public:
     void Initialize();
     void Update();
     void Deinitialize();
-    
-    void SpawnScene(const ResourceHandle<SceneResource>& scene);
+
+    entt::entity GetRootEntity() const;
+    void MarkSceneGraphModified();
+    entt::entity SpawnScene(const ResourceHandle<SceneResource>& scene, entt::entity parent = entt::null);
     
     template <typename ... TComp>
     auto View() const
