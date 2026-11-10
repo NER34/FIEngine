@@ -7,8 +7,9 @@
 
 SceneManager& SceneManager::Get()
 {
-    static SceneManager instance;
-    return instance;
+    auto* system = SystemLocator::Get().GetSystem<SceneManager>();
+    assert(system && "SceneManager is not registered");
+    return *static_cast<SceneManager*>(system);
 }
 
 namespace
@@ -30,7 +31,7 @@ void SceneManager::Initialize()
     SpawnScene(m_sceneHandle);
 }
 
-void SceneManager::Update()
+void SceneManager::Update(float deltaTime)
 {
     if (m_sceneGraphModified)
     {

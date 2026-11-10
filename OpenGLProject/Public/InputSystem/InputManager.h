@@ -3,14 +3,18 @@
 #include <queue>
 
 #include "InputSystem/IInputManaget.h"
+#include "SystemBase/SystemLocator.h"
 
 namespace FIE
 {	
-	class InputManager : public IInputManager
+	class InputManager : public IInputManager, public ISystemBase
 	{
 	public:
 
 		InputManager() {}
+		
+		void Initialize() override;
+		void Update(float deltaTime) override;
 
 		void update() override;
 		void setInputContext(InputContext* newInputContext) override;
@@ -22,6 +26,6 @@ namespace FIE
 
 		InputContext* m_inputContext = nullptr;
 		std::queue<InputEvent> m_inputQueue;
-
 	};
+	
 }

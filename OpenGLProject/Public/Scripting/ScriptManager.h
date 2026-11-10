@@ -1,14 +1,16 @@
 ﻿#pragma once
 
-class ScriptManager
+#include "SystemBase/SystemLocator.h"
+
+class ScriptManager : public ISystemBase
 {
 public:
     
     static ScriptManager& Get();
     
-    void Initialize();
-    void Update(float deltaTime);
-    void Deinitialize();
+    void Initialize() override;
+    void Update(float deltaTime) override;
+    void Deinitialize() override;
 
 private:
 

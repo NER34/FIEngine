@@ -5,13 +5,16 @@
 
 #include "ResourceContainer.h"
 #include "ResourceHandle.h"
+#include "SystemBase/SystemLocator.h"
 
-class ResourceManager
+class ResourceManager : public ISystemBase
 {
 public:
     
     ResourceManager() = default;
     ~ResourceManager();
+    
+    void Deinitialize() override;
 
     static ResourceManager& Get();
     

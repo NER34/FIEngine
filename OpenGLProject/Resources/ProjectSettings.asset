@@ -1,0 +1,9 @@
+{
+    "type": "ProjectSettingsResource",
+
+    "windowName": "FIE",
+    "windowWidth": 1280,
+    "windowHeight": 720,
+    
+    "startScene": "Scenes/Default_NoPlane_C&L.asset"
+}

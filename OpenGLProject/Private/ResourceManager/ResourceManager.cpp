@@ -10,10 +10,16 @@ ResourceManager::~ResourceManager()
     m_registeredContainers.clear();
 }
 
+void ResourceManager::Deinitialize()
+{
+    FreeAllResources();
+}
+
 ResourceManager& ResourceManager::Get()
 {
-    static ResourceManager instance;
-    return instance;
+    auto* system = SystemLocator::Get().GetSystem<ResourceManager>();
+    assert(system && "ResourceManager is not registered");
+    return *static_cast<ResourceManager*>(system);
 }
 
 void ResourceManager::FreeAllResources()

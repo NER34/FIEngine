@@ -3,72 +3,80 @@
 
 #include "OpenGLProject.h"
 
-#include <filesystem>
+#include <chrono>
 
-#include "glad/glad.h"
+#include "SystemBase/SystemLocator.h"
+#include "Utilities/Logger.h"
 
-#include "InputSystem/InputContext.h"
+#include "AssetManager/AssetManager.h"
 #include "InputSystem/InputManager.h"
-#include "Rendering/Camera.h"
+#include "ProjectSettings/ProjectSettings.h"
 #include "Rendering/Renderer.h"
 #include "ResourceManager/ResourceManager.h"
 #include "Scene/SceneManager.h"
 #include "Scripting/ScriptManager.h"
-#include "Utilities/Logger.h"
-#include "Window/GLFW/WindowGLFW.h"
+#include "Window/WindowManager.h"
+
 
 int main()
 {
-	FIE::WindowDesc windowDesc;
-	windowDesc.m_title = "OpenGL Project";
-	FIE::WindowGLFW window(windowDesc);
+	auto& systemLocator = SystemLocator::Get();
 	
-	FIE::IInputManager& inputManager = FIE::IInputManager::Get();
-	FIE::InputContext inputContext;
-	inputManager.setInputContext(&inputContext);
+	systemLocator.RegisterSystem<ResourceManager>();
+	systemLocator.RegisterSystem<AssetManager>();
+	systemLocator.RegisterSystem<FIE::IInputManager, FIE::InputManager>();
+	systemLocator.RegisterSystem<FIE::WindowManager>();
+	systemLocator.RegisterSystem<Renderer>();
+	systemLocator.RegisterSystem<ProjectSettings>();
+	systemLocator.RegisterSystem<SceneManager>();
+	systemLocator.RegisterSystem<ScriptManager>();
 	
-	inputContext.assignHandle(FIE::KEY_ESCAPE, [&window](FIE::InputIDs, float)
+	systemLocator.InitializeSystems<
+		ProjectSettings,
+		FIE::WindowManager,
+		FIE::IInputManager,
+		Renderer,
+		SceneManager,
+		ScriptManager
+		>();
+	
+	// TODO: Remove this thing from here
+	// --------------------------------
+	auto* system = SystemLocator::Get().GetSystem<FIE::WindowManager>();
+	if (!system)
 	{
-		window.requestWindowClose();
-	});
-	
-	// Load GLAD and init OpenGL
-	CameraDesc cameraDesc;
-	cameraDesc.m_aspectRatio = (float)window.getWindowDesc().m_width / (float)window.getWindowDesc().m_height;
-	
-	RendererDesc rendererDesc;
-	rendererDesc.m_viewportDesc = {
-		0, 0,
-		(GLsizei)window.getWindowDesc().m_width,
-		(GLsizei)window.getWindowDesc().m_height
-	};
-	rendererDesc.m_cameraDesc = cameraDesc;
-	
-	Renderer& renderer = Renderer::get();
-	renderer.Initialize(rendererDesc);
-	
-	SceneManager::Get().Initialize();
-
-	ScriptManager::Get().Initialize();
+		LOG_ERROR("Main: Failed to get window ref");
+		return 1;
+	}
+	auto& windowManager = *static_cast<FIE::WindowManager*>(system);
+	// --------------------------------
 
 	auto prevTime = std::chrono::high_resolution_clock::now(); 
-	while (!window.isWindowShouldClose())
+	while (!windowManager.GetWindow()->isWindowShouldClose())
 	{
 		auto currTime = std::chrono::high_resolution_clock::now();
 		float deltaTime = std::chrono::duration<float>(currTime - prevTime).count();
 		prevTime = currTime;
 		
-		inputManager.update();
-		ScriptManager::Get().Update(deltaTime);
-		SceneManager::Get().Update();
-		renderer.Render();
-		window.update();
+		systemLocator.UpdateSystems<
+			FIE::IInputManager,
+			ScriptManager,
+			SceneManager,
+			Renderer,
+			FIE::WindowManager
+			>(deltaTime);
 	}
 	
-	//inputManager.setInputContext(nullptr);
-	ScriptManager::Get().Deinitialize();
-	SceneManager::Get().Deinitialize();
-	ResourceManager::Get().FreeAllResources();
+	systemLocator.DeinitializeSystems<
+		ScriptManager,
+		SceneManager,
+		ProjectSettings,
+		FIE::IInputManager,
+		Renderer,
+		ResourceManager,
+		FIE::WindowManager
+		>();
 	
 	return 0;
 }
+	

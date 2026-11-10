@@ -2,18 +2,20 @@
 
 #include <entt.h>
 
+#include "SystemBase/SystemLocator.h"
+
 #include "ResourceManager/ResourceHandle.h"
 #include "ResourceManager/Resources/SceneResource.h"
 
-class SceneManager
+class SceneManager : public ISystemBase
 {
 public:
     
     static SceneManager& Get();
     
-    void Initialize();
-    void Update();
-    void Deinitialize();
+    void Initialize() override;
+    void Update(float deltaTime) override;
+    void Deinitialize() override;
 
     entt::entity GetRootEntity() const;
     void MarkSceneGraphModified();
@@ -45,4 +47,5 @@ private:
     entt::entity m_sceneRoot = entt::null;
     bool m_sceneGraphModified = false;
     ResourceHandle<SceneResource> m_sceneHandle;
+    
 };

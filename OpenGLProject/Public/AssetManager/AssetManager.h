@@ -7,14 +7,15 @@
 #include "Utilities/Logger.h"
 #include "Utilities/ParsingHelpers.h"
 
-class AssetManager
+class AssetManager : public ISystemBase
 {
 public:
     
     static AssetManager& Get()
     {
-        static AssetManager instance;
-        return instance;
+        auto* system = SystemLocator::Get().GetSystem<AssetManager>();
+        assert(system && "AssetManager is not registered");
+        return *static_cast<AssetManager*>(system);
     }
     
     template <typename TResource>

@@ -5,8 +5,9 @@
 
 ScriptManager& ScriptManager::Get()
 {
-    static ScriptManager manager;
-    return manager;
+    auto* system = SystemLocator::Get().GetSystem<ScriptManager>();
+    assert(system && "ScriptManager is not registered");
+    return *static_cast<ScriptManager*>(system);
 }
 
 void ScriptManager::Initialize()

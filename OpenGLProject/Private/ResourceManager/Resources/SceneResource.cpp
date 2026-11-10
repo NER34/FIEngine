@@ -72,20 +72,6 @@ void SceneResource::Free()
     m_subScenes.clear();
 }
 
-/*
-entt::registry& SceneResource::GetRegistry()
-{
-    return m_registry;
-}
-*/
-
-/*
-const entt::registry& SceneResource::GetRegistry() const
-{
-    return m_registry;
-}
-*/
-
 bool SceneResource::ParseEntities(SceneResource& resource, const nlohmann::json& data, EntityIDMapping& mapping)
 {
     if (!HasUnsignedField(data, "root"))

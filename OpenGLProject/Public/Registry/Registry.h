@@ -1,6 +1,8 @@
 ﻿#pragma once
 
 #include <memory>
+#include <string_view>
+#include <type_traits>
 #include <unordered_map>
 
 #include "Utilities/Logger.h"
@@ -18,7 +20,11 @@ public:
             m_registry.insert({ key, std::make_unique<TDerivedObject>(std::forward<TArgs>(args)...) });
             return true;
         }
-        LOG_ERROR("Failed to register object: key {} already registered", key);
+        // Non-string keys (e.g. SystemLocator's type_index) are reported by the owning class
+        if constexpr (std::is_convertible_v<const TKey&, std::string_view>)
+        {
+            LOG_ERROR("Failed to register object: key {} already registered", std::string_view(key));
+        }
         return false;
     }
     
@@ -28,7 +34,6 @@ public:
         {
             return it->second.get();
         }
-        LOG_ERROR("Failed to get object: key {} is not registered", key);
         return nullptr;
     }
 

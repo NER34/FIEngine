@@ -40,12 +40,12 @@ namespace FIE
 		const WindowDesc& getWindowDesc() const;
 
 		virtual void update() = 0;
+		virtual void requestWindowClose();
 
 	protected:
 
 		void updateWindowSize(uint32_t width, uint32_t height);
 		void updateWindowFullScreen(bool fullScreen);
-		virtual void requestWindowClose();
 
 	public:
 

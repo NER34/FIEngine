@@ -6,11 +6,49 @@
 #include "Components/MeshComponent.h"
 #include "Components/TransformComponent.h"
 #include "Scene/SceneManager.h"
+#include "Window/WindowManager.h"
 
-Renderer& Renderer::get()
+Renderer& Renderer::Get()
 {
-    static Renderer instance;
-    return instance;
+    auto* system = SystemLocator::Get().GetSystem<Renderer>();
+    assert(system && "Renderer is not registered");
+    return *static_cast<Renderer*>(system);
+}
+
+void Renderer::Initialize()
+{
+    auto* system = SystemLocator::Get().GetSystem<FIE::WindowManager>();
+    if (!system)
+    {
+        LOG_ERROR("Renderer: Failed to get WindowManager");
+        return;
+    }
+    
+    auto& windowManager = *static_cast<FIE::WindowManager*>(system);
+    const auto& window = windowManager.GetWindow();
+    
+    CameraDesc cameraDesc;
+    cameraDesc.m_aspectRatio = (float)window->getWindowDesc().m_width / (float)window->getWindowDesc().m_height;
+	
+    RendererDesc rendererDesc;
+    rendererDesc.m_viewportDesc = {
+        0, 0,
+        (GLsizei)window->getWindowDesc().m_width,
+        (GLsizei)window->getWindowDesc().m_height
+    };
+    rendererDesc.m_cameraDesc = cameraDesc;
+	
+    Initialize(rendererDesc);
+}
+
+void Renderer::Update(float deltaTime)
+{
+    Render();
+}
+
+void Renderer::Deinitialize()
+{
+    m_defaultMaterial.Reset();
 }
 
 void Renderer::Render()

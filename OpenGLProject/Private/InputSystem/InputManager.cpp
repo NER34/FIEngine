@@ -1,13 +1,35 @@
 
 #include "InputSystem/InputManager.h"
 #include "InputSystem/InputContext.h"
+#include "Window/WindowManager.h"
 
 namespace FIE
 {
 	IInputManager& IInputManager::Get()
 	{
-		static InputManager instance;
-		return instance;
+		auto* system = SystemLocator::Get().GetSystem<IInputManager>();
+		assert(system && "IInputManager is not registered");
+		return *static_cast<InputManager*>(system);
+	}
+
+	void InputManager::Initialize()
+	{
+		static InputContext inputContext;
+		setInputContext(&inputContext);
+	
+		inputContext.assignHandle(KEY_ESCAPE, [](InputIDs, float)
+		{
+			if (auto* system = SystemLocator::Get().GetSystem<WindowManager>())
+			{
+				auto& windowManager = *static_cast<WindowManager*>(system);
+				windowManager.GetWindow()->requestWindowClose();
+			}
+		});
+	}
+
+	void InputManager::Update(float deltaTime)
+	{
+		update();
 	}
 
 	void InputManager::update()

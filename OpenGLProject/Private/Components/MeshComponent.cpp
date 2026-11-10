@@ -15,9 +15,10 @@ DEFINE_COMPONENT_DESERIALIZE_FUNC(Deserialize, MeshComponent)
     }
     else
     {
-        if (!AssetManager::Get().Load<MeshResource>(data["mesh"], component.m_meshHandle))
+        const std::string& meshPath = data["mesh"];
+        if (!meshPath.empty() && !AssetManager::Get().Load<MeshResource>(meshPath, component.m_meshHandle))
         {
-            LOG_WARN("Mesh component failed to load mesh {}", data["mesh"].get<std::string>());
+            LOG_WARN("Mesh component failed to load mesh {}", meshPath);
         }
     }
 

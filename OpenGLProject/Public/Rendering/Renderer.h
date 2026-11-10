@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include "SystemBase/SystemLocator.h"
+
 #include "Camera.h"
 #include "ResourceManager/ResourceHandle.h"
 #include "ResourceManager/Resources/MaterialResource.h"
@@ -55,21 +57,24 @@ struct RendererDesc
     CameraDesc m_cameraDesc;
 };
 
-class Renderer
+class Renderer : public ISystemBase
 {
 public:
     
-    static Renderer& get();
+    static Renderer& Get();
     
     Renderer() 
         : m_frontDrawList(m_drawList_1)
         , m_backDrawList(m_drawList_2)
     {}
     
+    void Initialize() override;
+    void Update(float deltaTime) override;
+    void Deinitialize() override;
+    
     void Initialize(const RendererDesc& desc);
     void AddDraw(const GeometryDrawDesc& desc);
     void Render();
-    void Deinitialize();
     
 private:
     
@@ -83,4 +88,5 @@ private:
     
     Camera m_camera;
     ResourceHandle<MaterialResource> m_defaultMaterial;
+    
 };

@@ -2,6 +2,8 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <string>
+#include <type_traits>
 
 #include <json.h>
 
@@ -60,6 +62,39 @@ inline void DeserializeFloat(const nlohmann::json& data, const char* key, float&
         return;
     }
     outValue = data[key];
+}
+
+template <typename T>
+void DeserializeInteger(const nlohmann::json& data, const char* key, T& outValue)
+{
+    static_assert(std::is_integral_v<T>, "DeserializeInteger requires an integral type");
+
+    if (!data.contains(key))
+    {
+        return;
+    }
+
+    if (!data[key].is_number_integer())
+    {
+        LOG_ERROR("Field {} has an invalid value", key);
+        return;
+    }
+    outValue = data[key].get<T>();
+}
+
+inline void DeserializeString(const nlohmann::json& data, const char* key, std::string& outValue)
+{
+    if (!data.contains(key))
+    {
+        return;
+    }
+
+    if (!data[key].is_string())
+    {
+        LOG_ERROR("Field {} has an invalid value", key);
+        return;
+    }
+    outValue = data[key].get<std::string>();
 }
 
 inline void DeserializeVector3(const nlohmann::json& data, const char* key, glm::vec3& outVector)
