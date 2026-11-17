@@ -1,0 +1,35 @@
+{
+  "type": "SceneResource",
+  "root": 0,
+  "entities": [
+    0
+  ],
+  "components": [
+    {
+      "type": "TransformComponent",
+      "entity": 0,
+      "data": {
+        "position": [ 0.0, 0.0, 0.0 ],
+        "rotation": [ 0.0, 0.0, 180.0 ],
+        "scale": [ 1.0, 1.0, 1.0 ],
+        "parent": null,
+        "child": null,
+        "neighbor_r": null,
+        "neighbor_l": null
+      }
+    },
+    {
+      "type": "MeshComponent",
+      "entity": 0,
+      "data": {
+        "mesh": "Meshes/Sting-Sword-lowpoly.asset",
+        "materials": [
+          "Materials/Phong.asset",
+          "Materials/Phong.asset",
+          "Materials/Phong.asset",
+          "Materials/Phong.asset"
+        ]
+      }
+    }
+  ]
+}

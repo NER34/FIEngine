@@ -58,7 +58,9 @@ int main()
 		float deltaTime = std::chrono::duration<float>(currTime - prevTime).count();
 		prevTime = currTime;
 		
-		systemLocator.UpdateSystems<
+		LOG_INFO("FPS: {}", 1.0f / deltaTime);
+		
+		systemLocator.UpdateSystems< 
 			FIE::IInputManager,
 			ScriptManager,
 			SceneManager,

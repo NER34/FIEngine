@@ -1,0 +1,33 @@
+{
+  "type": "SceneResource",
+  "root": 0,
+  "entities": [
+    0
+  ],
+  "scenes": [],
+  "components": [
+    {
+      "type": "TransformComponent",
+      "entity": 0,
+      "data": {
+        "parent": null,
+        "child": null,
+        "neighbor_r": null,
+        "neighbor_l": null
+      }
+    },
+    {
+      "type": "NativeScriptComponent",
+      "entity": 0,
+      "data": {
+        "script": "SpawnForest",
+        "data": {
+          "scene": "Scenes/Sword.asset",
+          "timeout": 0.1,
+          "count": 100,
+          "radius": 500.0
+        }
+      }
+    }
+  ]
+}

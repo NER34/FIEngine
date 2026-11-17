@@ -8,12 +8,16 @@ class ProjectSettings : public ISystemBase
 {
 public:
     
+    static ProjectSettings* Get();
+    
     ProjectSettings() = default;
     ~ProjectSettings() override = default;
     
     void Initialize() override;
     void Deinitialize() override;
-    
+
+    bool IsValid() const { return m_settingsHandle.IsValid(); }
+
     const ProjectSettingsResource* operator->() const
     {
         return m_settingsHandle.operator->();

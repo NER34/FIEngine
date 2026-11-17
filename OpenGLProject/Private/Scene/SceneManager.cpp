@@ -4,6 +4,7 @@
 #include "ComponentFactory/ComponentFactory.h"
 #include "ComponentFactory/ComponentFactoryStructs.h"
 #include "Components/TransformComponent.h"
+#include "ProjectSettings/ProjectSettings.h"
 
 SceneManager& SceneManager::Get()
 {
@@ -12,20 +13,23 @@ SceneManager& SceneManager::Get()
     return *static_cast<SceneManager*>(system);
 }
 
-namespace
-{
-    const std::string g_scenePath = "Scenes/Default_NoPlane_C&L.asset";
-}
-
 void SceneManager::Initialize()
 {
     m_sceneRoot = m_registry.create();
     TransformComponent& transform = m_registry.emplace<TransformComponent>(m_sceneRoot);
     transform.m_current = m_sceneRoot;
     
-    if (!AssetManager::Get().Load<SceneResource>(g_scenePath, m_sceneHandle))
+    ProjectSettings* projectSettings = ProjectSettings::Get();
+    if (!projectSettings || !projectSettings->IsValid())
     {
-        LOG_ERROR("Failed to load scene {}", g_scenePath);
+        LOG_ERROR("SceneManager: project settings are not available, can't load start scene");
+        return;
+    }
+
+    const std::string& startScene = (*projectSettings)->m_startScene;
+    if (!AssetManager::Get().Load<SceneResource>(startScene, m_sceneHandle))
+    {
+        LOG_ERROR("Failed to load scene {}", startScene);
         return;
     }
     SpawnScene(m_sceneHandle);

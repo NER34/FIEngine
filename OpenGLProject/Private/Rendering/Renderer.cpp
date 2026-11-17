@@ -89,27 +89,25 @@ void Renderer::Render()
     {
         const glm::mat4& modelMat = drawDesc.m_transform;
         const auto& mesh = drawDesc.m_mesh;
-        //for (size_t i = 0; i < mesh->GetSubMeshCount(); i++)
-        //{
-            const auto& material = drawDesc.m_material;
-            if (!material.IsValid())
-            {
-                continue;
-            }
-            
-            material->Activate();
-            
-            const auto& shaderProgram = material->GetShaderProgram();
-            shaderProgram->SetUniformMat4("projViewMat", viewProjMat);
-            shaderProgram->SetUniformMat4("modelMat", modelMat);
-            shaderProgram->SetUniformFloat3("lightPos", lightPos);
-            shaderProgram->SetUniformFloat3("lightColor", lightColor);
-            shaderProgram->SetUniformFloat3("viewPos", cameraTransform.GetTransform().m_position);
-            
-            mesh->DrawSubMesh(drawDesc.m_subMeshIndex);
-            
-            material->Deactivate();
-        //}
+
+        const auto& material = drawDesc.m_material;
+        if (!material.IsValid())
+        {
+            continue;
+        }
+        
+        material->Activate();
+        
+        const auto& shaderProgram = material->GetShaderProgram();
+        shaderProgram->SetUniformMat4("projViewMat", viewProjMat);
+        shaderProgram->SetUniformMat4("modelMat", modelMat);
+        shaderProgram->SetUniformFloat3("lightPos", lightPos);
+        shaderProgram->SetUniformFloat3("lightColor", lightColor);
+        shaderProgram->SetUniformFloat3("viewPos", cameraTransform.GetTransform().m_position);
+        
+        mesh->DrawSubMesh(drawDesc.m_subMeshIndex);
+        
+        material->Deactivate();
     }
 }
 
