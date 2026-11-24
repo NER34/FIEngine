@@ -21,6 +21,11 @@ add_subdirectory("ThirdParty/assimp")
 add_subdirectory("ThirdParty/json")
 add_subdirectory("ThirdParty/stduuid")
 add_subdirectory("ThirdParty/entt")
+
+set(EASY_PROFILER_NO_GUI     ON CACHE BOOL "" FORCE)  # the GUI needs Qt                               
+set(EASY_PROFILER_NO_SAMPLES ON CACHE BOOL "" FORCE)
+add_subdirectory("ThirdParty/easy_profiler")
+
 add_subdirectory("OpenGLProject")
 
 set(VS_STARTUP_PROJECT OpenGLProject)

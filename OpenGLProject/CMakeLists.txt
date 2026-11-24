@@ -32,7 +32,12 @@ target_link_libraries(OpenGLProject
 		json
 		stduuid
 		entt
+		easy_profiler
 )
+
+add_custom_command(TARGET OpenGLProject POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E copy_if_different
+		$<TARGET_FILE:easy_profiler> $<TARGET_FILE_DIR:OpenGLProject>)
 
 #add_custom_command(
 #	TARGET OpenGLProject POST_BUILD

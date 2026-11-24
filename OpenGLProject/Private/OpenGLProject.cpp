@@ -9,6 +9,7 @@
 #include "Utilities/Logger.h"
 
 #include "AssetManager/AssetManager.h"
+#include "easy/profiler.h"
 #include "InputSystem/InputManager.h"
 #include "ProjectSettings/ProjectSettings.h"
 #include "Rendering/Renderer.h"
@@ -19,7 +20,11 @@
 
 
 int main()
-{
+{      
+	EASY_PROFILER_ENABLE;        // start collecting                                                   
+	EASY_MAIN_THREAD;            // name this thread "Main" in the viewer                              
+	profiler::startListen();     // let the GUI connect live (port 28077)
+	
 	auto& systemLocator = SystemLocator::Get();
 	
 	systemLocator.RegisterSystem<ResourceManager>();
@@ -54,6 +59,8 @@ int main()
 	auto prevTime = std::chrono::high_resolution_clock::now(); 
 	while (!windowManager.GetWindow()->isWindowShouldClose())
 	{
+		EASY_BLOCK("Frame", profiler::colors::Magenta);
+		
 		auto currTime = std::chrono::high_resolution_clock::now();
 		float deltaTime = std::chrono::duration<float>(currTime - prevTime).count();
 		prevTime = currTime;
@@ -78,6 +85,8 @@ int main()
 		ResourceManager,
 		FIE::WindowManager
 		>();
+	
+	profiler::dumpBlocksToFile("capture.prof");
 	
 	return 0;
 }
