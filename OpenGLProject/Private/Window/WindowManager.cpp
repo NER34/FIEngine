@@ -3,12 +3,15 @@
 #include "Window/WindowBase.h"
 #include "Window/GLFW/WindowGLFW.h"
 #include "ProjectSettings/ProjectSettings.h"
+#include "easy/profiler.h"
 
 
 namespace FIE
 {
     void WindowManager::Initialize()
     {
+        EASY_FUNCTION();
+
         WindowDesc windowDesc;
         if (auto* system = SystemLocator::Get().GetSystem<ProjectSettings>())
         {
@@ -22,11 +25,15 @@ namespace FIE
     
     void WindowManager::Update(float deltaTime)
     {
+        EASY_FUNCTION();
+
         m_window->update();
     }
     
     void WindowManager::Deinitialize()
     {
+        EASY_FUNCTION();
+
         m_window.reset();
     }
 

@@ -2,6 +2,7 @@
 
 #include "Components/NativeScriptComponent.h"
 #include "Scene/SceneManager.h"
+#include "easy/profiler.h"
 
 ScriptManager& ScriptManager::Get()
 {
@@ -12,11 +13,15 @@ ScriptManager& ScriptManager::Get()
 
 void ScriptManager::Initialize()
 {
+    EASY_FUNCTION();
+
     BeginPlayPendingScripts();
 }
 
 void ScriptManager::Update(float deltaTime)
 {
+    EASY_FUNCTION();
+
     // Scripts spawned since the last frame (e.g. by SpawnScene) begin play before their first update
     BeginPlayPendingScripts();
 
@@ -29,6 +34,8 @@ void ScriptManager::Update(float deltaTime)
 
 void ScriptManager::Deinitialize()
 {
+    EASY_FUNCTION();
+
     SceneManager::Get().View<NativeScriptComponent>().each(
         [&](auto entity, NativeScriptComponent& component)
         {

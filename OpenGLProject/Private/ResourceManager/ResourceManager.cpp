@@ -4,6 +4,7 @@
 
 #include "ResourceManager/ResourceContainer.h"
 #include "ResourceManager/Resources/MaterialResource.h"
+#include "easy/profiler.h"
 
 ResourceManager::~ResourceManager()
 {
@@ -12,6 +13,8 @@ ResourceManager::~ResourceManager()
 
 void ResourceManager::Deinitialize()
 {
+    EASY_FUNCTION();
+
     FreeAllResources();
 }
 

@@ -2,7 +2,6 @@
 
 #include "SystemBase/SystemLocator.h"
 
-#include "Camera.h"
 #include "ResourceManager/ResourceHandle.h"
 #include "ResourceManager/Resources/MaterialResource.h"
 #include "ResourceManager/Resources/MeshResource.h"
@@ -54,7 +53,7 @@ struct ViewportDesc
 struct RendererDesc
 {
     ViewportDesc m_viewportDesc;
-    CameraDesc m_cameraDesc;
+    //CameraDesc m_cameraDesc;
 };
 
 class Renderer : public ISystemBase
@@ -86,7 +85,7 @@ private:
     std::vector<GeometryDrawDesc> m_drawList_1;
     std::vector<GeometryDrawDesc> m_drawList_2;
     
-    Camera m_camera;
+    //Camera m_camera;
     ResourceHandle<MaterialResource> m_defaultMaterial;
     
 };

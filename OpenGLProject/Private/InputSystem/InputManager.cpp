@@ -2,6 +2,7 @@
 #include "InputSystem/InputManager.h"
 #include "InputSystem/InputContext.h"
 #include "Window/WindowManager.h"
+#include "easy/profiler.h"
 
 namespace FIE
 {
@@ -14,6 +15,8 @@ namespace FIE
 
 	void InputManager::Initialize()
 	{
+		EASY_FUNCTION();
+
 		static InputContext inputContext;
 		setInputContext(&inputContext);
 	
@@ -29,6 +32,8 @@ namespace FIE
 
 	void InputManager::Update(float deltaTime)
 	{
+		EASY_FUNCTION();
+
 		update();
 	}
 

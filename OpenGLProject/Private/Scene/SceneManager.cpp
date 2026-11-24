@@ -5,6 +5,7 @@
 #include "ComponentFactory/ComponentFactoryStructs.h"
 #include "Components/TransformComponent.h"
 #include "ProjectSettings/ProjectSettings.h"
+#include "easy/profiler.h"
 
 SceneManager& SceneManager::Get()
 {
@@ -15,6 +16,8 @@ SceneManager& SceneManager::Get()
 
 void SceneManager::Initialize()
 {
+    EASY_FUNCTION();
+
     m_sceneRoot = m_registry.create();
     TransformComponent& transform = m_registry.emplace<TransformComponent>(m_sceneRoot);
     transform.m_current = m_sceneRoot;
@@ -37,6 +40,8 @@ void SceneManager::Initialize()
 
 void SceneManager::Update(float deltaTime)
 {
+    EASY_FUNCTION();
+
     if (m_sceneGraphModified)
     {
         m_sceneGraphModified = false;
@@ -70,6 +75,8 @@ void SceneManager::Update(float deltaTime)
 
 void SceneManager::Deinitialize()
 {
+    EASY_FUNCTION();
+
     m_registry.clear();
     m_sceneRoot = entt::null;
 }

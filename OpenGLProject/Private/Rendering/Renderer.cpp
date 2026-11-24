@@ -7,6 +7,7 @@
 #include "Components/TransformComponent.h"
 #include "Scene/SceneManager.h"
 #include "Window/WindowManager.h"
+#include "easy/profiler.h"
 
 Renderer& Renderer::Get()
 {
@@ -17,6 +18,8 @@ Renderer& Renderer::Get()
 
 void Renderer::Initialize()
 {
+    EASY_FUNCTION();
+
     auto* system = SystemLocator::Get().GetSystem<FIE::WindowManager>();
     if (!system)
     {
@@ -27,8 +30,8 @@ void Renderer::Initialize()
     auto& windowManager = *static_cast<FIE::WindowManager*>(system);
     const auto& window = windowManager.GetWindow();
     
-    CameraDesc cameraDesc;
-    cameraDesc.m_aspectRatio = (float)window->getWindowDesc().m_width / (float)window->getWindowDesc().m_height;
+    //CameraDesc cameraDesc;
+    //cameraDesc.m_aspectRatio = (float)window->getWindowDesc().m_width / (float)window->getWindowDesc().m_height;
 	
     RendererDesc rendererDesc;
     rendererDesc.m_viewportDesc = {
@@ -36,18 +39,22 @@ void Renderer::Initialize()
         (GLsizei)window->getWindowDesc().m_width,
         (GLsizei)window->getWindowDesc().m_height
     };
-    rendererDesc.m_cameraDesc = cameraDesc;
+    //rendererDesc.m_cameraDesc = cameraDesc;
 	
     Initialize(rendererDesc);
 }
 
 void Renderer::Update(float deltaTime)
 {
+    EASY_FUNCTION();
+
     Render();
 }
 
 void Renderer::Deinitialize()
 {
+    EASY_FUNCTION();
+
     m_defaultMaterial.Reset();
 }
 
@@ -57,6 +64,16 @@ void Renderer::Render()
     
     std::swap(m_frontDrawList, m_backDrawList);
     m_backDrawList.clear();
+    
+    auto* system = SystemLocator::Get().GetSystem<FIE::WindowManager>();
+    if (!system)
+    {
+        LOG_ERROR("Renderer: Failed to get WindowManager");
+        return;
+    }
+    auto& windowManager = *static_cast<FIE::WindowManager*>(system);
+    const auto& window = windowManager.GetWindow();
+    float aspectRatio = (float)window->getWindowDesc().m_width / (float)window->getWindowDesc().m_height;
     
     glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -69,7 +86,7 @@ void Renderer::Render()
         return; // no camera in the scene, nothing to render                   
     }   
     const auto& [camera, cameraTransform] = cameraView.get<CameraComponent, TransformComponent>(*cameraEntity);
-    glm::mat4 projMat = camera.GetProjectionMatrix(m_camera.getCameraDesc().m_aspectRatio);
+    glm::mat4 projMat = camera.GetProjectionMatrix(aspectRatio);
     glm::mat4 viewMat = camera.GetViewMatrix(cameraTransform.GetTransform());
     glm::mat4 viewProjMat = projMat * viewMat * toLeftHandTransformMat;
     
@@ -157,7 +174,7 @@ void Renderer::Initialize(const RendererDesc& desc)
         desc.m_viewportDesc.height
         );
     
-    m_camera = Camera(desc.m_cameraDesc);
+    //m_camera = Camera(desc.m_cameraDesc);
     
 #define DEFAULT_MATERIAL_PATH "Materials/DefaultGrid.asset"
     if (!AssetManager::Get().Load<MaterialResource>(DEFAULT_MATERIAL_PATH, m_defaultMaterial))
