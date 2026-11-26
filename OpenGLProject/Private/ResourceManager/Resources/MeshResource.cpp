@@ -5,6 +5,7 @@
 #include "assimp/Importer.hpp"
 #include "assimp/postprocess.h"
 #include "assimp/scene.h"
+#include "easy/profiler.h"
 
 #include "Rendering/Validation.h"
 #include "Utilities/Logger.h"
@@ -102,6 +103,8 @@ size_t MeshResource::GetSubMeshCount() const
 
 void MeshResource::DrawSubMesh(size_t index) const
 {
+    EASY_FUNCTION()
+    
     assert(index < m_subMeshes.size());
     const auto& subMesh = m_subMeshes[index];
     

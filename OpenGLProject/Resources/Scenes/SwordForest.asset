@@ -23,8 +23,8 @@
         "script": "SpawnForest",
         "data": {
           "scene": "Scenes/Sword.asset",
-          "timeout": 0.1,
-          "count": 100,
+          "timeout": 0.01,
+          "count": 1000,
           "radius": 500.0
         }
       }

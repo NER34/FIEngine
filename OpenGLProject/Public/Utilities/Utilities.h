@@ -20,6 +20,15 @@ static  std::filesystem::path GetResourcesPath()
 #endif
 }
 
+static std::filesystem::path GetSavedDirectoryPath()
+{
+#ifdef SAVED_FOLDER_PATH
+    return SAVED_FOLDER_PATH;
+#else
+    return GetWorkingDirectoryPath() / "Saved";
+#endif
+}
+
 inline glm::vec3 RotateVector(glm::vec3 vector, glm::vec3 eulerRot)
 {
     vector = glm::rotateX(vector, glm::radians(eulerRot.x));

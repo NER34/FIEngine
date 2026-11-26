@@ -86,7 +86,13 @@ namespace FIE
 		glfwMakeContextCurrent(m_window);
 		glfwSetWindowUserPointer(m_window, this);
 		glfwSetWindowSizeCallback(m_window, onUpdateWindowSize);
+		glfwSetFramebufferSizeCallback(m_window, onUpdateFramebufferSize);
 		glfwSetWindowCloseCallback(m_window, onWindowCloseRequest);
+
+		// Framebuffer size can differ from window size (high-DPI), query the real one
+		int fbWidth = 0, fbHeight = 0;
+		glfwGetFramebufferSize(m_window, &fbWidth, &fbHeight);
+		updateFramebufferSize((uint32_t)fbWidth, (uint32_t)fbHeight);
 
 		InputAdapterGLFW::Initialize(m_window);
 	}
@@ -107,7 +113,7 @@ namespace FIE
 
 	void WindowGLFW::setWindowSize(uint32_t width, uint32_t height)
 	{
-		//TODO: Set window width manually
+		glfwSetWindowSize(m_window, width, height);
 		IWindow::setWindowSize(width, height);
 	}
 
@@ -135,6 +141,15 @@ namespace FIE
 			windowPtr->updateWindowSize(width, height);
 		}
 	}
+
+	void WindowGLFW::onUpdateFramebufferSize(GLFWwindow* window, int width, int height)
+	{
+		if (WindowGLFW* windowPtr = (WindowGLFW*)glfwGetWindowUserPointer(window))
+		{
+			windowPtr->updateFramebufferSize((uint32_t)width, (uint32_t)height);
+		}
+	}
+
 	void WindowGLFW::onWindowCloseRequest(GLFWwindow* window)
 	{
 		if (WindowGLFW* windowPtr = (WindowGLFW*)glfwGetWindowUserPointer(window))

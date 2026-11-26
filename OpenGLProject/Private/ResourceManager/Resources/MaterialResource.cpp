@@ -4,6 +4,7 @@
 
 #include "json.h"
 #include "AssetManager/AssetManager.h"
+#include "easy/profiler.h"
 #include "MaterialParameters/MaterialParamFactory.h"
 #include "ResourceManager/ResourceManager.h"
 #include "Utilities/Logger.h"
@@ -73,6 +74,8 @@ void MaterialResource::Free()
 
 void MaterialResource::Activate() const
 {
+    EASY_FUNCTION()
+    
     if (IsValid())
     {
         m_shaderProgram->Activate();

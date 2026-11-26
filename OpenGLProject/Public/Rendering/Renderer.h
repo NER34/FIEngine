@@ -5,16 +5,11 @@
 #include "ResourceManager/ResourceHandle.h"
 #include "ResourceManager/Resources/MaterialResource.h"
 #include "ResourceManager/Resources/MeshResource.h"
+#include "Window/WindowManager.h"
 
 struct GeometryDrawDesc
 {
     GeometryDrawDesc() = delete;
-    GeometryDrawDesc(const GeometryDrawDesc& other)
-        : m_mesh(other.m_mesh)
-        , m_material(other.m_material)
-        , m_transform(other.m_transform)
-        , m_subMeshIndex(other.m_subMeshIndex)
-    {}
     GeometryDrawDesc(
         const ResourceHandle<MeshResource>& mesh, 
         const ResourceHandle<MaterialResource>& material,
@@ -24,6 +19,7 @@ struct GeometryDrawDesc
         , m_material(material)
         , m_subMeshIndex(subMeshIndex)
     {}
+    
     GeometryDrawDesc(
         const ResourceHandle<MeshResource>& mesh, 
         const ResourceHandle<MaterialResource>& material, 
@@ -35,6 +31,12 @@ struct GeometryDrawDesc
         , m_transform(transform)
         , m_subMeshIndex(subMeshIndex)
     {}
+    
+    GeometryDrawDesc(const GeometryDrawDesc& other) = default;
+    GeometryDrawDesc& operator=(const GeometryDrawDesc& other) = default;
+    
+    GeometryDrawDesc(GeometryDrawDesc&&) noexcept = default;
+    GeometryDrawDesc& operator=(GeometryDrawDesc&&) noexcept = default;
     
     ResourceHandle<MeshResource> m_mesh;
     ResourceHandle<MaterialResource> m_material;
@@ -77,7 +79,10 @@ public:
     
 private:
     
+    void OnFramebufferResize(uint32_t width, uint32_t height);
+    
     void CollectMeshesForDrawing();
+    void SortMeshesForDrawing();
     
     std::vector<GeometryDrawDesc>& m_frontDrawList;
     std::vector<GeometryDrawDesc>& m_backDrawList;
@@ -87,5 +92,6 @@ private:
     
     //Camera m_camera;
     ResourceHandle<MaterialResource> m_defaultMaterial;
-    
+    FIE::WindowManager* m_windowManager = nullptr;
+    FIE::DispatcherHandle m_framebufferResizeHandle;
 };

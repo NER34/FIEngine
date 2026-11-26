@@ -1,6 +1,7 @@
 #pragma once
 
 #include "InputAdapterGLFW.h"
+#include "GLFW/glfw3.h"
 
 #include "Window/WindowBase.h"
 
@@ -39,6 +40,7 @@ namespace FIE
 	private:
 
 		static void onUpdateWindowSize(GLFWwindow* window, int width, int height);
+		static void onUpdateFramebufferSize(GLFWwindow* window, int width, int height);
 		static void onWindowCloseRequest(GLFWwindow* window);
 
 	private:

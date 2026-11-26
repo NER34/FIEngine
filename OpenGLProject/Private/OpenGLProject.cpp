@@ -4,9 +4,13 @@
 #include "OpenGLProject.h"
 
 #include <chrono>
+#include <ctime>
+#include <filesystem>
+#include <string>
 
 #include "SystemBase/SystemLocator.h"
 #include "Utilities/Logger.h"
+#include "Utilities/Utilities.h"
 
 #include "AssetManager/AssetManager.h"
 #include "easy/profiler.h"
@@ -21,8 +25,8 @@
 
 int main()
 {      
-	EASY_PROFILER_ENABLE;        // start collecting                                                   
-	EASY_MAIN_THREAD;            // name this thread "Main" in the viewer                              
+	EASY_PROFILER_ENABLE         // start collecting                                                   
+	EASY_MAIN_THREAD             // name this thread "Main" in the viewer                              
 	profiler::startListen();     // let the GUI connect live (port 28077)
 	
 	auto& systemLocator = SystemLocator::Get();
@@ -45,7 +49,7 @@ int main()
 		ScriptManager
 		>();
 	
-	// TODO: Remove this thing from here
+	// TODO: Remove this thing from here if there will be a chance
 	// --------------------------------
 	auto* system = SystemLocator::Get().GetSystem<FIE::WindowManager>();
 	if (!system)
@@ -59,13 +63,13 @@ int main()
 	auto prevTime = std::chrono::high_resolution_clock::now(); 
 	while (!windowManager.GetWindow()->isWindowShouldClose())
 	{
-		EASY_BLOCK("Frame", profiler::colors::Magenta);
+		EASY_BLOCK("Frame", profiler::colors::Magenta)
 		
 		auto currTime = std::chrono::high_resolution_clock::now();
 		float deltaTime = std::chrono::duration<float>(currTime - prevTime).count();
 		prevTime = currTime;
 		
-		LOG_INFO("FPS: {}", 1.0f / deltaTime);
+		//LOG_INFO("FPS: {}", 1.0f / deltaTime);
 		
 		systemLocator.UpdateSystems< 
 			FIE::IInputManager,
@@ -86,7 +90,24 @@ int main()
 		FIE::WindowManager
 		>();
 	
-	profiler::dumpBlocksToFile("capture.prof");
+	{
+		const std::time_t now = std::time(nullptr);
+		std::tm localTime{};
+#ifdef _WIN32
+		localtime_s(&localTime, &now);
+#else
+		localtime_r(&now, &localTime);
+#endif
+		char timestamp[16];
+		std::strftime(timestamp, sizeof(timestamp), "%d%m%y_%H%M%S", &localTime);
+
+		const std::filesystem::path savedDir = GetSavedDirectoryPath();
+		std::error_code ec;
+		std::filesystem::create_directories(savedDir, ec);
+
+		const std::filesystem::path capturePath = savedDir / ("capture_" + std::string(timestamp) + ".prof");
+		profiler::dumpBlocksToFile(capturePath.string().c_str());
+	}
 	
 	return 0;
 }

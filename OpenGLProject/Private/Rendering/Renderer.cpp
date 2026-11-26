@@ -8,6 +8,7 @@
 #include "Scene/SceneManager.h"
 #include "Window/WindowManager.h"
 #include "easy/profiler.h"
+#include "Rendering/Validation.h"
 
 Renderer& Renderer::Get()
 {
@@ -18,7 +19,7 @@ Renderer& Renderer::Get()
 
 void Renderer::Initialize()
 {
-    EASY_FUNCTION();
+    EASY_FUNCTION()
 
     auto* system = SystemLocator::Get().GetSystem<FIE::WindowManager>();
     if (!system)
@@ -27,53 +28,65 @@ void Renderer::Initialize()
         return;
     }
     
-    auto& windowManager = *static_cast<FIE::WindowManager*>(system);
-    const auto& window = windowManager.GetWindow();
-    
-    //CameraDesc cameraDesc;
-    //cameraDesc.m_aspectRatio = (float)window->getWindowDesc().m_width / (float)window->getWindowDesc().m_height;
-	
+    m_windowManager = static_cast<FIE::WindowManager*>(system);
+    const auto& window = m_windowManager->GetWindow();
+    m_framebufferResizeHandle = window->m_windowCallbacks.m_onFramebufferResized.BindMemberFunction(
+        this, &Renderer::OnFramebufferResize);
+
     RendererDesc rendererDesc;
     rendererDesc.m_viewportDesc = {
         0, 0,
-        (GLsizei)window->getWindowDesc().m_width,
-        (GLsizei)window->getWindowDesc().m_height
+        (GLsizei)window->getFramebufferWidth(),
+        (GLsizei)window->getFramebufferHeight()
     };
-    //rendererDesc.m_cameraDesc = cameraDesc;
 	
     Initialize(rendererDesc);
 }
 
 void Renderer::Update(float deltaTime)
 {
-    EASY_FUNCTION();
+    EASY_FUNCTION()
 
     Render();
 }
 
 void Renderer::Deinitialize()
 {
-    EASY_FUNCTION();
+    EASY_FUNCTION()
+
+    if (m_windowManager && m_windowManager->GetWindow())
+    {
+        m_windowManager->GetWindow()->m_windowCallbacks.m_onFramebufferResized.Unbind(m_framebufferResizeHandle);
+    }
+    m_framebufferResizeHandle.Reset();
+    m_windowManager = nullptr;
 
     m_defaultMaterial.Reset();
+    m_drawList_1.clear();
+    m_drawList_2.clear();
 }
 
 void Renderer::Render()
 {
-    CollectMeshesForDrawing();
-    
-    std::swap(m_frontDrawList, m_backDrawList);
-    m_backDrawList.clear();
-    
-    auto* system = SystemLocator::Get().GetSystem<FIE::WindowManager>();
-    if (!system)
+    if (!m_windowManager || !m_windowManager->GetWindow())
     {
-        LOG_ERROR("Renderer: Failed to get WindowManager");
+        LOG_ERROR("Renderer: No window to render into");
         return;
     }
-    auto& windowManager = *static_cast<FIE::WindowManager*>(system);
-    const auto& window = windowManager.GetWindow();
-    float aspectRatio = (float)window->getWindowDesc().m_width / (float)window->getWindowDesc().m_height;
+    const auto& window = m_windowManager->GetWindow();
+    if (window->isMinimized())
+    {
+        return; // 0x0 framebuffer, nothing to draw
+    }
+
+    CollectMeshesForDrawing();
+
+    std::swap(m_frontDrawList, m_backDrawList);
+    m_backDrawList.clear();
+
+    SortMeshesForDrawing();
+
+    float aspectRatio = window->GetAspectRatio();
     
     glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -102,6 +115,9 @@ void Renderer::Render()
         lightColor = light.m_lightColor;
     }
     
+    EASY_BLOCK("Renderer::Render Drawing")
+    
+    ResourceHandle<MaterialResource> currMaterial;
     for (const auto& drawDesc : m_frontDrawList)
     {
         const glm::mat4& modelMat = drawDesc.m_transform;
@@ -112,24 +128,40 @@ void Renderer::Render()
         {
             continue;
         }
+        if (currMaterial != material)
+        {
+            if (currMaterial.IsValid())
+            {
+                currMaterial->Deactivate();
+            }
+            currMaterial = material;
+            currMaterial->Activate();
+            
+            const auto& shaderProgram = material->GetShaderProgram();
+            shaderProgram->SetUniformMat4("projViewMat", viewProjMat);
+            shaderProgram->SetUniformFloat3("lightPos", lightPos);
+            shaderProgram->SetUniformFloat3("lightColor", lightColor);
+            shaderProgram->SetUniformFloat3("viewPos", cameraTransform.GetTransform().m_position);
+        }
         
-        material->Activate();
-        
-        const auto& shaderProgram = material->GetShaderProgram();
-        shaderProgram->SetUniformMat4("projViewMat", viewProjMat);
-        shaderProgram->SetUniformMat4("modelMat", modelMat);
-        shaderProgram->SetUniformFloat3("lightPos", lightPos);
-        shaderProgram->SetUniformFloat3("lightColor", lightColor);
-        shaderProgram->SetUniformFloat3("viewPos", cameraTransform.GetTransform().m_position);
-        
+        currMaterial->GetShaderProgram()->SetUniformMat4("modelMat", modelMat);
         mesh->DrawSubMesh(drawDesc.m_subMeshIndex);
-        
-        material->Deactivate();
     }
+    if (currMaterial.IsValid())
+    {
+        currMaterial->Deactivate();
+    }
+}
+
+void Renderer::OnFramebufferResize(uint32_t width, uint32_t height)
+{
+    CHECK_OGL_ERR(glViewport(0, 0, (GLsizei)width, (GLsizei)height))
 }
 
 void Renderer::CollectMeshesForDrawing()
 {    
+    EASY_FUNCTION()
+    
     SceneManager::Get().View<TransformComponent, MeshComponent>().each(
         [&](entt::entity entity, const TransformComponent& transform, const MeshComponent& meshComponent)
         {
@@ -159,24 +191,49 @@ void Renderer::CollectMeshesForDrawing()
         });
 }
 
+void Renderer::SortMeshesForDrawing()
+{
+    EASY_FUNCTION()
+    
+    std::ranges::sort(m_frontDrawList, [](const GeometryDrawDesc& A, const GeometryDrawDesc& B)
+    {
+        if (A.m_material < B.m_material)
+        {
+            return true;
+        }
+        if (A.m_material == B.m_material)
+        {
+            if (A.m_mesh < B.m_mesh)
+            {
+                return true;
+            }
+            if (A.m_mesh == B.m_mesh)
+            {
+                return A.m_subMeshIndex < B.m_subMeshIndex;
+            }
+        }
+        return false;
+    });
+}
+
 void Renderer::Initialize(const RendererDesc& desc)
 {
-	gladLoadGL();
+	CHECK_OGL_ERR(gladLoadGL())
     
 	//glEnable(GL_CULL_FACE);
-	glDisable(GL_CULL_FACE);
-    glEnable(GL_DEPTH_TEST);
+	CHECK_OGL_ERR(glDisable(GL_CULL_FACE))
+    CHECK_OGL_ERR(glEnable(GL_DEPTH_TEST))
     
-    glViewport(
+    CHECK_OGL_ERR(glViewport(
         desc.m_viewportDesc.x,
         desc.m_viewportDesc.y,
         desc.m_viewportDesc.width,
         desc.m_viewportDesc.height
-        );
+        ))
     
-    //m_camera = Camera(desc.m_cameraDesc);
     
-#define DEFAULT_MATERIAL_PATH "Materials/DefaultGrid.asset"
+    
+    constexpr const char* DEFAULT_MATERIAL_PATH = "Materials/DefaultGrid.asset";
     if (!AssetManager::Get().Load<MaterialResource>(DEFAULT_MATERIAL_PATH, m_defaultMaterial))
     {
         LOG_ERROR("Renderer: Failed to load {} material", DEFAULT_MATERIAL_PATH);

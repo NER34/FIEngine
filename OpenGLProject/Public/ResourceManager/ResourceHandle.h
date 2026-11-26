@@ -38,6 +38,8 @@ public:
         return m_resourcePtr.get();
     }
     
+    auto operator<=>(const ResourceHandle&) const = default;
+    
     void Reset()
     {
         m_resourcePtr.reset();

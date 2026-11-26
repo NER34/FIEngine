@@ -49,3 +49,4 @@ add_custom_command(TARGET OpenGLProject POST_BUILD
 # Debug enable/disable variable
 add_compile_definitions(DEBUG_ENABLED=1)
 add_compile_definitions(RESOURCES_FOLDER_PATH="${CMAKE_CURRENT_SOURCE_DIR}/Resources")
+add_compile_definitions(SAVED_FOLDER_PATH="${CMAKE_CURRENT_SOURCE_DIR}/Saved")
