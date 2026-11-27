@@ -30,6 +30,7 @@ namespace FIE
 			// Tell GLFW that we are using CORE profile
 			// So that means we only have the modern function
 			glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+			glfwWindowHint(GLFW_SAMPLES, 4);
 			LOG_INFO("GLFW Initialized");
 		}
 		return true;
@@ -93,6 +94,11 @@ namespace FIE
 		int fbWidth = 0, fbHeight = 0;
 		glfwGetFramebufferSize(m_window, &fbWidth, &fbHeight);
 		updateFramebufferSize((uint32_t)fbWidth, (uint32_t)fbHeight);
+		
+		if (props.m_fullScreen)
+		{
+			SetWindowFullscreen_Internal(true);
+		}
 
 		InputAdapterGLFW::Initialize(m_window);
 	}
@@ -114,13 +120,15 @@ namespace FIE
 	void WindowGLFW::setWindowSize(uint32_t width, uint32_t height)
 	{
 		glfwSetWindowSize(m_window, width, height);
-		IWindow::setWindowSize(width, height);
 	}
 
 	void WindowGLFW::setWindowFullScreen(bool fullScreen)
 	{
-		// TODO: Set window full screen mode
-		IWindow::setWindowFullScreen(fullScreen);
+		if (fullScreen != getWindowDesc().m_fullScreen)
+		{
+			SetWindowFullscreen_Internal(fullScreen);
+			IWindow::setWindowFullScreen(fullScreen);
+		}
 	}
 
 	void WindowGLFW::requestWindowClose()
@@ -132,6 +140,50 @@ namespace FIE
 	GLFWwindow* WindowGLFW::getGLFWWindow() const
 	{
 		return m_window;
+	}
+
+	void WindowGLFW::SetWindowFullscreen_Internal(bool fullScreen)
+	{	
+		if (fullScreen)
+		{
+			glfwGetWindowPos(m_window, &m_savedX, &m_savedY);
+			glfwGetWindowSize(m_window, &m_savedW, &m_savedH);
+			m_savedMaximized = glfwGetWindowAttrib(m_window, GLFW_MAXIMIZED) == GLFW_TRUE;
+					
+			// TODO: Find monitor nearest to the window
+			GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+			if (!monitor)
+			{
+				LOG_ERROR("No monitor for fullscreen"); 
+				return;
+			}
+			
+			const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+			glfwSetWindowAttrib(m_window, GLFW_DECORATED, GLFW_FALSE);
+			glfwSetWindowAttrib(m_window, GLFW_AUTO_ICONIFY, GLFW_FALSE);
+			glfwSetWindowMonitor(
+				m_window, monitor, 
+				0, 0, 
+				mode->width, mode->height, 
+				mode->refreshRate
+				);
+					
+		}
+		else
+		{
+			glfwSetWindowAttrib(m_window, GLFW_DECORATED, GLFW_TRUE);
+			glfwSetWindowAttrib(m_window, GLFW_AUTO_ICONIFY, GLFW_TRUE);
+			glfwSetWindowMonitor(
+				m_window, nullptr, 
+				m_savedX, m_savedY, 
+				m_savedW, m_savedH, 
+				GLFW_DONT_CARE
+				);
+			if (m_savedMaximized)
+			{
+				glfwMaximizeWindow(m_window);
+			}
+		}
 	}
 
 	void WindowGLFW::onUpdateWindowSize(GLFWwindow* window, int width, int height)

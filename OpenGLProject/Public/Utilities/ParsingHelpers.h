@@ -97,6 +97,21 @@ inline void DeserializeString(const nlohmann::json& data, const char* key, std::
     outValue = data[key].get<std::string>();
 }
 
+inline void DeserializeBool(const nlohmann::json& data, const char* key, bool& outValue)
+{
+    if (!data.contains(key))
+    {
+        return;
+    }
+
+    if (!data[key].is_boolean())
+    {
+        LOG_ERROR("Field {} has an invalid value", key);
+        return;
+    }
+    outValue = data[key].get<bool>();
+}
+
 inline void DeserializeVector3(const nlohmann::json& data, const char* key, glm::vec3& outVector)
 {
     if (!data.contains(key))

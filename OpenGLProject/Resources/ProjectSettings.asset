@@ -4,6 +4,7 @@
     "windowName": "FIE",
     "windowWidth": 1280,
     "windowHeight": 720,
+    "startFullScreen": false,
     
     "startScene": "Scenes/NewScene.asset"
 }

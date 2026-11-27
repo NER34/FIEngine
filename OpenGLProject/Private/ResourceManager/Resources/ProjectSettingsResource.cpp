@@ -7,6 +7,7 @@ DEFINE_ASSET_DESERIALIZE_FUNC(Deserialize, ProjectSettingsResource)
     DeserializeString(data, "windowName", resource.m_windowName);
     DeserializeInteger(data, "windowWidth", resource.m_windowWidth);
     DeserializeInteger(data, "windowHeight", resource.m_windowHeight);
+    DeserializeBool(data, "startFullScreen", resource.m_startFullScreen);
     
     DeserializeString(data, "startScene", resource.m_startScene);
     

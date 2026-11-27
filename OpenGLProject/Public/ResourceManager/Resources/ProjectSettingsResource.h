@@ -10,6 +10,7 @@ public:
     std::string m_windowName = "Default Window";
     int m_windowWidth = 600;
     int m_windowHeight = 400;
+    bool m_startFullScreen = false;
     
     std::string m_startScene;
 

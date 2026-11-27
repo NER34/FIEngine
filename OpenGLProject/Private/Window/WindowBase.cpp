@@ -15,7 +15,8 @@ namespace FIE
 
 	void IWindow::setWindowFullScreen(bool fullScreen)
 	{
-		updateWindowFullScreen(fullScreen);
+		if (fullScreen != m_props.m_fullScreen)
+			updateWindowFullScreen(fullScreen);
 	}
 
 	void IWindow::updateWindowSize(uint32_t width, uint32_t height)

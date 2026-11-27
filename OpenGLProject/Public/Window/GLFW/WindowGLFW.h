@@ -38,6 +38,8 @@ namespace FIE
 		GLFWwindow* getGLFWWindow() const;
 
 	private:
+		
+		void SetWindowFullscreen_Internal(bool fullScreen);
 
 		static void onUpdateWindowSize(GLFWwindow* window, int width, int height);
 		static void onUpdateFramebufferSize(GLFWwindow* window, int width, int height);
@@ -46,6 +48,11 @@ namespace FIE
 	private:
 
 		GLFWwindow* m_window = nullptr;
-
+		
+		int m_savedH = 0;
+		int m_savedW = 0;
+		int m_savedX = 0;
+		int m_savedY = 0;
+		bool m_savedMaximized = false;
 	};
 }

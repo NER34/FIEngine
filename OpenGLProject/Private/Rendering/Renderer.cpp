@@ -223,6 +223,7 @@ void Renderer::Initialize(const RendererDesc& desc)
 	//glEnable(GL_CULL_FACE);
 	CHECK_OGL_ERR(glDisable(GL_CULL_FACE))
     CHECK_OGL_ERR(glEnable(GL_DEPTH_TEST))
+    CHECK_OGL_ERR(glEnable(GL_MULTISAMPLE))
     
     CHECK_OGL_ERR(glViewport(
         desc.m_viewportDesc.x,
@@ -230,8 +231,6 @@ void Renderer::Initialize(const RendererDesc& desc)
         desc.m_viewportDesc.width,
         desc.m_viewportDesc.height
         ))
-    
-    
     
     constexpr const char* DEFAULT_MATERIAL_PATH = "Materials/DefaultGrid.asset";
     if (!AssetManager::Get().Load<MaterialResource>(DEFAULT_MATERIAL_PATH, m_defaultMaterial))

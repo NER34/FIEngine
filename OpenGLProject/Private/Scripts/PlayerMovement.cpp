@@ -8,6 +8,7 @@
 #include "Scene/SceneManager.h"
 #include "Utilities/Logger.h"
 #include "Utilities/ParsingHelpers.h"
+#include "Window/WindowManager.h"
 
 void PlayerMovement::BeginPlay()
 {
@@ -58,6 +59,22 @@ void PlayerMovement::BeginPlay()
 			if (inputValue > 0.5f)
 				m_attachToLight = !m_attachToLight;
 		}
+	);
+	
+	assignHandle(FIE::KEY_F,
+		[this](FIE::InputIDs inputID, float inputValue)
+		{
+			if (inputValue > 0.5f)
+			{
+				if (auto* system = SystemLocator::Get().GetSystem<FIE::WindowManager>())
+				{
+					auto* windowManager = static_cast<FIE::WindowManager*>(system);
+					const auto& window = windowManager->GetWindow();
+					bool isFullScreen = window->getWindowDesc().m_fullScreen;
+					window->setWindowFullScreen(!isFullScreen);
+				}
+			}
+		}	
 	);
 }
 
@@ -114,24 +131,11 @@ void PlayerMovement::EndPlay()
 
 DEFINE_SCRIPT_DESERIALIZE_FUNC(Deserialize, PlayerMovement)
 {
-    ::DeserializeEntity(data, "cameraEntity", mapping, script.m_cameraEntity);
-    ::DeserializeEntity(data, "lightEntity", mapping, script.m_lightEntity);
-
-    if (data.contains("movementSpeed"))
-    {
-        if (data["movementSpeed"].is_number())
-            script.m_cameraMovSpeed = data["movementSpeed"];
-        else
-            LOG_ERROR("PlayerMovement movementSpeed has an invalid value");
-    }
-
-    if (data.contains("rotationSpeed"))
-    {
-        if (data["rotationSpeed"].is_number())
-            script.m_cameraRotSpeed = data["rotationSpeed"];
-        else
-            LOG_ERROR("PlayerMovement rotationSpeed has an invalid value");
-    }
+    DeserializeEntity(data, "cameraEntity", mapping, script.m_cameraEntity);
+    DeserializeEntity(data, "lightEntity", mapping, script.m_lightEntity);
+	
+	DeserializeFloat(data, "rotationSpeed", script.m_cameraRotSpeed);
+	DeserializeFloat(data, "movementSpeed", script.m_cameraMovSpeed);
 }
 
 DEFINE_SCRIPT_COPY_FUNC(Copy, PlayerMovement)
