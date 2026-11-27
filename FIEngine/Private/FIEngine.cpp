@@ -1,7 +1,7 @@
-﻿// OpenGLProject.cpp : Defines the entry point for the application.
+﻿// FIEngine.cpp : Defines the entry point for the application.
 //
 
-#include "OpenGLProject.h"
+#include "FIEngine.h"
 
 #include <chrono>
 #include <ctime>

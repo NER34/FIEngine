@@ -1,4 +1,4 @@
-﻿# CMakeList.txt : CMake project for OpenGLProject, include source and define
+﻿# CMakeList.txt : CMake project for FIEngine, include source and define
 # project specific logic here.
 #
 
@@ -9,19 +9,19 @@ file(GLOB_RECURSE files CONFIGURE_DEPENDS
 		"*.vert"
 		"*.frag"
 )
-add_executable(OpenGLProject ${files})
+add_executable(FIEngine ${files})
 
-target_include_directories(OpenGLProject
+target_include_directories(FIEngine
 		PUBLIC
 			"Public"
 )
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
-  set_property(TARGET OpenGLProject PROPERTY CXX_STANDARD 20)
+  set_property(TARGET FIEngine PROPERTY CXX_STANDARD 20)
 endif()
 
 # TODO: Add tests and install targets if needed.
-target_link_libraries(OpenGLProject
+target_link_libraries(FIEngine
 	PRIVATE
 		glfw
 		glad
@@ -35,15 +35,15 @@ target_link_libraries(OpenGLProject
 		easy_profiler
 )
 
-add_custom_command(TARGET OpenGLProject POST_BUILD
+add_custom_command(TARGET FIEngine POST_BUILD
 		COMMAND ${CMAKE_COMMAND} -E copy_if_different
-		$<TARGET_FILE:easy_profiler> $<TARGET_FILE_DIR:OpenGLProject>)
+		$<TARGET_FILE:easy_profiler> $<TARGET_FILE_DIR:FIEngine>)
 
 #add_custom_command(
-#	TARGET OpenGLProject POST_BUILD
+#	TARGET FIEngine POST_BUILD
 #	COMMAND ${CMAKE_COMMAND} -E copy_directory
 #		"${CMAKE_CURRENT_SOURCE_DIR}/Resources"
-#		"$<TARGET_FILE_DIR:OpenGLProject>/Resources"
+#		"$<TARGET_FILE_DIR:FIEngine>/Resources"
 #)
 
 # Debug enable/disable variable

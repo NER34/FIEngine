@@ -9,7 +9,7 @@ if (POLICY CMP0141)
   set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT "$<IF:$<AND:$<C_COMPILER_ID:MSVC>,$<CXX_COMPILER_ID:MSVC>>,$<$<CONFIG:Debug,RelWithDebInfo>:EditAndContinue>,$<$<CONFIG:Debug,RelWithDebInfo>:ProgramDatabase>>")
 endif()
 
-project ("OpenGLProject")
+project ("FIEngine")
 
 # Include sub-projects.
 add_subdirectory("ThirdParty/glfw")
@@ -26,10 +26,10 @@ set(EASY_PROFILER_NO_GUI     ON CACHE BOOL "" FORCE)  # the GUI needs Qt
 set(EASY_PROFILER_NO_SAMPLES ON CACHE BOOL "" FORCE)
 add_subdirectory("ThirdParty/easy_profiler")
 
-add_subdirectory("OpenGLProject")
+add_subdirectory("FIEngine")
 
-set(VS_STARTUP_PROJECT OpenGLProject)
+set(VS_STARTUP_PROJECT FIEngine)
 
-set_target_properties(OpenGLProject PROPERTIES
-        VS_DEBUGGER_WORKING_DIRECTORY "$<TARGET_FILE_DIR:OpenGLProject>"
+set_target_properties(FIEngine PROPERTIES
+        VS_DEBUGGER_WORKING_DIRECTORY "$<TARGET_FILE_DIR:FIEngine>"
 )
